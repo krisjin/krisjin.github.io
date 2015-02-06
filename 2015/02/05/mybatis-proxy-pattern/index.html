@@ -8,8 +8,8 @@
   <title>mybatis映射文件配置中代理模式的使用 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="1.mybatis映射间述
-在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来">
+  <meta name="description" content="1.mybatis映射简述
+在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -229,9 +229,8 @@
     </header>
     <div class="entry">
       
-        <h2 id="1-mybatis映射间述">1.mybatis映射间述</h2>
-<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。</p>
-<p><strong>接口：</strong>  </p>
+        <h2 id="1-mybatis映射简述">1.mybatis映射简述</h2>
+<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。<br><a id="more"></a><br><strong>接口：</strong>  </p>
 <pre><code> <span class="keyword">public</span> <span class="keyword">interface</span> NewsMapper {
        <span class="keyword">public</span> String <span class="title">getNews</span>(<span class="keyword">long</span> id);
 
@@ -264,7 +263,7 @@
 <span class="constant">SqlSession sqlSession</span> = sqlSessionFactory.openSession();
 <span class="constant">NewsMapper newsMapper</span> = sqlSession.getMapper(NewsMapper.class);
 </code></pre><p><strong>类图</strong></p>
-<p><img src="/img/mybatis-mapper-proxy-flow" alt="mybatis"></p>
+<p><img src="/img/mybatis-mapper-proxy-flow.png" alt="mybatis"></p>
 <p><strong>具体类说明</strong></p>
 <p>SqlSessionFactoryBuilder：SqlSessionFactory 实例创建</p>
 <p>DefaultSqlSession：SqlSession 的子类，定义数据库操作。</p>
