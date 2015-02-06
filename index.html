@@ -227,8 +227,51 @@
     </header>
     <div class="entry">
       
-        <h3 id="1-mybaits_流程图">1.mybaits 流程图</h3>
-<p><img src="/img/flow.png" alt="mybatis"></p>
+        <h2 id="1-mybatis映射间述">1.mybatis映射间述</h2>
+<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。</p>
+<p><strong>接口：</strong>  </p>
+<pre><code> <span class="keyword">public</span> <span class="keyword">interface</span> NewsMapper {
+       <span class="keyword">public</span> String <span class="title">getNews</span>(<span class="keyword">long</span> id);
+
+   }
+</code></pre><p><strong>代理类：</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapperProxy</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>{
+
+<span class="keyword">public</span> Object <span class="title">invoke</span>(Object proxy, Method method, Object[] args) <span class="keyword">throws</span> Throwable {
+
+    <span class="keyword">return</span> <span class="string">"hello news"</span>;
+}
+}
+</code></pre><p><strong>测试类：</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Test {
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
+
+    NewsMapper mapper = (NewsMapper) Proxy.newProxyInstance(NewsMapper.class.getClassLoader(),
+            <span class="keyword">new</span> Class[] { NewsMapper.class }, <span class="keyword">new</span> MapperProxy());
+
+    String s = mapper.getNews(<span class="number">22</span>);
+    System.<span class="keyword">out</span>.println(s);
+}
+}
+</code></pre><p>从上面的例子中可以看出，映射接口并没有实现类，所以代理类中method 没有调用。这样做到了在接口没有任何实现类的情况获取返回值。大体上就是mybatis中接口与xml的关系。</p>
+<h2 id="mybatis映射文件原理分析">mybatis映射文件原理分析</h2>
+<p><strong>使用代码</strong></p>
+<pre><code><span class="constant">InputStream  inputStream</span> = Resources.getResourceAsStream(<span class="string">"mybatis-config.xml"</span>);
+<span class="constant">SqlSessionFactory sqlSessionFactory</span> = new SqlSessionFactoryBuilder().build(inputStream);
+<span class="constant">SqlSession sqlSession</span> = sqlSessionFactory.openSession();
+<span class="constant">NewsMapper newsMapper</span> = sqlSession.getMapper(NewsMapper.class);
+</code></pre><p><strong>类图</strong></p>
+<p><img src="/img/mybatis-mapper-proxy-flow" alt="mybatis"></p>
+<p><strong>具体类说明</strong></p>
+<p>SqlSessionFactoryBuilder：SqlSessionFactory 实例创建</p>
+<p>DefaultSqlSession：SqlSession 的子类，定义数据库操作。</p>
+<p>XMLConfigBuilder：读取mybatis-config.xml并解析，将将解析的内容存到配置类中</p>
+<p>Configuration：用来存储操作mybatis-config.xml中的内容</p>
+<p>MapperRegistry：处理与保持xml中Mapper对应的MapperProxyFactory。</p>
+<p>MapperProxyFactory：创建mapper的接口的伪实例</p>
+<p>MapperProxy：mapper接口代理类，并在invoke方法内返回MapperMethod的执行结果 </p>
+<p>MapperMethod：此类用于将AccountSecurityMaster.xml中的insert,update,delete,select配置直接映射成jdbc的statement操作。</p>
 
       
     </div>
