@@ -8,15 +8,9 @@
   <title>netty入门实例 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="服务端
-服务端代码：
-public class TimeServer {
-
-public void bind(int port) throws Exception {
-
-    EventLoopGroup bossGroup = new NioEventLoopGroup();
-
-    Even">
+  <meta name="description" content="netty介绍
+Netty is a NIO client server framework which enables quick and easy development of network applications such as protocol servers and clients. It greatly simplifies and streamlines network programming such as TCP and UDP socket server.
+‘Quick and easy’ doesn’t mean that a resulting application will suffer from a maintainability or a performance issue. Netty has been designed carefully with the experiences earned from the implementation of a lot of protocols such as FTP, SMTP, HTTP, and various binary and text-based legacy protocols. As a result, Netty has succeeded to find a way to achieve ease of development, performance, stability, and flexibility without a compromise.">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -236,7 +230,11 @@ public void bind(int port) throws Exception {
     </header>
     <div class="entry">
       
-        <h2 id="服务端">服务端</h2>
+        <h2 id="netty介绍">netty介绍</h2>
+<p>Netty is a NIO client server framework which enables quick and easy development of network applications such as protocol servers and clients. It greatly simplifies and streamlines network programming such as TCP and UDP socket server.</p>
+<p>‘Quick and easy’ doesn’t mean that a resulting application will suffer from a maintainability or a performance issue. Netty has been designed carefully with the experiences earned from the implementation of a lot of protocols such as FTP, SMTP, HTTP, and various binary and text-based legacy protocols. As a result, Netty has succeeded to find a way to achieve ease of development, performance, stability, and flexibility without a compromise.</p>
+<a id="more"></a>
+<h2 id="服务端">服务端</h2>
 <p><strong>服务端代码：</strong></p>
 <pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServer</span> </span>{
 
