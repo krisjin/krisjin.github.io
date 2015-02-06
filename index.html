@@ -30,7 +30,7 @@
   <header id="header" class="inner">
 <div class="alignleft">
   <h1><a href="/">krisjin博客</a></h1>
-  <h2><a href="/">一步一脚印 , 一页一菩提</a></h2>
+  <h2><a href="/">一步一脚印</a></h2>
 </div>
 <nav id="main-nav" class="alignright">
   <ul>
@@ -199,6 +199,211 @@
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/06/netty-start-sample/">netty入门实例</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="服务端">服务端</h2>
+<p><strong>服务端代码：</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServer</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
+
+    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    EventLoopGroup workderGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();
+    <span class="keyword">try</span> {
+        b.group(bossGroup, workderGroup).channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>).childHandler(<span class="keyword">new</span> ChildChannelHandler());
+
+        <span class="comment">// 绑定端口，同步等待成功</span>
+        ChannelFuture f = b.bind(port).sync();
+
+        <span class="comment">// 等待服务器端端口关闭</span>
+        f.channel().closeFuture().sync();
+
+    } <span class="keyword">finally</span> {
+        bossGroup.shutdownGracefully();
+        workderGroup.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildChannelHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>{
+
+    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel channel) <span class="keyword">throws</span> Exception {
+        channel.pipeline().addLast(<span class="keyword">new</span> TimeServerHandler());
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> Exception {
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+
+    <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+        <span class="keyword">try</span> {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+
+        } <span class="keyword">catch</span> (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+    <span class="keyword">new</span> TimeServer().bind(port);
+}
+}
+</code></pre><p><strong>服务端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    ByteBuf buf = (ByteBuf) msg;
+
+    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
+
+    buf.readBytes(req);
+
+    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
+
+    System.out.println(<span class="string">"The time server receive order :"</span> + body);
+
+    String currentTime = <span class="string">"QUERY TIME ORDER"</span>.equalsIgnoreCase(body) ? <span class="keyword">new</span> java.util.Date(System.currentTimeMillis())
+            .toString() : <span class="string">"BAD ORDER"</span>;
+
+    ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
+    ctx.write(resp);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+    ctx.flush();
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+    ctx.close();
+}
+
+}
+</code></pre><h2 id="客户端">客户端</h2>
+<p><strong>客户端代码</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> TimeClient {
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) {
+
+    <span class="comment">// 配置客户端NIO线程组</span>
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();
+
+    <span class="keyword">try</span> {
+        bootstrap.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(<span class="keyword">new</span> TimeClientHandler());
+                    }
+
+                });
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture f = bootstrap.connect(host, port).sync();
+        <span class="comment">// 等待客户端链路关闭</span>
+        f.channel().closeFuture().sync();
+    } <span class="keyword">catch</span> (InterruptedException e) {
+        e.printStackTrace();
+    } <span class="keyword">finally</span> {
+
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+    <span class="keyword">try</span> {
+        <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+        }
+    } <span class="keyword">catch</span> (NumberFormatException e) {
+        e.printStackTrace();
+    }
+    <span class="keyword">new</span> TimeClient().connect(port, <span class="string">"127.0.0.1"</span>);
+}
+}
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+<span class="keyword">private</span> <span class="keyword">final</span> ByteBuf firstMessage;
+
+<span class="keyword">public</span> <span class="title">TimeClientHandler</span>() {
+    <span class="keyword">byte</span>[] req = <span class="string">"QUERY TIME ORDER"</span>.getBytes();
+    firstMessage = Unpooled.buffer(req.length);
+    firstMessage.writeBytes(req);
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+
+    ctx.writeAndFlush(firstMessage);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    ByteBuf buf = (ByteBuf) msg;
+
+    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
+    buf.readBytes(req);
+    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
+
+    System.out.println(<span class="string">"Now is :"</span> + body);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+
+    ctx.close();
+
+}
+
+}
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
   <article class="post">
   
     <div class="gallery">

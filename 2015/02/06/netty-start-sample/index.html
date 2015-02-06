@@ -5,16 +5,23 @@
 <head>
   <meta charset="utf-8">
   
-  <title>mybatis映射配置代理模式的使用 | krisjin博客</title>
+  <title>netty入门实例 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="1.mybatis映射简述
-在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。">
+  <meta name="description" content="服务端
+服务端代码：
+public class TimeServer {
+
+public void bind(int port) throws Exception {
+
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
+
+    Even">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="mybatis映射配置代理模式的使用"/>
+  <meta property="og:title" content="netty入门实例"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -219,77 +226,184 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-05T02:46:02.000Z"><a href="/2015/02/05/mybatis-proxy-pattern/">2月 5 2015</a></time>
+        <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
       
       
   
-    <h1 class="title">mybatis映射配置代理模式的使用</h1>
+    <h1 class="title">netty入门实例</h1>
   
 
     </header>
     <div class="entry">
       
-        <h2 id="1-mybatis映射简述">1.mybatis映射简述</h2>
-<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。<br><a id="more"></a><br><strong>接口：</strong>  </p>
-<pre><code> <span class="keyword">public</span> <span class="keyword">interface</span> NewsMapper {
-       <span class="keyword">public</span> String <span class="title">getNews</span>(<span class="keyword">long</span> id);
+        <h2 id="服务端">服务端</h2>
+<p><strong>服务端代码：</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServer</span> </span>{
 
-   }
-</code></pre><p><strong>代理类：</strong></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapperProxy</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>{
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
 
-<span class="keyword">public</span> Object <span class="title">invoke</span>(Object proxy, Method method, Object[] args) <span class="keyword">throws</span> Throwable {
+    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
 
-    <span class="keyword">return</span> <span class="string">"hello news"</span>;
+    EventLoopGroup workderGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();
+    <span class="keyword">try</span> {
+        b.group(bossGroup, workderGroup).channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>).childHandler(<span class="keyword">new</span> ChildChannelHandler());
+
+        <span class="comment">// 绑定端口，同步等待成功</span>
+        ChannelFuture f = b.bind(port).sync();
+
+        <span class="comment">// 等待服务器端端口关闭</span>
+        f.channel().closeFuture().sync();
+
+    } <span class="keyword">finally</span> {
+        bossGroup.shutdownGracefully();
+        workderGroup.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildChannelHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>{
+
+    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel channel) <span class="keyword">throws</span> Exception {
+        channel.pipeline().addLast(<span class="keyword">new</span> TimeServerHandler());
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> Exception {
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+
+    <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+        <span class="keyword">try</span> {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+
+        } <span class="keyword">catch</span> (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+    <span class="keyword">new</span> TimeServer().bind(port);
 }
 }
-</code></pre><p><strong>测试类：</strong></p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> Test {
+</code></pre><p><strong>服务端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    ByteBuf buf = (ByteBuf) msg;
+
+    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
+
+    buf.readBytes(req);
+
+    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
+
+    System.out.println(<span class="string">"The time server receive order :"</span> + body);
+
+    String currentTime = <span class="string">"QUERY TIME ORDER"</span>.equalsIgnoreCase(body) ? <span class="keyword">new</span> java.util.Date(System.currentTimeMillis())
+            .toString() : <span class="string">"BAD ORDER"</span>;
+
+    ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
+    ctx.write(resp);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+    ctx.flush();
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+    ctx.close();
+}
+
+}
+</code></pre><h2 id="客户端">客户端</h2>
+<p><strong>客户端代码</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> TimeClient {
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) {
+
+    <span class="comment">// 配置客户端NIO线程组</span>
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();
+
+    <span class="keyword">try</span> {
+        bootstrap.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(<span class="keyword">new</span> TimeClientHandler());
+                    }
+
+                });
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture f = bootstrap.connect(host, port).sync();
+        <span class="comment">// 等待客户端链路关闭</span>
+        f.channel().closeFuture().sync();
+    } <span class="keyword">catch</span> (InterruptedException e) {
+        e.printStackTrace();
+    } <span class="keyword">finally</span> {
+
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
+}
 
 <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-
-    NewsMapper mapper = (NewsMapper) Proxy.newProxyInstance(NewsMapper.class.getClassLoader(),
-            <span class="keyword">new</span> Class[] { NewsMapper.class }, <span class="keyword">new</span> MapperProxy());
-
-    String s = mapper.getNews(<span class="number">22</span>);
-    System.<span class="keyword">out</span>.println(s);
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+    <span class="keyword">try</span> {
+        <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+        }
+    } <span class="keyword">catch</span> (NumberFormatException e) {
+        e.printStackTrace();
+    }
+    <span class="keyword">new</span> TimeClient().connect(port, <span class="string">"127.0.0.1"</span>);
 }
 }
-</code></pre><p>从上面的例子中可以看出，映射接口并没有实现类，所以代理类中method 没有调用。这样做到了在接口没有任何实现类的情况获取返回值。大体上就是mybatis中接口与xml的关系。</p>
-<h2 id="mybatis映射文件原理分析">mybatis映射文件原理分析</h2>
-<p><strong>使用代码</strong></p>
-<pre><code><span class="constant">InputStream  inputStream</span> = Resources.getResourceAsStream(<span class="string">"mybatis-config.xml"</span>);
-<span class="constant">SqlSessionFactory sqlSessionFactory</span> = new SqlSessionFactoryBuilder().build(inputStream);
-<span class="constant">SqlSession sqlSession</span> = sqlSessionFactory.openSession();
-<span class="constant">NewsMapper newsMapper</span> = sqlSession.getMapper(NewsMapper.class);
-</code></pre><p><strong>类图</strong></p>
-<p><img src="/img/mybatis-mapper-proxy-flow.png" alt=""></p>
-<p><strong>具体类说明</strong></p>
-<p>SqlSessionFactoryBuilder：SqlSessionFactory 实例创建</p>
-<p>DefaultSqlSession：SqlSession 的子类，定义数据库操作。</p>
-<p>XMLConfigBuilder：读取mybatis-config.xml并解析，将将解析的内容存到配置类中</p>
-<p>Configuration：用来存储操作mybatis-config.xml中的内容</p>
-<p>MapperRegistry：处理与保持xml中Mapper对应的MapperProxyFactory。</p>
-<p>MapperProxyFactory：创建mapper的接口的伪实例</p>
-<p>MapperProxy：mapper接口代理类，并在invoke方法内返回MapperMethod的执行结果 </p>
-<p>MapperMethod：此类用于将AccountSecurityMaster.xml中的insert,update,delete,select配置直接映射成jdbc的statement操作。</p>
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+<span class="keyword">private</span> <span class="keyword">final</span> ByteBuf firstMessage;
 
+<span class="keyword">public</span> <span class="title">TimeClientHandler</span>() {
+    <span class="keyword">byte</span>[] req = <span class="string">"QUERY TIME ORDER"</span>.getBytes();
+    firstMessage = Unpooled.buffer(req.length);
+    firstMessage.writeBytes(req);
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+
+    ctx.writeAndFlush(firstMessage);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    ByteBuf buf = (ByteBuf) msg;
+
+    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
+    buf.readBytes(req);
+    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
+
+    System.out.println(<span class="string">"Now is :"</span> + body);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+
+    ctx.close();
+
+}
+
+}
+</code></pre>
       
     </div>
     <footer>
       
         
-  
-  <div class="categories">
-    <a href="/categories/mybatis/">mybatis</a>
-  </div>
-
         
-  
-  <div class="tags">
-    <a href="/tags/动态代理/">动态代理</a>, <a href="/tags/mybatis/">mybatis</a>
-  </div>
-
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -315,10 +429,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/06/netty-start-sample/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/05/hello-world/" class="alignright next" >下一页</a>
+    <a href="/2015/02/05/mybatis-proxy-pattern/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
