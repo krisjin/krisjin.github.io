@@ -5,17 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>netty入门实例 | krisjin博客</title>
+  <title>tcp粘包拆包实例 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="netty介绍
-Netty is a NIO client server framework which enables quick and easy development of network applications such as protocol servers and clients. It greatly simplifies and streamlines network programming such as TCP and UDP socket server.
-‘Quick and easy’ doesn’t mean that a resulting application will suffer from a maintainability or a performance issue. Netty has been designed carefully with the experiences earned from the implementation of a lot of protocols such as FTP, SMTP, HTTP, and various binary and text-based legacy protocols. As a result, Netty has succeeded to find a way to achieve ease of development, performance, stability, and flexibility without a compromise.">
+  <meta name="description" content="TCP粘包/拆包
+TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想合理的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包为题。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="netty入门实例"/>
+  <meta property="og:title" content="tcp粘包拆包实例"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -220,25 +219,22 @@ Netty is a NIO client server framework which enables quick and easy development 
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
+        <time datetime="2015-02-09T07:23:20.000Z"><a href="/2015/02/09/tcp-stick-package-unpacking/">2月 9 2015</a></time>
       
       
   
-    <h1 class="title">netty入门实例</h1>
+    <h1 class="title">tcp粘包拆包实例</h1>
   
 
     </header>
     <div class="entry">
       
-        <h2 id="netty介绍">netty介绍</h2>
-<p>Netty is a NIO client server framework which enables quick and easy development of network applications such as protocol servers and clients. It greatly simplifies and streamlines network programming such as TCP and UDP socket server.</p>
-<p>‘Quick and easy’ doesn’t mean that a resulting application will suffer from a maintainability or a performance issue. Netty has been designed carefully with the experiences earned from the implementation of a lot of protocols such as FTP, SMTP, HTTP, and various binary and text-based legacy protocols. As a result, Netty has succeeded to find a way to achieve ease of development, performance, stability, and flexibility without a compromise.</p>
-<a id="more"></a>
-<h2 id="服务端">服务端</h2>
-<p><strong>服务端代码：</strong></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServer</span> </span>{
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
+        <h3 id="TCP粘包/拆包">TCP粘包/拆包</h3>
+<p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想合理的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包为题。<br><a id="more"></a></p>
+<h3 id="TCP粘包拆包问题说明">TCP粘包拆包问题说明</h3>
+<p>我们可以通过</p>
+<p>上实例代码：<br><strong>服务器端代码</strong><br>    public class TimeServer {</p>
+<pre><code><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
 
     EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
 
@@ -265,6 +261,8 @@ Netty is a NIO client server framework which enables quick and easy development 
 <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildChannelHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>{
 
     <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel channel) <span class="keyword">throws</span> Exception {
+        channel.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
+        channel.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
         channel.pipeline().addLast(<span class="keyword">new</span> TimeServerHandler());
     }
 
@@ -284,23 +282,21 @@ Netty is a NIO client server framework which enables quick and easy development 
     <span class="keyword">new</span> TimeServer().bind(port);
 }
 }
-</code></pre><p><strong>服务端handler</strong></p>
+</code></pre><p><strong>服务器端handler</strong></p>
 <pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">private</span> <span class="keyword">int</span> counter;
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
 
-    ByteBuf buf = (ByteBuf) msg;
+    String body = (String) msg;
 
-    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
-
-    buf.readBytes(req);
-
-    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
-
-    System.out.println(<span class="string">"The time server receive order :"</span> + body);
+    System.out.println(<span class="string">"The time server receive order :"</span> + body + <span class="string">" ; the counter is :"</span> + ++counter);
 
     String currentTime = <span class="string">"QUERY TIME ORDER"</span>.equalsIgnoreCase(body) ? <span class="keyword">new</span> java.util.Date(System.currentTimeMillis())
             .toString() : <span class="string">"BAD ORDER"</span>;
+
+    currentTime += System.getProperty(<span class="string">"line.separator"</span>);
 
     ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
     ctx.write(resp);
@@ -316,8 +312,7 @@ Netty is a NIO client server framework which enables quick and easy development 
 }
 
 }
-</code></pre><h2 id="客户端">客户端</h2>
-<p><strong>客户端代码</strong></p>
+</code></pre><p><strong>客户端代码</strong></p>
 <pre><code><span class="keyword">public</span> <span class="keyword">class</span> TimeClient {
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) {
 
@@ -331,6 +326,8 @@ Netty is a NIO client server framework which enables quick and easy development 
                 .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
 
                     <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
+                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
                         ch.pipeline().addLast(<span class="keyword">new</span> TimeClientHandler());
                     }
 
@@ -362,38 +359,37 @@ Netty is a NIO client server framework which enables quick and easy development 
 }
 </code></pre><p><strong>客户端handler</strong></p>
 <pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
-<span class="keyword">private</span> <span class="keyword">final</span> ByteBuf firstMessage;
+
+<span class="keyword">private</span> <span class="keyword">int</span> counter;
+<span class="keyword">private</span> <span class="keyword">byte</span>[] req;
 
 <span class="keyword">public</span> <span class="title">TimeClientHandler</span>() {
-    <span class="keyword">byte</span>[] req = <span class="string">"QUERY TIME ORDER"</span>.getBytes();
-    firstMessage = Unpooled.buffer(req.length);
-    firstMessage.writeBytes(req);
+    req = (<span class="string">"QUERY TIME ORDER"</span> + System.getProperty(<span class="string">"line.separator"</span>)).getBytes();
 }
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
 
-    ctx.writeAndFlush(firstMessage);
+    ByteBuf message = <span class="keyword">null</span>;
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) {
+        message = Unpooled.buffer(req.length);
+        message.writeBytes(req);
+        ctx.writeAndFlush(message);
+    }
 
 }
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
 
-    ByteBuf buf = (ByteBuf) msg;
+    String body = (String) msg;
 
-    <span class="keyword">byte</span>[] req = <span class="keyword">new</span> <span class="keyword">byte</span>[buf.readableBytes()];
-    buf.readBytes(req);
-    String body = <span class="keyword">new</span> String(req, <span class="string">"UTF-8"</span>);
-
-    System.out.println(<span class="string">"Now is :"</span> + body);
+    System.out.println(<span class="string">"Now is :"</span> + body + <span class="string">" ; the counter is : "</span> + ++counter);
 
 }
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
-
     ctx.close();
-
 }
-
 }
 </code></pre>
       
@@ -437,10 +433,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/09/tcp-stick-package-unpacking/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/05/mybatis-proxy-pattern/" class="alignright next" >下一页</a>
+    <a href="/2015/02/06/netty-start-sample/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
