@@ -233,6 +233,7 @@ TCP是个”流”协议，所谓流，就是没有界限的一串数据。大�
 <p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。<br><a id="more"></a></p>
 <h3 id="TCP粘包拆包问题说明">TCP粘包拆包问题说明</h3>
 <p>通过下图进行说明：</p>
+<p><img src="/img/tcp-stick.png" alt=""></p>
 <p>上实例代码：<br><strong>服务器端代码</strong><br>    public class TimeServer {</p>
 <pre><code><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
 
