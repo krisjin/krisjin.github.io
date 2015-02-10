@@ -240,13 +240,13 @@ TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包�
 <li>以太网（Ethernet）的数据帧在链路层 　　</li>
 <li>IP包在网络层 　　</li>
 <li>TCP或UDP包在传输层 　　</li>
-<li><p>TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝  </p>
-<a id="more"></a>
+<li>TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝  <a id="more"></a>
+</li>
+</ol>
 <h3 id="MTU(最大传输单元)">MTU(最大传输单元)</h3>
 <p>在应用程序中我们用到的Data的长度最大是多少，直接取决于底层的限制。 　　<br>我们从下到上分析一下：  </p>
-</li>
-<li><p><strong>在链路层</strong>，由以太网的物理特性决定了数据帧的长度为（46＋18）－（1500＋18），其中的18是数据帧的头和尾，也就是说数据帧的内容最大为1500（不包括帧头和帧尾），即MTU（Maximum Transmission Unit）为1500；   </p>
-</li>
+<ol>
+<li><strong>在链路层</strong>，由以太网的物理特性决定了数据帧的长度为（46＋18）－（1500＋18），其中的18是数据帧的头和尾，也就是说数据帧的内容最大为1500（不包括帧头和帧尾），即MTU（Maximum Transmission Unit）为1500；   </li>
 <li><strong>在网络层</strong>，因为IP包的首部要占用20字节，所以这的MTU为1500－20＝1480； </li>
 <li><strong>在传输层</strong>，对于UDP包的首部要占用8字节，所以这的MTU为1480－8＝1472； 　　<br>所以</li>
 <li><strong>在应用层</strong>，你的Data最大长度为1472。 （当我们的UDP包中的数据多于MTU(1472)时，发送方的IP层需要分片fragmentation进行传输，而在接收方IP层则需要进行数据报重组，由于UDP是不可靠的传输协议，如果分片丢失导致重组失败，将导致UDP数据包被丢弃）。 　　<br>从上面的分析来看，在普通的局域网环境下，UDP的数据最大为1472字节最好（避免分片重组）。   但在网络编程中，Internet中的路由器可能有设置成不同的值（小于默认值），Internet上的标准MTU值为576，所以Internet的UDP编程时数据长度最好在576－20－8＝548字节以内。</li>
