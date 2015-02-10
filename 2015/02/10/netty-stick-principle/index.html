@@ -5,13 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>about | krisjin博客</title>
+  <title>LineBasedFrameDecoder和StringDecoder的原理分析 | krisjin博客</title>
   <meta name="author" content="krisjin">
+  
+  <meta name="description" content="LineBasedFrameDecoder详解
+LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="about"/>
+  <meta property="og:title" content="LineBasedFrameDecoder和StringDecoder的原理分析"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -198,26 +201,80 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="page">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
   
   <div class="post-content">
     <header>
       
+        <div class="icon"></div>
+        <time datetime="2015-02-10T08:56:24.000Z"><a href="/2015/02/10/netty-stick-principle/">2月 10 2015</a></time>
+      
       
   
-    <h1 class="title">about</h1>
+    <h1 class="title">LineBasedFrameDecoder和StringDecoder的原理分析</h1>
   
 
     </header>
     <div class="entry">
       
-        
+        <h3 id="LineBasedFrameDecoder详解">LineBasedFrameDecoder详解</h3>
+<p>LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。</p>
+<p><em>关键实现代码：</em></p>
+<pre><code>  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">findEndOfLine</span>(<span class="keyword">final</span> ByteBuf buffer) {
+    <span class="keyword">final</span> <span class="keyword">int</span> n = buffer.writerIndex();
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = buffer.readerIndex(); i &lt; n; i ++) {
+        <span class="keyword">final</span> <span class="keyword">byte</span> b = buffer.getByte(i);
+        <span class="keyword">if</span> (b == <span class="string">'\n'</span>) {
+            <span class="keyword">return</span> i;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (b == <span class="string">'\r'</span> &amp;&amp; i &lt; n - <span class="number">1</span> &amp;&amp; buffer.getByte(i + <span class="number">1</span>) == <span class="string">'\n'</span>) {
+            <span class="keyword">return</span> i;  <span class="comment">// \r\n</span>
+        }
+    }
+    <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// Not found.</span>
+}
+</code></pre><h3 id="StringDecoderr详解">StringDecoderr详解</h3>
+<p>StringDecoder的功能非常简单，就是将接收到的对象转换成字符串，然后继续调用后面的handler。</p>
+<p><em>关键代码：</em><br>       public String toString(int index, int length, Charset charset) {<br>        if (length == 0) {<br>            return “”;<br>        }</p>
+<pre><code>    ByteBuffer nioBuffer;
+    <span class="keyword">if</span> (nioBufferCount() == <span class="number">1</span>) {
+        nioBuffer = nioBuffer(<span class="keyword">index</span>, <span class="keyword">length</span>);
+    } <span class="keyword">else</span> {
+        nioBuffer = ByteBuffer.allocate(<span class="keyword">length</span>);
+        getBytes(<span class="keyword">index</span>, nioBuffer);
+        nioBuffer.flip();
+    }
+
+    <span class="keyword">return</span> ByteBufUtil.decodeString(nioBuffer, charset);
+}
+</code></pre>
       
     </div>
     <footer>
       
         
+  
+  <div class="categories">
+    <a href="/categories/netty/">netty</a>
+  </div>
+
         
+  
+  <div class="tags">
+    <a href="/tags/netty/">netty</a>
+  </div>
+
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -243,6 +300,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
+    
+    <a href="/2015/02/10/tcp-stick-problem-understand/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
