@@ -9,7 +9,7 @@
   <meta name="author" content="krisjin">
   
   <meta name="description" content="LineBasedFrameDecoder详解
-LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束">
+LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -230,8 +230,7 @@ LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，�
     <div class="entry">
       
         <h3 id="LineBasedFrameDecoder详解">LineBasedFrameDecoder详解</h3>
-<p>LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。</p>
-<p><em>关键实现代码：</em></p>
+<p>LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。<br><a id="more"></a><br><em>关键实现代码：</em></p>
 <pre><code>  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">findEndOfLine</span>(<span class="keyword">final</span> ByteBuf buffer) {
     <span class="keyword">final</span> <span class="keyword">int</span> n = buffer.writerIndex();
     <span class="keyword">for</span> (<span class="keyword">int</span> i = buffer.readerIndex(); i &lt; n; i ++) {
