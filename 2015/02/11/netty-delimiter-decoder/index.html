@@ -5,16 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>tcp粘包拆包实例 | krisjin博客</title>
+  <title>netty分隔符解码 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="1.TCP粘包/拆包
-TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。">
+  <meta name="description" content="DelimiterBasedFrameDecoder分隔符解码
+上一章介绍了换行的粘包拆包处理，使用到的类是LineBasedFrameDecoder和StringDecoder这章介绍分隔符解码的处理。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="tcp粘包拆包实例"/>
+  <meta property="og:title" content="netty分隔符解码"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -219,111 +219,150 @@ TCP是个”流”协议，所谓流，就是没有界限的一串数据。大�
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-09T07:23:20.000Z"><a href="/2015/02/09/tcp-stick-package-unpacking/">2月 9 2015</a></time>
+        <time datetime="2015-02-11T02:17:35.000Z"><a href="/2015/02/11/netty-delimiter-decoder/">2月 11 2015</a></time>
       
       
   
-    <h1 class="title">tcp粘包拆包实例</h1>
+    <h1 class="title">netty分隔符解码</h1>
   
 
     </header>
     <div class="entry">
       
-        <h3 id="1-TCP粘包/拆包">1.TCP粘包/拆包</h3>
-<p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。<br><a id="more"></a></p>
-<h3 id="2-TCP粘包拆包问题说明">2.TCP粘包拆包问题说明</h3>
-<p>通过下图进行说明：</p>
-<p><img src="/img/tcp-stick.png" alt=""><br>假设客户端分别发送了两个数据包D1和D2给服务端，由于服务端一次读取的字节数是不确定的，所以可能存在以下四种情况。</p>
-<ol>
-<li>服务端分两次读取了两个独立的数据包，分别是D1和D2,没有粘包和拆包。</li>
-<li>服务端一次读取到了两个数据包，D1和D2粘合在一起，被称为TCP粘包。</li>
-<li>服务端分两次读取到了两个数据包，第一次读取了完整的D1包和D2包的部分内容，第二次读取到了D2包的剩余内容，这被称为ＴＣＰ拆包。</li>
-<li>服务端分两次读取到了两个数据包，第一次读取了D1包的部分内容D1_1,第二次读取了D1的剩余内容D1_2和D2包的整包。</li>
-</ol>
-<p>如果此时tcp接收滑窗非常小，而数据包D1和D2比较大。很有可能发生第五种情况，即服务端分多次才能将D1和D2包接收完全。</p>
-<h3 id="3-TCP粘包拆包发生的原因">3.TCP粘包拆包发生的原因</h3>
-<p>问题产生的原因有三个，分别如下：</p>
-<ol>
-<li>应用程序写入的字节大小大于套接口发送缓冲区大小。</li>
-<li>进行MSS大小的TCP分段。</li>
-<li>以太网侦测的payload大于MTU进行IP分片。<br>图示：<br><img src="/img/tcp-stick-problem.png" alt=""></li>
-</ol>
-<h3 id="4-粘包问题的解决策略">4.粘包问题的解决策略</h3>
-<p>由于底层的TCP无法理解上层的业务数据，所以在底层是无法保证数据包不被拆分和重组的，这个问题只能通过上层的应用协议栈设计来解决，根据业界的主流协议的解决方案如下：</p>
-<ol>
-<li>消息定长，例如每个报文的大小固定长度为200字节，如果不够，空位补空格。</li>
-<li>在包尾增加回车换行符进行分割，例如FTP协议。</li>
-<li>将消息分为消息头和消息体，消息头包含表示消息体总长度的字段，通常设计思路为消息头的第一个字段使用int32来表示消息的总长度。</li>
-<li>更复杂的应用层协议。</li>
-</ol>
-<h3 id="5-实例代码">5.实例代码</h3>
-<p><strong>服务器端代码</strong><br>    public class TimeServer {</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
+        <h3 id="DelimiterBasedFrameDecoder分隔符解码">DelimiterBasedFrameDecoder分隔符解码</h3>
+<p>上一章介绍了换行的粘包拆包处理，使用到的类是LineBasedFrameDecoder和StringDecoder<br>这章介绍分隔符解码的处理。</p>
+<a id="more"></a>
+<p><strong>服务端代码</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServer</span> </span>{
 
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> Exception {
+
+    <span class="comment">// 配置服务端线程组</span>
     EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
+    EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();
 
-    EventLoopGroup workderGroup = <span class="keyword">new</span> NioEventLoopGroup();
-
-    ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();
+    ServerBootstrap boot = <span class="keyword">new</span> ServerBootstrap();
     <span class="keyword">try</span> {
-        b.group(bossGroup, workderGroup).channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>).childHandler(<span class="keyword">new</span> ChildChannelHandler());
+        boot.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, <span class="number">100</span>).handler(<span class="keyword">new</span> LoggingHandler(LogLevel.INFO))
+                .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    <span class="annotation">@Override</span>
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) <span class="keyword">throws</span> Exception {
+
+                        ByteBuf delimiter = Unpooled.copiedBuffer(<span class="string">"$_"</span>.getBytes());
+                        ch.pipeline().addLast(<span class="keyword">new</span> DelimiterBasedFrameDecoder(<span class="number">1024</span>, delimiter));
+                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> EchoServerHandler());
+                    }
+
+                });
 
         <span class="comment">// 绑定端口，同步等待成功</span>
-        ChannelFuture f = b.bind(port).sync();
-
-        <span class="comment">// 等待服务器端端口关闭</span>
-        f.channel().closeFuture().sync();
-
+        ChannelFuture cf = boot.bind(port).sync();
+        <span class="comment">// 等待服务器端监听端口关闭</span>
+        cf.channel().closeFuture().sync();
     } <span class="keyword">finally</span> {
+        <span class="comment">// 优雅退出，释放线程池资源</span>
         bossGroup.shutdownGracefully();
-        workderGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
-
-}
-
-<span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildChannelHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>{
-
-    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel channel) <span class="keyword">throws</span> Exception {
-        channel.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
-        channel.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
-        channel.pipeline().addLast(<span class="keyword">new</span> TimeServerHandler());
-    }
-
 }
 
 <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> Exception {
-    <span class="keyword">int</span> port = <span class="number">8888</span>;
-
+    <span class="keyword">int</span> port = <span class="number">8080</span>;
     <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
-        <span class="keyword">try</span> {
-            port = Integer.valueOf(args[<span class="number">0</span>]);
-
-        } <span class="keyword">catch</span> (NumberFormatException e) {
-            e.printStackTrace();
-        }
+        port = Integer.valueOf(args[<span class="number">0</span>]);
     }
-    <span class="keyword">new</span> TimeServer().bind(port);
-}
-}
-</code></pre><p><strong>服务器端handler</strong></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
 
-<span class="keyword">private</span> <span class="keyword">int</span> counter;
+    <span class="keyword">new</span> EchoServer().bind(port);
+}
+}
+</code></pre><p><strong>服务端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">int</span> counter = <span class="number">0</span>;
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+    String body = (String) msg;
+    System.out.println(<span class="string">"This is "</span> + ++counter + <span class="string">" times receive client : ["</span> + body + <span class="string">"]"</span>);
+
+    body += <span class="string">"$_"</span>;
+    ByteBuf echo =Unpooled.copiedBuffer(body.getBytes());
+
+    ctx.writeAndFlush(echo);
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+    cause.printStackTrace();
+    ctx.close();
+}
+}
+</code></pre><p><strong>客户端代码</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> EchoClient {
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) throws Exception {
+
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    <span class="keyword">try</span> {
+        Bootstrap boot = <span class="keyword">new</span> Bootstrap();
+        boot.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    @Override
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
+
+                        ByteBuf delimiter = Unpooled.copiedBuffer(<span class="string">"$_"</span>.getBytes());
+                        ch.pipeline().addLast(<span class="keyword">new</span> DelimiterBasedFrameDecoder(<span class="number">1024</span>, delimiter));
+                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> EchoClientHandler());
+
+                    }
+
+                });
+
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture cf = boot.connect(host, port).sync();
+        <span class="comment">// 等待客户端链路关闭</span>
+        cf.channel().closeFuture().sync();
+
+    } <span class="keyword">finally</span> {
+        <span class="comment">// 优雅退出，释放NIO线程组</span>
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) throws Exception {
+    <span class="keyword">int</span> port = <span class="number">8080</span>;
+    String host = <span class="string">"127.0.0.1"</span>;
+    <span class="keyword">new</span> EchoClient().connect(port, host);
+}
+
+}
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+<span class="keyword">int</span> counter = <span class="number">0</span>;
+<span class="keyword">static</span> <span class="keyword">final</span> String ECHO_REQ = <span class="string">"Hi, krisjin. Welcome to Netty.$_"</span>;
+
+<span class="keyword">public</span> <span class="title">EchoClientHandler</span>() {
+
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) {
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {
+        ByteBuf write = Unpooled.copiedBuffer(ECHO_REQ.getBytes());
+
+        ctx.writeAndFlush(write);
+
+    }
+}
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
 
-    String body = (String) msg;
-
-    System.out.println(<span class="string">"The time server receive order :"</span> + body + <span class="string">" ; the counter is :"</span> + ++counter);
-
-    String currentTime = <span class="string">"QUERY TIME ORDER"</span>.equalsIgnoreCase(body) ? <span class="keyword">new</span> java.util.Date(System.currentTimeMillis())
-            .toString() : <span class="string">"BAD ORDER"</span>;
-
-    currentTime += System.getProperty(<span class="string">"line.separator"</span>);
-
-    ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
-    ctx.write(resp);
+    System.out.println(<span class="string">"This is "</span> + ++counter + <span class="string">"times recevie server : ["</span> + msg + <span class="string">"]"</span>);
 
 }
 
@@ -331,87 +370,8 @@ TCP是个”流”协议，所谓流，就是没有界限的一串数据。大�
     ctx.flush();
 }
 
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
-    ctx.close();
-}
-
-}
-</code></pre><p><strong>客户端代码</strong></p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> TimeClient {
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) {
-
-    <span class="comment">// 配置客户端NIO线程组</span>
-    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
-
-    Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();
-
-    <span class="keyword">try</span> {
-        bootstrap.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
-                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
-
-                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
-                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
-                        ch.pipeline().addLast(<span class="keyword">new</span> TimeClientHandler());
-                    }
-
-                });
-        <span class="comment">// 发起异步连接操作</span>
-        ChannelFuture f = bootstrap.connect(host, port).sync();
-        <span class="comment">// 等待客户端链路关闭</span>
-        f.channel().closeFuture().sync();
-    } <span class="keyword">catch</span> (InterruptedException e) {
-        e.printStackTrace();
-    } <span class="keyword">finally</span> {
-
-        <span class="keyword">group</span>.shutdownGracefully();
-    }
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    <span class="keyword">int</span> port = <span class="number">8888</span>;
-    <span class="keyword">try</span> {
-        <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
-            port = Integer.valueOf(args[<span class="number">0</span>]);
-        }
-    } <span class="keyword">catch</span> (NumberFormatException e) {
-        e.printStackTrace();
-    }
-    <span class="keyword">new</span> TimeClient().connect(port, <span class="string">"127.0.0.1"</span>);
-}
-}
-</code></pre><p><strong>客户端handler</strong></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
-
-<span class="keyword">private</span> <span class="keyword">int</span> counter;
-<span class="keyword">private</span> <span class="keyword">byte</span>[] req;
-
-<span class="keyword">public</span> <span class="title">TimeClientHandler</span>() {
-    req = (<span class="string">"QUERY TIME ORDER"</span> + System.getProperty(<span class="string">"line.separator"</span>)).getBytes();
-}
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
-
-    ByteBuf message = <span class="keyword">null</span>;
-
-    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) {
-        message = Unpooled.buffer(req.length);
-        message.writeBytes(req);
-        ctx.writeAndFlush(message);
-    }
-
-}
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
-
-    String body = (String) msg;
-
-    System.out.println(<span class="string">"Now is :"</span> + body + <span class="string">" ; the counter is : "</span> + ++counter);
-
-}
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) {
+    cause.printStackTrace();
     ctx.close();
 }
 }
@@ -457,10 +417,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/10/tcp-stick-problem-understand/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/06/netty-start-sample/" class="alignright next" >下一页</a>
+    <a href="/2015/02/10/netty-stick-principle/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>

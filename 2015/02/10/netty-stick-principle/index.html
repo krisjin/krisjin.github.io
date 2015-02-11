@@ -245,8 +245,13 @@ LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，�
 }
 </code></pre><h3 id="StringDecoderr详解">StringDecoderr详解</h3>
 <p>StringDecoder的功能非常简单，就是将接收到的对象转换成字符串，然后继续调用后面的handler。</p>
-<p><em>关键代码：</em><br>       public String toString(int index, int length, Charset charset) {<br>        if (length == 0) {<br>            return “”;<br>        }</p>
-<pre><code>    ByteBuffer nioBuffer;
+<p><em>关键代码：</em></p>
+<pre><code>   public String toString(<span class="keyword">int</span> <span class="keyword">index</span>, <span class="keyword">int</span> <span class="keyword">length</span>, Charset charset) {
+    <span class="keyword">if</span> (<span class="keyword">length</span> == <span class="number">0</span>) {
+        <span class="keyword">return</span> <span class="string">""</span>;
+    }
+
+    ByteBuffer nioBuffer;
     <span class="keyword">if</span> (nioBufferCount() == <span class="number">1</span>) {
         nioBuffer = nioBuffer(<span class="keyword">index</span>, <span class="keyword">length</span>);
     } <span class="keyword">else</span> {
@@ -299,6 +304,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
+    <a href="/2015/02/11/netty-delimiter-decoder/" class="alignleft prev" >上一页</a>
+    
     
     <a href="/2015/02/10/tcp-stick-problem-understand/" class="alignright next" >下一页</a>
     
@@ -341,7 +348,7 @@ var duoshuoQuery = {short_name:"krisjin"};
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
   
-    <li><a href="/categories/netty/">netty</a><small>3</small></li>
+    <li><a href="/categories/netty/">netty</a><small>4</small></li>
   
     <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
   
