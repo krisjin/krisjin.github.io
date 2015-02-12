@@ -10,7 +10,7 @@
   
   <meta name="description" content="FixedLengthFrameDecoder使用
 FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照指定的长度对消息进行解码，开发者不需要考虑TCP的粘包拆包问题，非常使用。下面通过一个实例来具体了解一下：
-1、服务端:在服务端的ChannelPipelin">
+1、服务端:在服务端的ChannelPipeline中新增FixedLengthFrameDecoder，消息截取长度自定义。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -232,7 +232,7 @@ FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照�
       
         <h3 id="FixedLengthFrameDecoder使用">FixedLengthFrameDecoder使用</h3>
 <p>FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照指定的长度对消息进行解码，开发者不需要考虑TCP的粘包拆包问题，非常使用。下面通过一个实例来具体了解一下：</p>
-<p>1、<strong>服务端:</strong><br>在服务端的ChannelPipeline中新增FixedLengthFrameDecoder，消息截取长度自定义。</p>
+<p>1、<strong>服务端:</strong><br>在服务端的ChannelPipeline中新增FixedLengthFrameDecoder，消息截取长度自定义。<br><a id="more"></a></p>
 <pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServer</span> </span>{
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> InterruptedException {
