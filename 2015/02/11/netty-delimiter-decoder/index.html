@@ -5,18 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>krisjin博客</title>
+  <title>netty分隔符解码 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="title: netty分隔符解码date: 2015-02-11 10:17:35categories: netty
-tags: [netty]
-DelimiterBasedFrameDecoder分隔符解码
-上一章介绍了换行的粘包拆包处理，使用到的类是LineBasedFrameDecoder和">
+  <meta name="description" content="DelimiterBasedFrameDecoder分隔符解码
+上一章介绍了换行的粘包拆包处理，使用到的类是LineBasedFrameDecoder和StringDecoder这章介绍分隔符解码的处理。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="netty分隔符解码"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -221,21 +219,19 @@ DelimiterBasedFrameDecoder分隔符解码
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-13T16:07:45.625Z"><a href="/2015/02/14/netty-delimiter-decoder/">2月 14 2015</a></time>
+        <time datetime="2015-02-11T02:17:35.000Z"><a href="/2015/02/11/netty-delimiter-decoder/">2月 11 2015</a></time>
       
       
   
-    <h1 class="title"></h1>
+    <h1 class="title">netty分隔符解码</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>title: netty分隔符解码<br>date: 2015-02-11 10:17:35<br>categories: netty</p>
-<h2 id="tags:_[netty]">tags: [netty]</h2>
-<h3 id="DelimiterBasedFrameDecoder分隔符解码">DelimiterBasedFrameDecoder分隔符解码</h3>
+        <h3 id="DelimiterBasedFrameDecoder分隔符解码">DelimiterBasedFrameDecoder分隔符解码</h3>
 <p>上一章介绍了换行的粘包拆包处理，使用到的类是LineBasedFrameDecoder和StringDecoder<br>这章介绍分隔符解码的处理。</p>
-<p>&lt;!—more—&gt;</p>
+<a id="more"></a>
 <p><strong>服务端代码</strong></p>
 <pre><code><span class="xml"><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-class"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>class<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>EchoServer<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
 
@@ -394,7 +390,17 @@ DelimiterBasedFrameDecoder分隔符解码
     <footer>
       
         
+  
+  <div class="categories">
+    <a href="/categories/netty/">netty</a>
+  </div>
+
         
+  
+  <div class="tags">
+    <a href="/tags/netty/">netty</a>
+  </div>
+
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -420,8 +426,10 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
+    <a href="/2015/02/11/thread-tweleve-pattern/" class="alignleft prev" >上一页</a>
     
-    <a href="/2015/02/14/netty-file-server/" class="alignright next" >下一页</a>
+    
+    <a href="/2015/02/10/netty-stick-principle/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
@@ -462,7 +470,7 @@ var duoshuoQuery = {short_name:"krisjin"};
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
   
-    <li><a href="/categories/netty/">netty</a><small>6</small></li>
+    <li><a href="/categories/netty/">netty</a><small>7</small></li>
   
     <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
   
