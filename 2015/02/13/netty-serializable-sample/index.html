@@ -5,17 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>netty定长消息解码 | krisjin博客</title>
+  <title>netty serializable sample | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="FixedLengthFrameDecoder使用
-FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照指定的长度对消息进行解码，开发者不需要考虑TCP的粘包拆包问题，非常使用。下面通过一个实例来具体了解一下：
-1、服务端:在服务端的ChannelPipeline中新增FixedLengthFrameDecoder，消息截取长度自定义。">
+  <meta name="description" content="Java序列化
+jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,java的序列化性能也很低">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="netty定长消息解码"/>
+  <meta property="og:title" content="netty serializable sample"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -220,63 +219,147 @@ FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照�
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-12T03:24:00.000Z"><a href="/2015/02/12/netty-fixed-length-decoder/">2月 12 2015</a></time>
+        <time datetime="2015-02-13T05:35:46.000Z"><a href="/2015/02/13/netty-serializable-sample/">2月 13 2015</a></time>
       
       
   
-    <h1 class="title">netty定长消息解码</h1>
+    <h1 class="title">netty serializable sample</h1>
   
 
     </header>
     <div class="entry">
       
-        <h3 id="FixedLengthFrameDecoder使用">FixedLengthFrameDecoder使用</h3>
-<p>FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照指定的长度对消息进行解码，开发者不需要考虑TCP的粘包拆包问题，非常使用。下面通过一个实例来具体了解一下：</p>
-<p>1、<strong>服务端:</strong><br>在服务端的ChannelPipeline中新增FixedLengthFrameDecoder，消息截取长度自定义。<br><a id="more"></a></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServer</span> </span>{
+        <h3 id="Java序列化">Java序列化</h3>
+<p>jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。<br>序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM<br>中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,java的序列化性能也很低<br><a id="more"></a></p>
+<h3 id="netty序列化">netty序列化</h3>
+<p>使用netty提供的序列化，序列化类也同样要实现Serializable接口，提高了两个序列化类是ObjectDecoder，ObjectEncoder，下面通过具体实例来了解下：</p>
+<p><strong>服务器端</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderServer</span> </span>{
 
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> InterruptedException {
-
     EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
-
     EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();
 
     <span class="keyword">try</span> {
-
         ServerBootstrap boot = <span class="keyword">new</span> ServerBootstrap();
-
-        boot.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, <span class="number">100</span>).childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+        boot.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .option(ChannelOption.SO_BACKLOG, <span class="number">100</span>).handler(<span class="keyword">new</span> LoggingHandler(LogLevel.INFO))
+            .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
 
                     <span class="annotation">@Override</span>
                     <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) <span class="keyword">throws</span> Exception {
-                        ch.pipeline().addLast(<span class="keyword">new</span> FixedLengthFrameDecoder(<span class="number">7</span>));
-                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
-                        ch.pipeline().addLast(<span class="keyword">new</span> EchoServerHandler());
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectDecoder(<span class="number">1024</span> * <span class="number">1024</span>, ClassResolvers.weakCachingConcurrentResolver(<span class="keyword">this</span>.getClass().getClassLoader())));
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectEncoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> OrderServerHandler());
+
                     }
                 });
 
-        <span class="comment">// 绑定端口，同步等待成功</span>
-        ChannelFuture cf = boot.bind(port).sync();
-        <span class="comment">// 等待服务器监听端口关闭</span>
+
+        <span class="comment">//绑定端口，同步等待</span>
+        ChannelFuture cf =boot.bind(port).sync();
+        <span class="comment">//等待服务端监听端口关闭</span>
         cf.channel().closeFuture().sync();
-    } <span class="keyword">finally</span> {
+
+    }  <span class="keyword">finally</span> {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> InterruptedException {
+    <span class="keyword">new</span> OrderServer().bind(<span class="number">8080</span>);
+}
+
+}
+</code></pre><p><strong>服务器端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+    OrderRequest request = (OrderRequest) msg;
+
+    <span class="keyword">if</span> (<span class="string">"krisjin"</span>.equals(request.getUserName())) {
+
+        System.out.println(<span class="string">"Service accept client order request: ["</span> + request.toString() + <span class="string">"]"</span>);
+        ctx.writeAndFlush(getResponse(request.getOrderId()));
+    }
+
+}
+
+<span class="keyword">private</span> OrderResponse <span class="title">getResponse</span>(<span class="keyword">long</span> orderId) {
+    OrderResponse resp = <span class="keyword">new</span> OrderResponse();
+
+    resp.setOrderId(orderId);
+    resp.setRespCode(<span class="number">0</span>);
+    resp.setDesc(<span class="string">"Receive order success,we are as quickly as possible send..."</span>);
+    <span class="keyword">return</span> resp;
+}
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+    cause.printStackTrace();
+    ctx.close();
+}
+}    
+</code></pre><p><strong>客户端</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> OrderClient {
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) {
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    <span class="keyword">try</span> {
+        Bootstrap boot = <span class="keyword">new</span> Bootstrap();
+        boot.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    @Override
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
+
+                        ch.pipeline().addLast(
+                                <span class="keyword">new</span> ObjectDecoder(<span class="number">1024</span>, ClassResolvers.cacheDisabled(<span class="keyword">this</span>.getClass()
+                                        .getClassLoader())));
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectEncoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> OrderClientHandler());
+                    }
+                });
+
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture cf = boot.connect(host, port).sync();
+        cf.channel().closeFuture().sync();
+
+    } <span class="keyword">catch</span> (InterruptedException e) {
+        e.printStackTrace();
+    } <span class="keyword">finally</span> {
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
 }
 
 <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    <span class="keyword">int</span> port = <span class="number">8080</span>;
-    <span class="keyword">try</span> {
-        <span class="keyword">new</span> EchoServer().bind(port);
-    } <span class="keyword">catch</span> (InterruptedException e) {
-        e.printStackTrace();
+    <span class="keyword">new</span> OrderClient().connect(<span class="number">8080</span>, <span class="string">"127.0.0.1"</span>);
+}
+}
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) {
+        ctx.write(buildRequest(i));
     }
+    ctx.flush();
 }
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    System.out.println(<span class="string">"Receive server response :"</span> + msg);
+
 }
-</code></pre><p><strong>服务端handler</strong></p>
-<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
 
 <span class="annotation">@Override</span>
 <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
@@ -284,57 +367,19 @@ FixedLengthFrameDecoder是netty提供的固定长度解码器，它能够按照�
     ctx.close();
 }
 
+<span class="keyword">private</span> OrderRequest <span class="title">buildRequest</span>(<span class="keyword">long</span> orderId) {
+    OrderRequest request = <span class="keyword">new</span> OrderRequest();
+    request.setOrderId(orderId);
+    request.setUserName(<span class="string">"krisjin"</span>);
+    request.setAddress(<span class="string">"朝阳门外大街泛利大厦"</span>);
+    request.setMobilePhone(<span class="string">"10000000"</span>);
+    request.setProductName(<span class="string">"黑客与画家"</span>);
+    <span class="keyword">return</span> request;
+}
+
 <span class="annotation">@Override</span>
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
-
-    System.out.println(<span class="string">"Receive client : ["</span> + msg + <span class="string">"]"</span>);
-
-}
-
-}
-</code></pre><p>2、<strong>客户端</strong> </p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> EchoClient {
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span>(<span class="keyword">int</span> port, String host) throws InterruptedException {
-
-    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
-
-    <span class="keyword">try</span> {
-        Bootstrap boot = <span class="keyword">new</span> Bootstrap();
-
-        boot.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>);
-
-        boot.handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
-            @Override
-            <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast(<span class="keyword">new</span> EchoClientHandler());
-            }
-
-        });
-
-        ChannelFuture cf = boot.connect(host, port).sync();
-        cf.channel().closeFuture().sync();
-
-    } <span class="keyword">finally</span> {
-        <span class="keyword">group</span>.shutdownGracefully();
-    }
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) throws InterruptedException {
-    <span class="keyword">new</span> EchoClient().connect(<span class="number">8080</span>, <span class="string">"127.0.0.1"</span>);
-}
-
-}
-</code></pre><p><strong>客户端handler</strong><br>    public class EchoClientHandler extends ChannelHandlerAdapter {</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
-    <span class="keyword">super</span>.channelRead(ctx, msg);
-}
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
-
-    ByteBuf out = Unpooled.copiedBuffer(<span class="string">"Krisjin  Welcome to Beijing!"</span>.getBytes());
-    ctx.writeAndFlush(out);
-
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+    ctx.flush();
 }
 
 }
@@ -380,10 +425,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/13/netty-serializable-sample/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/11/thread-tweleve-pattern/" class="alignright next" >下一页</a>
+    <a href="/2015/02/12/netty-fixed-length-decoder/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
