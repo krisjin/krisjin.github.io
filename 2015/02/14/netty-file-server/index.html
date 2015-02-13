@@ -5,18 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>krisjin博客</title>
+  <title>netty实现http文件服务器 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="title: netty实现http文件服务器date: 2015-02-14 00:07:01categories: netty
-tags: [netty]
-Http介绍
-Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统">
+  <meta name="description" content="Http介绍
+Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="netty实现http文件服务器"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -221,20 +219,18 @@ Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成�
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-13T16:25:46.078Z"><a href="/2015/02/14/netty-file-server/">2月 14 2015</a></time>
+        <time datetime="2015-02-13T16:07:01.000Z"><a href="/2015/02/14/netty-file-server/">2月 14 2015</a></time>
       
       
   
-    <h1 class="title"></h1>
+    <h1 class="title">netty实现http文件服务器</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>title: netty实现http文件服务器<br>date: 2015-02-14 00:07:01<br>categories: netty</p>
-<h2 id="tags:_[netty]">tags: [netty]</h2>
-<h3 id="Http介绍">Http介绍</h3>
-<p>Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。<br>&lt;!—more—&gt;<br>具体的关于HTTP及Netyy的实现细节在以后的章节在写，先上实例代码：</p>
+        <h3 id="Http介绍">Http介绍</h3>
+<p>Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。<br><a id="more"></a><br>具体的关于HTTP及Netyy的实现细节在以后的章节在写，先上实例代码：</p>
 <h3 id="实例代码">实例代码</h3>
 <p><strong>服务端：</strong></p>
 <pre><code><span class="xml"><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-class"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>class<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>HttpFileServer<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
@@ -474,7 +470,17 @@ HttpMethod GET = <span class="tag">&lt;<span class="title">span</span> <span cla
     <footer>
       
         
+  
+  <div class="categories">
+    <a href="/categories/netty/">netty</a>
+  </div>
+
         
+  
+  <div class="tags">
+    <a href="/tags/netty/">netty</a>
+  </div>
+
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -500,8 +506,10 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
+    <a href="/2015/02/14/netty-delimiter-decoder/" class="alignleft prev" >上一页</a>
     
-    <a href="/2015/02/14/netty-delimiter-decoder/" class="alignright next" >下一页</a>
+    
+    <a href="/2015/02/13/netty-serializable-sample/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
@@ -542,7 +550,7 @@ var duoshuoQuery = {short_name:"krisjin"};
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
   
-    <li><a href="/categories/netty/">netty</a><small>5</small></li>
+    <li><a href="/categories/netty/">netty</a><small>6</small></li>
   
     <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
   

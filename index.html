@@ -217,287 +217,6 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-13T16:25:46.078Z"><a href="/2015/02/14/netty-file-server/">2月 14 2015</a></time>
-      
-      
-  
-    <h1 class="title"><a href="/2015/02/14/netty-file-server/"></a></h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <p>title: netty实现http文件服务器<br>date: 2015-02-14 00:07:01<br>categories: netty</p>
-<h2 id="tags:_[netty]">tags: [netty]</h2>
-<h3 id="Http介绍">Http介绍</h3>
-<p>Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。<br>&lt;!—more—&gt;<br>具体的关于HTTP及Netyy的实现细节在以后的章节在写，先上实例代码：</p>
-<h3 id="实例代码">实例代码</h3>
-<p><strong>服务端：</strong></p>
-<pre><code><span class="xml"><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-class"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>class<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>HttpFileServer<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-function"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>run<span class="tag">&lt;/<span class="title">span</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-params"</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>int<span class="tag">&lt;/<span class="title">span</span>&gt;</span> port, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> String url)<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> InterruptedException <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
-
-    EventLoopGroup bossGroup = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> NioEventLoopGroup();
-    EventLoopGroup workerGroup = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> NioEventLoopGroup();
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>try<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-        ServerBootstrap boot = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> ServerBootstrap();
-
-        boot.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                .childHandler(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> ChannelInitializer<span class="tag">&lt;<span class="title">SocketChannel</span>&gt;</span>() {
-
-                    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-annotation"</span>&gt;</span>@Override<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-                    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-function"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>protected<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>initChannel<span class="tag">&lt;/<span class="title">span</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-params"</span>&gt;</span>(SocketChannel ch)<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Exception <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
-                        ch.pipeline().addLast(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"http-decoder"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpRequestDecoder());
-                        ch.pipeline().addLast(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"http-aggregator"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpObjectAggregator(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>65536<span class="tag">&lt;/<span class="title">span</span>&gt;</span>));
-                        ch.pipeline().addLast(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"http-encoder"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpResponseEncoder());
-                        ch.pipeline().addLast(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"http-chunked"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> ChunkedWriteHandler());
-                        ch.pipeline().addLast(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"fileServerHandler"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpFileServerHandler(url));
-                    }
-
-                });
-        ChannelFuture cf =boot.bind(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"127.0.0.1"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>,port).sync();
-        System.out.println(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"Http文件目录服务器启动：http://127.0.0.1:"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>+port+url);
-        cf.channel().closeFuture().sync();
-
-    } <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>finally<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-
-    }
-
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-function"</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>static<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-title"</span>&gt;</span>main<span class="tag">&lt;/<span class="title">span</span>&gt;</span><span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-params"</span>&gt;</span>(String[] args)<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> InterruptedException <span class="tag">&lt;/<span class="title">span</span>&gt;</span>{
-    String url=<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"/src/main/java/"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpFileServer().run(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>8080<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, url);
-
-}
-
-}
-`<span class="tag">&lt;/<span class="title">pre</span>&gt;</span>
-
-**服务端handler:**
-
-<span class="tag">&lt;<span class="title">pre</span>&gt;</span>`<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>class<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpFileServerHandler <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>extends<span class="tag">&lt;/<span class="title">span</span>&gt;</span> SimpleChannelInboundHandler<span class="tag">&lt;<span class="title">FullHttpRequest</span>&gt;</span> {
-
-HttpMethod GET = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpMethod(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"GET"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>private<span class="tag">&lt;/<span class="title">span</span>&gt;</span> String url;
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>private<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Pattern ALLOWED_FILE_NAME = Pattern.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>compile<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"[A-Za-z0-9][-_A-Za-z0-9\\.]*"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>private<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Pattern INSECURE_URI = Pattern.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>compile<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>".*[<span class="tag">&lt;&gt;</span>&amp;\"].*"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> HttpFileServerHandler(String url) {
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>this<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.url = url;
-}
-
-@Override
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>protected<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> messageReceived(ChannelHandlerContext ctx, FullHttpRequest request) <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Exception {
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (!request.getDecoderResult().isSuccess()) {
-        sendError(ctx, HttpResponseStatus.BAD_REQUEST);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (request.getMethod() != HttpMethod.GET) {
-        sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> String uri = request.getUri();
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> String path = sanitizeUri(uri);
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (path == <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>null<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) {
-        sendError(ctx, HttpResponseStatus.FORBIDDEN);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span> = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(path);
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.isHidden() || !<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.exists()) {
-        sendError(ctx, HttpResponseStatus.NOT_FOUND);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.isDirectory()) {
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (uri.endsWith(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"/"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>)) {
-            sendList(ctx, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-        } <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>else<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-            sendRedirect(ctx, uri + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'/'<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-        }
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (!<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.isFile()) {
-        sendError(ctx, HttpResponseStatus.FORBIDDEN);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    RandomAccessFile randomAccessFile = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>null<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>try<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-        randomAccessFile = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> RandomAccessFile(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"r"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    } <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>catch<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (FileNotFoundException e) {
-        sendError(ctx, HttpResponseStatus.NO_CONTENT);
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>long<span class="tag">&lt;/<span class="title">span</span>&gt;</span> fileLength = randomAccessFile.length();
-    HttpResponse response = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-    HttpHeaders.setContentLength(response, fileLength);
-    setContentTypeHeader(response, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (HttpHeaders.isKeepAlive(request)) {
-        response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-    }
-    ctx.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>write<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(response);
-    ChannelFuture sendFileFuture;
-
-    sendFileFuture = ctx.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>write<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> ChunkedFile(randomAccessFile, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>0<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, fileLength, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>8192<span class="tag">&lt;/<span class="title">span</span>&gt;</span>), ctx.newProgressivePromise());
-    sendFileFuture.addListener(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> ChannelProgressiveFutureListener() {
-
-        @Override
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> operationComplete(ChannelProgressiveFuture future) <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Exception {
-
-            System.err.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>println<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(future.channel() + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>" transfer complete"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-        }
-
-        @Override
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> operationProgressed(ChannelProgressiveFuture future, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>long<span class="tag">&lt;/<span class="title">span</span>&gt;</span> progress, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>long<span class="tag">&lt;/<span class="title">span</span>&gt;</span> total)
-                <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Exception {
-            <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (total <span class="tag">&lt; &lt;<span class="attribute">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>0<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) {
-                System.err.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>println<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(future.channel() + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>" transfer progress : "<span class="tag">&lt;/<span class="title">span</span>&gt;</span> + progress);
-            } <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>else<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-                System.err.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>println<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(future.channel() + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>" transfer progress : "<span class="tag">&lt;/<span class="title">span</span>&gt;</span> + progress + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>" / "<span class="tag">&lt;/<span class="title">span</span>&gt;</span> + total);
-            }
-        }
-    });
-
-    ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (!HttpHeaders.isKeepAlive(request)) {
-        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-    }
-
-}
-
-@Override
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> exceptionCaught(ChannelHandlerContext ctx, Throwable cause) <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throws<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Exception {
-
-    cause.printStackTrace();
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (ctx.channel().isActive()) {
-        sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-    }
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>private<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
-    FullHttpResponse response = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(
-            <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"Failure :"<span class="tag">&lt;/<span class="title">span</span>&gt;</span> + status + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"\r\n"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, CharsetUtil.UTF_8));
-    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"text/plain; charset=UTF-8"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> String sanitizeUri(String uri) {
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// Decode the path.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>try<span class="tag">&lt;/<span class="title">span</span>&gt;</span> {
-        uri = URLDecoder.decode(uri, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"UTF-8"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    } <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>catch<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (UnsupportedEncodingException e) {
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>throw<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> Error(e);
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (uri.isEmpty() || uri.charAt(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>0<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) != <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'/'<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) {
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>null<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// Convert file separators.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    uri = uri.replace(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'/'<span class="tag">&lt;/<span class="title">span</span>&gt;</span>, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.separatorChar);
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// Simplistic dumb security check.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// You will have to do something serious in the production environment.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>if<span class="tag">&lt;/<span class="title">span</span>&gt;</span> (uri.contains(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.separator + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'.'<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) || uri.contains(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'.'<span class="tag">&lt;/<span class="title">span</span>&gt;</span> + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.separator) || uri.charAt(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>0<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) == <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'.'<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-            || uri.charAt(uri.length() - <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-number"</span>&gt;</span>1<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) == <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>'.'<span class="tag">&lt;/<span class="title">span</span>&gt;</span> || INSECURE_URI.matcher(uri).matches()) {
-        <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>null<span class="tag">&lt;/<span class="title">span</span>&gt;</span>;
-    }
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// Convert to absolute path.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>return<span class="tag">&lt;/<span class="title">span</span>&gt;</span> System.getProperty(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"user.dir"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) + <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.separator + uri;
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>final<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> sendList(ChannelHandlerContext ctx, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) {
-    FullHttpResponse response = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"text/html; charset=UTF-8"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    StringBuilder sb = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> StringBuilder();
-
-    String dirPath = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.getPath();
-
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"<span class="doctype">&lt;!DOCTYPE html&gt;</span>\r\n"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"<span class="tag">&lt;<span class="title">html</span>&gt;</span><span class="tag">&lt;<span class="title">head</span>&gt;</span><span class="tag">&lt;<span class="title">title</span>&gt;</span>"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(dirPath);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"目录："<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"<span class="tag">&lt;/<span class="title">title</span>&gt;</span><span class="tag">&lt;/<span class="title">head</span>&gt;</span><span class="tag">&lt;<span class="title">body</span>&gt;</span>\r\n"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"<span class="tag">&lt;<span class="title">h3</span>&gt;</span>"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(dirPath).<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"目录："<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"<span class="tag">&lt;/<span class="title">h3</span>&gt;</span>\r\n"<span class="tag">&lt;/<span class="title">span</span>&gt;</span>);
-
-    sb.<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>append<span class="tag">&lt;/<span class="title">span</span>&gt;</span>(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-string"</span>&gt;</span>"</span>
-</code></pre><p>“);<br>        sb.<span class="hljs-keyword">append</span>(<span class="hljs-string">“<em>   <a href="\"../\"">..</a><br>\r\n”</em></span>);<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">File</span> f : <span class="hljs-keyword">file</span>.listFiles()) {<br>            <span class="hljs-keyword">if</span> (f.isHidden() || !f.canRead()) {<br>                <span class="hljs-keyword">continue</span>;<br>            }<br>            String name = f.getName();<br>            <span class="hljs-keyword">if</span> (!ALLOWED_FILE_NAME.matcher(name).matches()) {<br>                <span class="hljs-keyword">continue</span>;<br>            }<br>            sb.<span class="hljs-keyword">append</span>(<span class="hljs-string">“   <a href="\""</span">);<br>            sb.<span class="hljs-keyword">append</span>(name);<br>            sb.<span class="hljs-keyword">append</span>(<span class="hljs-string">“\”&gt;”</span>);<br>            sb.<span class="hljs-keyword">append</span>(name);<br>            sb.<span class="hljs-keyword">append</span>(<span class="hljs-string">“</span></a>\r\n”</span>);</p>
-<pre><code>    ByteBuf buffer = Unpooled.copiedBuffer(sb, CharsetUtil.UTF_8);
-    response.content().writeBytes(buffer);
-    buffer.release();
-
-    <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-comment"</span>&gt;</span>// Close the connection as soon as the error message is sent.<span class="tag">&lt;/<span class="title">span</span>&gt;</span>
-    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>public<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> sendRedirect(ChannelHandlerContext ctx, String newUri) {
-    FullHttpResponse response = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND);
-    response.headers().set(HttpHeaders.Names.LOCATION, newUri);
-    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-
-}
-
-<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>private<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>void<span class="tag">&lt;/<span class="title">span</span>&gt;</span> setContentTypeHeader(HttpResponse response, <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>File<span class="tag">&lt;/<span class="title">span</span>&gt;</span> <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>) {
-
-    MimetypesFileTypeMap mimeTypeMap = <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>new<span class="tag">&lt;/<span class="title">span</span>&gt;</span> MimetypesFileTypeMap();
-    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, mimeTypeMap.getContentType(<span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"hljs-keyword"</span>&gt;</span>file<span class="tag">&lt;/<span class="title">span</span>&gt;</span>.getPath()));
-}
-
-}
-</code></pre>
-      
-    </div>
-    <footer>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
-  <article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
-    
-      <img src="">
-    
-  </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
         <time datetime="2015-02-13T16:07:45.625Z"><a href="/2015/02/14/netty-delimiter-decoder/">2月 14 2015</a></time>
       
       
@@ -670,6 +389,55 @@ HttpMethod GET = <span class="tag">&lt;<span class="title">span</span> <span cla
     </div>
     <footer>
       
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-13T16:07:01.000Z"><a href="/2015/02/14/netty-file-server/">2月 14 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/14/netty-file-server/">netty实现http文件服务器</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="Http介绍">Http介绍</h3>
+<p>Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。<br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/14/netty-file-server/#more" class="more-link">阅读全文</a>
+          </div>
         
         
       
@@ -1109,7 +877,7 @@ HttpMethod GET = <span class="tag">&lt;<span class="title">span</span> <span cla
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
   
-    <li><a href="/categories/netty/">netty</a><small>5</small></li>
+    <li><a href="/categories/netty/">netty</a><small>6</small></li>
   
     <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
   
