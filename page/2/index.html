@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>netty | krisjin博客</title>
+  <title>第 2 页 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
   
@@ -199,121 +199,217 @@
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title category">netty</h2>
-
-
-  <div class="archive">
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
     
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-16T04:24:42.000Z"><a href="/2015/02/16/netty-api-reference/">2月 16 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/16/netty-api-reference/">Netty包功能描述</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-16T00:00:35.000Z"><a href="/2015/02/16/channel-detail/">2月 16 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/16/channel-detail/">netty channel详解</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-13T16:07:01.000Z"><a href="/2015/02/14/netty-file-server/">2月 14 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/14/netty-file-server/">netty实现http文件服务器</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-13T05:35:46.000Z"><a href="/2015/02/13/netty-serializable-sample/">2月 13 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/13/netty-serializable-sample/">netty序列化实现</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-12T03:24:00.000Z"><a href="/2015/02/12/netty-fixed-length-decoder/">2月 12 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/12/netty-fixed-length-decoder/">netty定长消息解码</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-11T02:17:35.000Z"><a href="/2015/02/11/netty-delimiter-decoder/">2月 11 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/11/netty-delimiter-decoder/">netty分隔符解码</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-10T08:56:24.000Z"><a href="/2015/02/10/netty-stick-principle/">2月 10 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/10/netty-stick-principle/">LineBasedFrameDecoder和StringDecoder的原理分析</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-09T07:23:20.000Z"><a href="/2015/02/09/tcp-stick-package-unpacking/">2月 9 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/09/tcp-stick-package-unpacking/">tcp粘包拆包实例</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/06/netty-start-sample/">netty入门实例</a></h1>
-            
-          </header>
-        </div>
-      </article>
+      <img src="">
     
   </div>
-</div></div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-10T03:36:43.000Z"><a href="/2015/02/10/tcp-stick-problem-understand/">2月 10 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/10/tcp-stick-problem-understand/">理解TCP粘包问题之网络编程总结</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="协议简述">协议简述</h3>
+<ol>
+<li><strong>TCP/IP协议</strong> ：链路层，网络层，传输层，应用层。 　　</li>
+<li>以太网（Ethernet）的数据帧在链路层 　　</li>
+<li>IP包在网络层 　　</li>
+<li>TCP或UDP包在传输层 　　</li>
+<li>TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝  
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/10/tcp-stick-problem-understand/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-09T07:23:20.000Z"><a href="/2015/02/09/tcp-stick-package-unpacking/">2月 9 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/09/tcp-stick-package-unpacking/">tcp粘包拆包实例</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="1-TCP粘包/拆包">1.TCP粘包/拆包</h3>
+<p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。<br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/09/tcp-stick-package-unpacking/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/06/netty-start-sample/">netty入门实例</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="netty介绍">netty介绍</h2>
+<p>Netty is a NIO client server framework which enables quick and easy development of network applications such as protocol servers and clients. It greatly simplifies and streamlines network programming such as TCP and UDP socket server.</p>
+<p>‘Quick and easy’ doesn’t mean that a resulting application will suffer from a maintainability or a performance issue. Netty has been designed carefully with the experiences earned from the implementation of a lot of protocols such as FTP, SMTP, HTTP, and various binary and text-based legacy protocols. As a result, Netty has succeeded to find a way to achieve ease of development, performance, stability, and flexibility without a compromise.</p>
+
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/06/netty-start-sample/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-05T02:46:02.000Z"><a href="/2015/02/05/mybatis-proxy-pattern/">2月 5 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/05/mybatis-proxy-pattern/">mybatis映射配置代理模式的使用</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="1-mybatis映射简述">1.mybatis映射简述</h2>
+<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。<br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/05/mybatis-proxy-pattern/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+<nav id="pagination">
+  
+    <a href="/" class="alignleft prev">上一页</a>
+  
+  
+  <div class="clearfix"></div>
+</nav></div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
