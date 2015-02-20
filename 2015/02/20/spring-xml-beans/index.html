@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Spring容器之BeanFactory | krisjin博客</title>
+  <title>Spring Xml配置文件之beans | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="Spring核心容器中实现了控制反转与依赖注入，它解决了业务类依赖关系的隔离，所有的对象创建及依赖关系的绑定都有Spring容器实现，由它统一管理。">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Spring容器之BeanFactory"/>
+  <meta property="og:title" content="Spring Xml配置文件之beans"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -218,115 +218,32 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-20T10:08:30.000Z"><a href="/2015/02/20/spring-ioc-container-sample/">2月 20 2015</a></time>
+        <time datetime="2015-02-20T10:43:48.000Z"><a href="/2015/02/20/spring-xml-beans/">2月 20 2015</a></time>
       
       
   
-    <h1 class="title">Spring容器之BeanFactory</h1>
+    <h1 class="title">Spring Xml配置文件之beans</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>Spring核心容器中实现了控制反转与依赖注入，它解决了业务类依赖关系的隔离，所有的对象创建及依赖关系的绑定都有Spring容器实现，由它统一管理。  <a id="more"></a></p>
-<h3 id="BeanFactory的对象注册和依赖绑定">BeanFactory的对象注册和依赖绑定</h3>
-<p>BeanFactory 作为一个IoC Service Provider,为了能够明确管理各个业务对象以及业务对象之间的依赖绑定关系，同样需要某种途径来记录和管理这写信息。<br>1). <strong>直接编码方式</strong></p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> HardCodeBeanFactory {
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    DefaultListableBeanFactory factory = <span class="keyword">new</span> DefaultListableBeanFactory();
-    BeanFactory container = bind(factory);
-    UserController uc = (UserController) container.getBean(<span class="string">"userController"</span>);
-    uc.addUser(<span class="keyword">new</span> User());
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> BeanFactory <span class="title">bind</span>(BeanDefinitionRegistry registry) {
-    AbstractBeanDefinition controller = <span class="keyword">new</span> RootBeanDefinition(UserController.class, <span class="keyword">true</span>);
-    AbstractBeanDefinition userService = <span class="keyword">new</span> RootBeanDefinition(UserService.class, <span class="keyword">true</span>);
-
-    <span class="comment">//将Bean注册到容器之中</span>
-    registry.registerBeanDefinition(<span class="string">"userController"</span>, controller);
-    registry.registerBeanDefinition(<span class="string">"userService"</span>, userService);
-
-    <span class="comment">//指定依赖关系（setter方法注入方式）</span>
-    MutablePropertyValues propertyVlaue = <span class="keyword">new</span> MutablePropertyValues();
-    propertyVlaue.addPropertyValue(<span class="keyword">new</span> PropertyValue(<span class="string">"userService"</span>, userService));
-    controller.setPropertyValues(propertyVlaue);
-
-    <span class="comment">//构造函数注入方式</span>
-    <span class="comment">// ConstructorArgumentValues argValue= new ConstructorArgumentValues();</span>
-    <span class="comment">// argValue.addIndexedArgumentValue(0, userService);</span>
-    <span class="comment">// controller.setConstructorArgumentValues(argValue);</span>
-
-    <span class="keyword">return</span> (BeanFactory) registry;
-
-}
-}
-</code></pre><p>2). Xml配置方式</p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> ConfigFileBeanFactory {
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-
-    <span class="comment">// ApplicationContext factory = new</span>
-    <span class="comment">// ClassPathXmlApplicationContext("classpath:applicationContext.xml");</span>
-
-    DefaultListableBeanFactory beanFactory = <span class="keyword">new</span> DefaultListableBeanFactory();
-
-    BeanFactory container = (BeanFactory) bind(beanFactory);
-
-    UserController userController = (UserController) container.getBean(<span class="string">"userController"</span>);
-
-    userController.addUser(<span class="keyword">new</span> User());
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> BeanFactory <span class="title">bind</span>(BeanDefinitionRegistry registry) {
-
-    XmlBeanDefinitionReader reader = <span class="keyword">new</span> XmlBeanDefinitionReader(registry);
-    reader.loadBeanDefinitions(<span class="string">"classpath:applicationContext.xml"</span>);
-
-    <span class="keyword">return</span> (BeanFactory) registry;
-}
-}
-</code></pre><p>3).注解方式</p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> AnnotationInjection {
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    BeanFactory factory = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"classpath:applicationContext.xml"</span>);
-    AnnotationUserController userController = (AnnotationUserController) factory.getBean(<span class="string">"userController"</span>);
-    userController.addUser(<span class="keyword">new</span> User());
-}
-
-}
-</code></pre><hr>
-<pre><code><span class="annotation">@Component</span>(<span class="string">"userController"</span>)
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AnnotationUserController</span> </span>{
-
-<span class="annotation">@Autowired</span>
-<span class="keyword">private</span> UserService userService;
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span>(User user) {
-    userService.addUser(<span class="keyword">new</span> User());
-}
-</code></pre><p>}</p>
-<p>配置文件：</p>
-<pre><code>&lt;<span class="keyword">context</span>:<span class="keyword">component</span>-scan base-<span class="keyword">package</span>=<span class="string">"org.spring.explore"</span>&gt;&lt;/<span class="keyword">context</span>:<span class="keyword">component</span>-scan&gt;
-</code></pre><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在AnnotationUserController类中增加了两个注解，@Autowired是这里的主角，它的存在讲告知Spring容器需要为当前对象注入那些依赖对象。而@Component则是配合在配置文件中classpath-scanning功能使用的。在Spring的配置文件中增加一个“触发器”，使用@Autowired和@Component标注的类就能获得依赖对象的注入了。  </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在Spring的配置文件中<em><context:component-scan></context:component-scan></em> 会到指定的包下面扫描标注有@Component的类，如果找到，则将它们添加到容器进行管理，并根据它们所标注的@Autowired为这些类注入符合条件的依赖对象。</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。  <a id="more"></a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所有注册到容器的业务对象，在Sring中称之为Bean,所以，每个对象在XMl中的映射也自然而然的对应一个<em>bean</em>的元素。既然容器中可以管理很多的业务对象，那么把这么多的bean元素组织起来，就叫做beans。下面看下beans元素。</p>
+<h3 id="beans元素属性">beans元素属性</h3>
+<ol>
+<li><strong>default-lazy-init</strong>：其值可以指定为true和false,默认值是false。用来标识是否对所有的bean进行延迟初始化。</li>
+<li><strong>default-autowire</strong>：可以取值为no、byName、byType、constructor、default，默认为no。</li>
+<li><strong>default-init-method</strong>：如果所管理的bean按照某种规则，都有同样名称的初始化方法的话，可以在这里统一指定这个初始化方法名，而不用在没个bean上都重复单独指定。</li>
+<li><strong>default-destroy-method</strong>： 与default-init-method相对应，如果所管理的bean有按照某种规则使用了相同名称的对象销毁方法，可以通过这个属性统一指定。</li>
+</ol>
+<h3 id="import元素">import元素</h3>
+<p>通常情况下，可以根据模块功能或者层次关系，将配置信息分门别类地放到多个配置文件中。在加载主配置文件时，并将主配置文件所依赖的配置文件同时加载，可以在这个主配置文件中通过import元素对其所依赖的配置文件进行引用。</p>
 
       
     </div>
     <footer>
       
         
-  
-  <div class="categories">
-    <a href="/categories/spring/">spring</a>
-  </div>
-
         
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
@@ -353,10 +270,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/20/spring-xml-beans/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/18/software-maintenance-reuse/" class="alignright next" >下一页</a>
+    <a href="/2015/02/20/spring-ioc-container-sample/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
