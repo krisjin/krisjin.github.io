@@ -5,23 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>java多线程12种设计模式记录 | krisjin博客</title>
+  <title>Spring注入之道 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="以下是java多线程编程中常见的设计模式，在网上找到在此保存，以供以后慢慢研究。
-
-Single Threaded Execution Pattern(单线程执行模式)
-
-Immutable Pattern(不可变模式)
-
-Guarded Suspension Pattern(防卫暂停模式)
-
-Balking Pattern(止步模式，阻行模式)">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;各个业务对象之间相互协作来完成同一使命。这时，各个业务对象的相互依赖就是无法避免的。对象之间需要相互协作，在横向上它们存在一定的依赖性。而现在我们就是要看一下，在Spring的IoC容器的XML配置中，应该如何表达这种依赖型。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;既然业务对象现在都符合IoC的规则，那么要了解的表达方式其实很简单，无非就是看下构造方法注入和setter方法注入通过XML是如何表达的而已。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="java多线程12种设计模式记录"/>
+  <meta property="og:title" content="Spring注入之道"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -226,44 +218,65 @@ Balking Pattern(止步模式，阻行模式)">
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-11T09:13:41.000Z"><a href="/2015/02/11/thread-tweleve-pattern/">2月 11 2015</a></time>
+        <time datetime="2015-02-21T01:34:25.000Z"><a href="/2015/02/21/spring-injection-pattern/">2月 21 2015</a></time>
       
       
   
-    <h1 class="title">java多线程12种设计模式记录</h1>
+    <h1 class="title">Spring注入之道</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>以下是java多线程编程中常见的设计模式，在网上找到在此保存，以供以后慢慢研究。</p>
-<ol>
-<li><p>Single Threaded Execution Pattern(单线程执行模式)</p>
-</li>
-<li><p>Immutable Pattern(不可变模式)</p>
-</li>
-<li><p>Guarded Suspension Pattern(防卫暂停模式)</p>
-</li>
-<li><p>Balking Pattern(止步模式，阻行模式)<a id="more"></a></p>
-</li>
-<li><p>Producer-Consumer Pattern(生产者-消费者模式)</p>
-</li>
-<li><p>Read-Write Lock Pattern(读-写锁模式)</p>
-</li>
-<li><p>Thread-Per-Message Pattern(每个消息一个线程模式)</p>
-</li>
-<li><p>Worker Thread Pattern(工人线程模式)，也称Background Thread(背景线程)</p>
-</li>
-<li><p>Future Pattern</p>
-</li>
-<li><p>Two-Phase Termination Pattern(两阶段终止模式)</p>
-</li>
-<li><p>Thread-Specific Storage Pattern(线程独有储藏库模式，针对每个线程提供的内存空间)</p>
-</li>
-<li><p>Active Object Pattern(主动对象模式，是各种模式的组合使用，使用了5、7、9等</p>
-</li>
-</ol>
-
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;各个业务对象之间相互协作来完成同一使命。这时，各个业务对象的相互依赖就是无法避免的。对象之间需要相互协作，在横向上它们存在一定的依赖性。而现在我们就是要看一下，在Spring的IoC容器的XML配置中，应该如何表达这种依赖型。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;既然业务对象现在都符合IoC的规则，那么要了解的表达方式其实很简单，无非就是看下构造方法注入和setter方法注入通过XML是如何表达的而已。<a id="more"></a>  </p>
+<h3 id="构造方法注入">构造方法注入</h3>
+<hr>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;按照Spring的IoC容器配置格式，通过构造方法注入方式，为当前业务对象注入其所依赖的对象，需要使用<em>constructor-arg</em>,如下代码所示：</p>
+<pre><code>&lt;bean id=<span class="string">"newsPanel"</span> class=<span class="string">"org.spring.explore.controller.NewsPanel"</span>&gt;
+    &lt;constructor-arg&gt;
+        &lt;<span class="keyword">ref</span> bean=<span class="string">"newsService"</span> /&gt;
+        &lt;<span class="keyword">ref</span> bean=<span class="string">"statNewsService"</span> /&gt;
+    &lt;/constructor-arg&gt;
+&lt;/bean&gt;
+&lt;bean id=<span class="string">"newsService"</span> class=<span class="string">"org.spring.explore.service.NewsService"</span> /&gt;
+&lt;bean id=<span class="string">"statNewsService"</span> class=<span class="string">"org.spring.explore.service.StatNewsService"</span> /&gt;
+</code></pre><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;有些时候，容器在加载XML配置的时候，因为某些原因，无法明确配置项与对象的构造方法参数列表的的对应关系，就需要请<em>constructor-arg</em>的type和index属性出马。比如对象存在多个构造方法，当参数列表数目相同而类型不同的时候，容器无法区分应该使用哪个构造方法来实例化对象，或者构造方法可能同时传入最少两个类型的对象。</p>
+<h4 id="type属性">type属性</h4>
+<pre><code><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"statNewsService"</span> <span class="attribute">class</span>=<span class="value">"org.spring.explore.service.CacheService"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">type</span>=<span class="value">"String"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">value</span>&gt;</span>memcached<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">type</span>=<span class="value">"int"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">value</span>&gt;</span>123<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">bean</span>&gt;</span>
+</code></pre><h4 id="index属性">index属性</h4>
+<pre><code><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"statNewsService"</span> <span class="attribute">class</span>=<span class="value">"org.spring.explore.service.CacheService"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">index</span>=<span class="value">"1"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">value</span>&gt;</span>memcached<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">index</span>=<span class="value">"0"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">value</span>&gt;</span>123<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">bean</span>&gt;</span>
+</code></pre><p>在构造函数注入中使用ref来引用容器中其它的对象实例，可以通过ref的bean、parent属性来指定引用的对象是什么,如下所示</p>
+<pre><code>&lt;bean id=<span class="string">"fxNews"</span> class=<span class="string">"..."</span>&gt;
+    &lt;constructor-arg&gt;
+        &lt;<span class="keyword">ref</span> bean=<span class="string">""</span> /&gt;
+    &lt;/constructor-arg&gt;
+    &lt;constructor-arg&gt;
+        &lt;<span class="keyword">ref</span> parent=<span class="string">""</span> /&gt;
+    &lt;/constructor-arg&gt;
+&lt;/bean&gt;
+</code></pre><p>parent只能指定位于当前容器的父容器中定义的对象引用。<br>bean 则通吃，直接使用bean来指定对象引用就行。  </p>
+<p>BeanFactory可以分层次（通过实现HierarchicalBeanFactory接口），容器A在初始化的时候，可以首先加载容器B中所有的对象定义，然后在加载自身的对象定义，这样，容器B就成了容器A的父容器，容器A可以引用容器B中的所有对象定义。</p>
+<h3 id="setter方法注入">setter方法注入</h3>
+<hr>
+<pre><code>&lt;bean id=<span class="string">"fxNews"</span> class=<span class="string">"..."</span>&gt;
+    &lt;property name=<span class="string">"newsService"</span> <span class="keyword">ref</span>=<span class="string">"newsService"</span>/&gt;
+    &lt;property name=<span class="string">"statNewsService"</span> <span class="keyword">ref</span>=<span class="string">"statNewsService"</span>/&gt;
+&lt;/bean&gt;
+</code></pre>
       
     </div>
     <footer>
@@ -271,15 +284,10 @@ Balking Pattern(止步模式，阻行模式)">
         
   
   <div class="categories">
-    <a href="/categories/thread/">thread</a>
+    <a href="/categories/spring/">spring</a>
   </div>
 
         
-  
-  <div class="tags">
-    <a href="/tags/thread/">thread</a>
-  </div>
-
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -305,10 +313,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/12/netty-fixed-length-decoder/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/11/netty-delimiter-decoder/" class="alignright next" >下一页</a>
+    <a href="/2015/02/20/spring-xml-beans/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
