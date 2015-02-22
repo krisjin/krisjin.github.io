@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Spring容器之BeanFactory | krisjin博客</title>
+  <title>Spring bean scope | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="Spring核心容器中实现了控制反转与依赖注入，它解决了业务类依赖关系的隔离，所有的对象创建及依赖关系的绑定都有Spring容器实现，由它统一管理。">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BeanFactory除了拥有作为IoC Service Provider的职责，作为一个轻量级容器，它还有其它一些职责，其中就包括对象的生命周期管理。在容器中管理的对象的scope概念，大部分都会翻译成“作用域”这个名词。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Spring容器之BeanFactory"/>
+  <meta property="og:title" content="Spring bean scope"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -218,104 +218,29 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-20T10:08:30.000Z"><a href="/2015/02/20/spring-ioc-container-sample/">2月 20 2015</a></time>
+        <time datetime="2015-02-22T07:56:54.000Z"><a href="/2015/02/22/spring-bean-scope/">2月 22 2015</a></time>
       
       
   
-    <h1 class="title">Spring容器之BeanFactory</h1>
+    <h1 class="title">Spring bean scope</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>Spring核心容器中实现了控制反转与依赖注入，它解决了业务类依赖关系的隔离，所有的对象创建及依赖关系的绑定都有Spring容器实现，由它统一管理。  <a id="more"></a></p>
-<h3 id="BeanFactory的对象注册和依赖绑定">BeanFactory的对象注册和依赖绑定</h3>
-<p>BeanFactory 作为一个IoC Service Provider,为了能够明确管理各个业务对象以及业务对象之间的依赖绑定关系，同样需要某种途径来记录和管理这写信息。<br>1). <strong>直接编码方式</strong></p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> HardCodeBeanFactory {
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    DefaultListableBeanFactory factory = <span class="keyword">new</span> DefaultListableBeanFactory();
-    BeanFactory container = bind(factory);
-    UserController uc = (UserController) container.getBean(<span class="string">"userController"</span>);
-    uc.addUser(<span class="keyword">new</span> User());
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> BeanFactory <span class="title">bind</span>(BeanDefinitionRegistry registry) {
-    AbstractBeanDefinition controller = <span class="keyword">new</span> RootBeanDefinition(UserController.class, <span class="keyword">true</span>);
-    AbstractBeanDefinition userService = <span class="keyword">new</span> RootBeanDefinition(UserService.class, <span class="keyword">true</span>);
-
-    <span class="comment">//将Bean注册到容器之中</span>
-    registry.registerBeanDefinition(<span class="string">"userController"</span>, controller);
-    registry.registerBeanDefinition(<span class="string">"userService"</span>, userService);
-
-    <span class="comment">//指定依赖关系（setter方法注入方式）</span>
-    MutablePropertyValues propertyVlaue = <span class="keyword">new</span> MutablePropertyValues();
-    propertyVlaue.addPropertyValue(<span class="keyword">new</span> PropertyValue(<span class="string">"userService"</span>, userService));
-    controller.setPropertyValues(propertyVlaue);
-
-    <span class="comment">//构造函数注入方式</span>
-    <span class="comment">// ConstructorArgumentValues argValue= new ConstructorArgumentValues();</span>
-    <span class="comment">// argValue.addIndexedArgumentValue(0, userService);</span>
-    <span class="comment">// controller.setConstructorArgumentValues(argValue);</span>
-
-    <span class="keyword">return</span> (BeanFactory) registry;
-
-}
-}
-</code></pre><p>2). Xml配置方式</p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> ConfigFileBeanFactory {
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-
-    <span class="comment">// ApplicationContext factory = new</span>
-    <span class="comment">// ClassPathXmlApplicationContext("classpath:applicationContext.xml");</span>
-
-    DefaultListableBeanFactory beanFactory = <span class="keyword">new</span> DefaultListableBeanFactory();
-
-    BeanFactory container = (BeanFactory) bind(beanFactory);
-
-    UserController userController = (UserController) container.getBean(<span class="string">"userController"</span>);
-
-    userController.addUser(<span class="keyword">new</span> User());
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> BeanFactory <span class="title">bind</span>(BeanDefinitionRegistry registry) {
-
-    XmlBeanDefinitionReader reader = <span class="keyword">new</span> XmlBeanDefinitionReader(registry);
-    reader.loadBeanDefinitions(<span class="string">"classpath:applicationContext.xml"</span>);
-
-    <span class="keyword">return</span> (BeanFactory) registry;
-}
-}
-</code></pre><p>3).注解方式</p>
-<p>代码清单：</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">class</span> AnnotationInjection {
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    BeanFactory factory = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"classpath:applicationContext.xml"</span>);
-    AnnotationUserController userController = (AnnotationUserController) factory.getBean(<span class="string">"userController"</span>);
-    userController.addUser(<span class="keyword">new</span> User());
-}
-
-}
-</code></pre><hr>
-<pre><code><span class="annotation">@Component</span>(<span class="string">"userController"</span>)
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AnnotationUserController</span> </span>{
-
-<span class="annotation">@Autowired</span>
-<span class="keyword">private</span> UserService userService;
-
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span>(User user) {
-    userService.addUser(<span class="keyword">new</span> User());
-}
-</code></pre><p>}</p>
-<p>配置文件：</p>
-<pre><code>&lt;<span class="keyword">context</span>:<span class="keyword">component</span>-scan base-<span class="keyword">package</span>=<span class="string">"org.spring.explore"</span>&gt;&lt;/<span class="keyword">context</span>:<span class="keyword">component</span>-scan&gt;
-</code></pre><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在AnnotationUserController类中增加了两个注解，@Autowired是这里的主角，它的存在讲告知Spring容器需要为当前对象注入那些依赖对象。而@Component则是配合在配置文件中classpath-scanning功能使用的。在Spring的配置文件中增加一个“触发器”，使用@Autowired和@Component标注的类就能获得依赖对象的注入了。  </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在Spring的配置文件中<em><context:component-scan></context:component-scan></em> 会到指定的包下面扫描标注有@Component的类，如果找到，则将它们添加到容器进行管理，并根据它们所标注的@Autowired为这些类注入符合条件的依赖对象。</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BeanFactory除了拥有作为IoC Service Provider的职责，作为一个轻量级容器，它还有其它一些职责，其中就包括对象的生命周期管理。在容器中管理的对象的scope概念，大部分都会翻译成“作用域”这个名词。   <a id="more"></a>  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scope用来声明容器中对象所应该出的限定场景或者说该对象的存活时间，即容器在对象进入相应的scope之前，生成并装配成对象，在该对象不再处于这些scope的限定之后，容器通常会销毁这些对象。打个比方吧,我们都是处于社会（容器）中，如果把中学教师作为一类定义，那么当容器初始化这些类后，中学教师只能局限在中学这样的场景中；中学，就可以作为中学教师的scope。</p>
+<h3 id="singleton">singleton</h3>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;配置中的bean定义可以看做是一个模板，容器会根据这个模块构造对象。但是要根据这个模板生成多少个对象实例，又该让着实例存活多久，则由容器根据bean定义的scope语意来决定。标记为拥有singleton scope的对象定义，在Spring的IoC容器中只存在一个实例，所有对该对象的引用都共享这个实例。该实例从容器启动，并因为第一次请求而初始化之后，将一直存活到容器退出。<br>从下图了解：<br><img src="/img/singleton.png" alt="">  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;需要注意一点的事，不要以为名字的原因而与GoF所提出的Singleton模式相混淆，二者的语意是不同的：标记为Singleton的bean是有容器来保证这种类型的bean在同一个容器中只存在一个共享实例；而Singleton模式则是保证在同一Classloader中只存在一个这种类型的实例。可以以下两方面来了解singleton的bean所具有的特性。  </p>
+<ol>
+<li><strong>对象实例数量</strong> singleton类型的bean定义，在一个容器中只存在一个共享实例，所有对该类型bean的依赖都引用这一单一实例。这就好像在每一个幼儿园都有一个滑梯一样，这个幼儿园的小朋友共同使用这个滑梯。而对该幼儿园容器来说，滑梯实际上就是一个singleton的bean.  </li>
+<li><strong>对象存活时间</strong> singleton类型的bean定义，从容器启动，到它第一次请求而被实例化开始，只要容器不销毁或者退出，该类型bean的单一实例就会一直存活。  </li>
+</ol>
+<h3 id="prototype">prototype</h3>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;针对声明为拥有prototype scope的bean定义，容器在接到该类型对象的请求时候，会每次都重新生成一个新的对象实例给对方。虽然这种类型的对象的实例化以及属性设置等工作都是由容器负责的，但是只要准备完毕，并且对象实例返回给请求之后，容器就不再拥有当前对象的引用，请求方需要自己负责当前返回对象的后继生命周期管理工作，包括对该对象的销毁。也就是说容器每次返回给请求方一个新的对象实例之后，就由这个对象实例“自生自灭”了。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;声明为prototype类型的bean定义类型，都是有一些状态的，比如保存每个客户信息的对象。通过下图理解scrope的用法。  </p>
+<p><img src="/img/prototype.png" alt=""></p>
 
       
     </div>
@@ -353,10 +278,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/20/spring-xml-beans/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/18/software-maintenance-reuse/" class="alignright next" >下一页</a>
+    <a href="/2015/02/21/spring-injection-pattern/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
