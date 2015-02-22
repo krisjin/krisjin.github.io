@@ -5,13 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Architecture | krisjin博客</title>
+  <title>spring startup process | krisjin博客</title>
   <meta name="author" content="krisjin">
+  
+  <meta name="description" content="Spring容器启动开始，首先会通过某种途径加载配置元数据，除了代码方式比较直接，在大部分情况下，容器需要依赖某些工具类（BeanDefinitionReader）对加载配置元数据进行解析和分析，并将分析后的信息编组为对应的BeanDefinition,最后把这些保存了Bean定义必要信息的BeanDefinition,注册到相应的BeanDefinitionRegistry。看下图：">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="spring startup process"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -198,25 +200,102 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title category">Architecture</h2>
-
-
-  <div class="archive">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
     
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-18T02:40:59.000Z"><a href="/2015/02/18/software-maintenance-reuse/">2月 18 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/18/software-maintenance-reuse/">软件的可维护与可复用</a></h1>
-            
-          </header>
-        </div>
-      </article>
+      <img src="">
     
   </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-22T10:03:51.000Z"><a href="/2015/02/22/spring-startup-process/">2月 22 2015</a></time>
+      
+      
+  
+    <h1 class="title">spring startup process</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>Spring容器启动开始，首先会通过某种途径加载配置元数据，除了代码方式比较直接，在大部分情况下，容器需要依赖某些工具类（BeanDefinitionReader）对加载配置元数据进行解析和分析，并将分析后的信息编组为对应的BeanDefinition,最后把这些保存了Bean定义必要信息的BeanDefinition,注册到相应的BeanDefinitionRegistry。看下图：<a id="more"></a></p>
+<p><strong>容器启动阶段类图</strong></p>
+<p><img src="/img/container startup.png" alt=""></p>
+<p><strong>其它后处理类图</strong></p>
+<p><img src="/img/beanfactoryprocess.png" alt=""></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/spring/">spring</a>
+  </div>
+
+        
+<!-- Baidu Button BEGIN -->
+<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
+<a class="bds_qzone"></a>
+<a class="bds_tsina"></a>
+<a class="bds_tqq"></a>
+<a class="bds_renren"></a>
+<a class="bds_t163"></a>
+<span class="bds_more"></span>
+<a class="shareCount"></a>
+</div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2015/02/22/spring-bean-scope/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+
+
+<section id="comment">
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->    
+</section>
+
 </div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
