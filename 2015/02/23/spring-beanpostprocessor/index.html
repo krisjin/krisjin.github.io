@@ -5,16 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>LineBasedFrameDecoder和StringDecoder的原理分析 | krisjin博客</title>
+  <title>Spring bean实例化后处理器 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="LineBasedFrameDecoder详解
-LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Spring Bean 实例化阶段后处理器主要是BeanPostProcessor接口，它与BeanFactoryPostProcessor容易产生混淆。只要记住BeanPostProcessor是存在于对象实例化阶段，而BeanFactoryPostProcessor则存在于容器启动阶段。这两个概念就比较容易区分了。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="LineBasedFrameDecoder和StringDecoder的原理分析"/>
+  <meta property="og:title" content="Spring bean实例化后处理器"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -219,50 +218,64 @@ LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，�
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-10T08:56:24.000Z"><a href="/2015/02/10/netty-stick-principle/">2月 10 2015</a></time>
+        <time datetime="2015-02-22T23:38:24.000Z"><a href="/2015/02/23/spring-beanpostprocessor/">2月 23 2015</a></time>
       
       
   
-    <h1 class="title">LineBasedFrameDecoder和StringDecoder的原理分析</h1>
+    <h1 class="title">Spring bean实例化后处理器</h1>
   
 
     </header>
     <div class="entry">
       
-        <h3 id="LineBasedFrameDecoder详解">LineBasedFrameDecoder详解</h3>
-<p>LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。<br><a id="more"></a><br><em>关键实现代码：</em></p>
-<pre><code>  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">findEndOfLine</span>(<span class="keyword">final</span> ByteBuf buffer) {
-    <span class="keyword">final</span> <span class="keyword">int</span> n = buffer.writerIndex();
-    <span class="keyword">for</span> (<span class="keyword">int</span> i = buffer.readerIndex(); i &lt; n; i ++) {
-        <span class="keyword">final</span> <span class="keyword">byte</span> b = buffer.getByte(i);
-        <span class="keyword">if</span> (b == <span class="string">'\n'</span>) {
-            <span class="keyword">return</span> i;
-        } <span class="keyword">else</span> <span class="keyword">if</span> (b == <span class="string">'\r'</span> &amp;&amp; i &lt; n - <span class="number">1</span> &amp;&amp; buffer.getByte(i + <span class="number">1</span>) == <span class="string">'\n'</span>) {
-            <span class="keyword">return</span> i;  <span class="comment">// \r\n</span>
-        }
-    }
-    <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// Not found.</span>
-}
-</code></pre><h3 id="StringDecoderr详解">StringDecoderr详解</h3>
-<p>StringDecoder的功能非常简单，就是将接收到的对象转换成字符串，然后继续调用后面的handler。</p>
-<p><em>关键代码：</em></p>
-<pre><code>   public String toString(<span class="keyword">int</span> <span class="keyword">index</span>, <span class="keyword">int</span> <span class="keyword">length</span>, Charset charset) {
-    <span class="keyword">if</span> (<span class="keyword">length</span> == <span class="number">0</span>) {
-        <span class="keyword">return</span> <span class="string">""</span>;
-    }
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spring Bean 实例化阶段后处理器主要是BeanPostProcessor接口，它与BeanFactoryPostProcessor容易产生混淆。只要记住BeanPostProcessor是存在于对象实例化阶段，而BeanFactoryPostProcessor则存在于容器启动阶段。这两个概念就比较容易区分了。<a id="more"></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;与BeanFacotryPostProcessor通常会处理容器所有符合条件的BeanDefinition类似，BeanPostProcessor会处理容器内所有符合条件的实例化后的对象实例。该接口声明了两个方法，分别在两个不同的时机执行，见下代码定义：</p>
+<pre><code>public interface BeanPostProcessor {
 
-    ByteBuffer nioBuffer;
-    <span class="keyword">if</span> (nioBufferCount() == <span class="number">1</span>) {
-        nioBuffer = nioBuffer(<span class="keyword">index</span>, <span class="keyword">length</span>);
-    } <span class="keyword">else</span> {
-        nioBuffer = ByteBuffer.allocate(<span class="keyword">length</span>);
-        getBytes(<span class="keyword">index</span>, nioBuffer);
-        nioBuffer.flip();
-    }
+/<span class="keyword">*</span><span class="keyword">*</span>
+ <span class="keyword">*</span> Apply this BeanPostProcessor to the given new bean instance <span class="variable">&lt;i&gt;</span>before<span class="variable">&lt;/i&gt;</span> any bean
+ <span class="keyword">*</span> initialization callbacks (like InitializingBean's {<span class="comment">@code afterPropertiesSet}</span>
+ <span class="keyword">*</span> or a custom init-method). The bean will already be populated with property values.
+ <span class="keyword">*</span> The returned bean instance may be a wrapper around the original.
+ <span class="keyword">*</span> <span class="comment">@param bean the new bean instance</span>
+ <span class="keyword">*</span> <span class="comment">@param beanName the name of the bean</span>
+ <span class="keyword">*</span> <span class="comment">@return the bean instance to use, either the original or a wrapped one; if</span>
+ <span class="keyword">*</span> {<span class="comment">@code null}, no subsequent BeanPostProcessors will be invoked</span>
+ <span class="keyword">*</span> <span class="comment">@throws org.springframework.beans.BeansException in case of errors</span>
+ <span class="keyword">*</span> <span class="comment">@see org.springframework.beans.factory.InitializingBean#afterPropertiesSet</span>
+ <span class="keyword">*</span>/
+Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
-    <span class="keyword">return</span> ByteBufUtil.decodeString(nioBuffer, charset);
+/<span class="keyword">*</span><span class="keyword">*</span>
+ <span class="keyword">*</span> Apply this BeanPostProcessor to the given new bean instance <span class="variable">&lt;i&gt;</span>after<span class="variable">&lt;/i&gt;</span> any bean
+ <span class="keyword">*</span> initialization callbacks (like InitializingBean's {<span class="comment">@code afterPropertiesSet}</span>
+ <span class="keyword">*</span> or a custom init-method). The bean will already be populated with property values.
+ <span class="keyword">*</span> The returned bean instance may be a wrapper around the original.
+ <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span>In case of a FactoryBean, this callback will be invoked for both the FactoryBean
+ <span class="keyword">*</span> instance and the objects created by the FactoryBean (as of Spring 2.0). The
+ <span class="keyword">*</span> post-processor can decide whether to apply to either the FactoryBean or created
+ <span class="keyword">*</span> objects or both through corresponding {<span class="comment">@code bean instanceof FactoryBean} checks.</span>
+ <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span>This callback will also be invoked after a short-circuiting triggered by a
+ <span class="keyword">*</span> {<span class="comment">@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,</span>
+ <span class="keyword">*</span> in contrast to all other BeanPostProcessor callbacks.
+ <span class="keyword">*</span> <span class="comment">@param bean the new bean instance</span>
+ <span class="keyword">*</span> <span class="comment">@param beanName the name of the bean</span>
+ <span class="keyword">*</span> <span class="comment">@return the bean instance to use, either the original or a wrapped one; if</span>
+ <span class="keyword">*</span> {<span class="comment">@code null}, no subsequent BeanPostProcessors will be invoked</span>
+ <span class="keyword">*</span> <span class="comment">@throws org.springframework.beans.BeansException in case of errors</span>
+ <span class="keyword">*</span> <span class="comment">@see org.springframework.beans.factory.InitializingBean#afterPropertiesSet</span>
+ <span class="keyword">*</span> <span class="comment">@see org.springframework.beans.factory.FactoryBean</span>
+ <span class="keyword">*</span>/
+Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+
 }
-</code></pre>
+</code></pre><p><em>postProcessBeforeInitialization</em>方法就如下图中BeanPostProcess前置处理这一步将会执行的方法，<em>postProcessAfterInitialization</em>方法对应下图中BeanPostProcessor后置处理那一步执行的方法。BeanPostProcessor的两个方法中都传入了原理对象实例的引用，这为我们扩展容器的对象实例化过程中的行为提供了极为的便利。我们几乎可以对传入的对象实例执行任何的操作。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通常比较常见的使用BeanPostProcessor的场景，是处理标记接口实现类，或者为当前对象提供代理实现。ApplicationContext对应的那些Aware接口实际上是通过BeanPostProcessor的方式进行处理的。当ApplicationContext中每个对象实例化过程走到BeanPostProcessor前置处理这一步是，ApplicationContext容器会检测到之前注册到容器的ApplicationContextAwareProcessor这个BeanPostProcessor实现类，然后调用其<em>postProcessBeforeInitialization</em>方法，检查并设置Aware相关依赖。</p>
+<p><strong>Bean的实例化过程</strong></p>
+<p><img src="/img/Bean的实例化过程.png" alt=""></p>
+<p><strong>BeanPostProcessor类图</strong>  </p>
+<p><img src="/img/beanpostprocessor.png.png" alt=""></p>
+
       
     </div>
     <footer>
@@ -270,15 +283,10 @@ LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，�
         
   
   <div class="categories">
-    <a href="/categories/netty/">netty</a>
+    <a href="/categories/spring/">spring</a>
   </div>
 
         
-  
-  <div class="tags">
-    <a href="/tags/netty/">netty</a>
-  </div>
-
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -304,10 +312,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/11/netty-delimiter-decoder/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/10/tcp-stick-problem-understand/" class="alignright next" >下一页</a>
+    <a href="/2015/02/22/spring-startup-process/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
