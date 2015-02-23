@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Spring注入之道 | krisjin博客</title>
+  <title>策略模式 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;各个业务对象之间相互协作来完成同一使命。这时，各个业务对象的相互依赖就是无法避免的。对象之间需要相互协作，在横向上它们存在一定的依赖性。而现在我们就是要看一下，在Spring的IoC容器的XML配置中，应该如何表达这种依赖型。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;既然业务对象现在都符合IoC的规则，那么要了解的表达方式其实很简单，无非就是看下构造方法注入和setter方法注入通过XML是如何表达的而已。">
+  <meta name="description" content="策略模式属于对象的行为模式，其用意是针对一组算法，将每一个算法封装到具有共同接口的独立类中，从而使得它们可以相互转换。策略模式可以使得算法可以在不影响客户端的情况下发生变化。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Spring注入之道"/>
+  <meta property="og:title" content="策略模式"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -218,65 +218,21 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-21T01:34:25.000Z"><a href="/2015/02/21/spring-injection-pattern/">2月 21 2015</a></time>
+        <time datetime="2015-02-23T12:19:19.000Z"><a href="/2015/02/23/strategy-pattern/">2月 23 2015</a></time>
       
       
   
-    <h1 class="title">Spring注入之道</h1>
+    <h1 class="title">策略模式</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;各个业务对象之间相互协作来完成同一使命。这时，各个业务对象的相互依赖就是无法避免的。对象之间需要相互协作，在横向上它们存在一定的依赖性。而现在我们就是要看一下，在Spring的IoC容器的XML配置中，应该如何表达这种依赖型。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;既然业务对象现在都符合IoC的规则，那么要了解的表达方式其实很简单，无非就是看下构造方法注入和setter方法注入通过XML是如何表达的而已。<a id="more"></a>  </p>
-<h3 id="构造方法注入">构造方法注入</h3>
-<hr>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;按照Spring的IoC容器配置格式，通过构造方法注入方式，为当前业务对象注入其所依赖的对象，需要使用<em>constructor-arg</em>,如下代码所示：</p>
-<pre><code>&lt;bean id=<span class="string">"newsPanel"</span> class=<span class="string">"org.spring.explore.controller.NewsPanel"</span>&gt;
-    &lt;constructor-arg&gt;
-        &lt;<span class="keyword">ref</span> bean=<span class="string">"newsService"</span> /&gt;
-        &lt;<span class="keyword">ref</span> bean=<span class="string">"statNewsService"</span> /&gt;
-    &lt;/constructor-arg&gt;
-&lt;/bean&gt;
-&lt;bean id=<span class="string">"newsService"</span> class=<span class="string">"org.spring.explore.service.NewsService"</span> /&gt;
-&lt;bean id=<span class="string">"statNewsService"</span> class=<span class="string">"org.spring.explore.service.StatNewsService"</span> /&gt;
-</code></pre><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;有些时候，容器在加载XML配置的时候，因为某些原因，无法明确配置项与对象的构造方法参数列表的的对应关系，就需要请<em>constructor-arg</em>的type和index属性出马。比如对象存在多个构造方法，当参数列表数目相同而类型不同的时候，容器无法区分应该使用哪个构造方法来实例化对象，或者构造方法可能同时传入最少两个类型的对象。</p>
-<h4 id="type属性">type属性</h4>
-<pre><code><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"statNewsService"</span> <span class="attribute">class</span>=<span class="value">"org.spring.explore.service.CacheService"</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">type</span>=<span class="value">"String"</span>&gt;</span>
-        <span class="tag">&lt;<span class="title">value</span>&gt;</span>memcached<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
-    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">type</span>=<span class="value">"int"</span>&gt;</span>
-        <span class="tag">&lt;<span class="title">value</span>&gt;</span>123<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
-    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
-<span class="tag">&lt;/<span class="title">bean</span>&gt;</span>
-</code></pre><h4 id="index属性">index属性</h4>
-<pre><code><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"statNewsService"</span> <span class="attribute">class</span>=<span class="value">"org.spring.explore.service.CacheService"</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">index</span>=<span class="value">"1"</span>&gt;</span>
-        <span class="tag">&lt;<span class="title">value</span>&gt;</span>memcached<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
-    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
-    <span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">index</span>=<span class="value">"0"</span>&gt;</span>
-        <span class="tag">&lt;<span class="title">value</span>&gt;</span>123<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
-    <span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span>
-<span class="tag">&lt;/<span class="title">bean</span>&gt;</span>
-</code></pre><p>在构造函数注入中使用ref来引用容器中其它的对象实例，可以通过ref的bean、parent属性来指定引用的对象是什么,如下所示</p>
-<pre><code>&lt;bean id=<span class="string">"fxNews"</span> class=<span class="string">"..."</span>&gt;
-    &lt;constructor-arg&gt;
-        &lt;<span class="keyword">ref</span> bean=<span class="string">""</span> /&gt;
-    &lt;/constructor-arg&gt;
-    &lt;constructor-arg&gt;
-        &lt;<span class="keyword">ref</span> parent=<span class="string">""</span> /&gt;
-    &lt;/constructor-arg&gt;
-&lt;/bean&gt;
-</code></pre><p>parent只能指定位于当前容器的父容器中定义的对象引用。<br>bean 则通吃，直接使用bean来指定对象引用就行。  </p>
-<p>BeanFactory可以分层次（通过实现HierarchicalBeanFactory接口），容器A在初始化的时候，可以首先加载容器B中所有的对象定义，然后在加载自身的对象定义，这样，容器B就成了容器A的父容器，容器A可以引用容器B中的所有对象定义。</p>
-<h3 id="setter方法注入">setter方法注入</h3>
-<hr>
-<pre><code>&lt;bean id=<span class="string">"fxNews"</span> class=<span class="string">"..."</span>&gt;
-    &lt;property name=<span class="string">"newsService"</span> <span class="keyword">ref</span>=<span class="string">"newsService"</span>/&gt;
-    &lt;property name=<span class="string">"statNewsService"</span> <span class="keyword">ref</span>=<span class="string">"statNewsService"</span>/&gt;
-&lt;/bean&gt;
-</code></pre>
+        <p>策略模式属于对象的行为模式，其用意是针对一组算法，将每一个算法封装到具有共同接口的独立类中，从而使得它们可以相互转换。策略模式可以使得算法可以在不影响客户端的情况下发生变化。<a id="more"></a></p>
+<p><em>策略模式类图：</em></p>
+<p><img src="/img/strategy pattern.png" alt=""></p>
+<p>查看代码：<br><a href="https://github.com/zoopaper/java-pattern/tree/master/src/main/java/com/pattern/strategy" target="_blank" rel="external">https://github.com/zoopaper/java-pattern/tree/master/src/main/java/com/pattern/strategy</a></p>
+
       
     </div>
     <footer>
@@ -284,7 +240,7 @@
         
   
   <div class="categories">
-    <a href="/categories/spring/">spring</a>
+    <a href="/categories/design-pattern/">design pattern</a>
   </div>
 
         
@@ -313,10 +269,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/22/spring-bean-scope/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/20/spring-xml-beans/" class="alignright next" >下一页</a>
+    <a href="/2015/02/23/netty-file-transport/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>

@@ -217,6 +217,55 @@
     <header>
       
         <div class="icon"></div>
+        <time datetime="2015-02-10T08:56:24.000Z"><a href="/2015/02/10/netty-stick-principle/">2月 10 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/10/netty-stick-principle/">LineBasedFrameDecoder和StringDecoder的原理分析</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="LineBasedFrameDecoder详解">LineBasedFrameDecoder详解</h3>
+<p>LineBasedFrameDecoder的工作原理是依次遍历ByteBuf中的可读字节，判断是否有“\n”或者“\r\n”，如果有就以此为结束为止，从可读索引到结束位置区间的字节组成了一行。它是以换行符为结束标志的解码器，支持携带结束符或者不携带结束符两种解码方式，同时支持单行的最大长度。如果连续读取到最大长度后仍然没有发现换行符，就回抛出异常，同时忽略掉之前读到的异常码流。<br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/10/netty-stick-principle/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2015-02-10T03:36:43.000Z"><a href="/2015/02/10/tcp-stick-problem-understand/">2月 10 2015</a></time>
       
       
@@ -425,7 +474,7 @@
   
     <li><a href="/categories/Architecture/">Architecture</a><small>1</small></li>
   
-    <li><a href="/categories/design-pattern/">design pattern</a><small>1</small></li>
+    <li><a href="/categories/design-pattern/">design pattern</a><small>2</small></li>
   
     <li><a href="/categories/life/">life</a><small>1</small></li>
   
