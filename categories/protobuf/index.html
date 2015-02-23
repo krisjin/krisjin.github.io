@@ -5,16 +5,13 @@
 <head>
   <meta charset="utf-8">
   
-  <title>软件的可维护与可复用 | krisjin博客</title>
+  <title>protobuf | krisjin博客</title>
   <meta name="author" content="krisjin">
-  
-  <meta name="description" content="软件系统的可维护性
-   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。     一个可维护性较好的系统，应当允许维护工作能够以容易、准确、安全和经济的形式进行。但是现有的软件系统设计往往不具有这样的特性。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="软件的可维护与可复用"/>
+  
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -201,115 +198,25 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+<h2 class="archive-title category">protobuf</h2>
+
+
+  <div class="archive">
     
-      <img src="">
+      <article class="post">
+        <div class="post-content">
+          <header>
+            <div class="icon"></div>
+            <time datetime="2015-02-23T03:12:36.000Z"><a href="/2015/02/23/protobuf-start/">2月 23 2015</a></time>
+            
+              <h1 class="title"><a href="/2015/02/23/protobuf-start/">protobuf入门</a></h1>
+            
+          </header>
+        </div>
+      </article>
     
   </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2015-02-18T02:40:59.000Z"><a href="/2015/02/18/software-maintenance-reuse/">2月 18 2015</a></time>
-      
-      
-  
-    <h1 class="title">软件的可维护与可复用</h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <h2 id="软件系统的可维护性">软件系统的可维护性</h2>
-<p>   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。<br>   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。<br>     一个可维护性较好的系统，应当允许维护工作能够以容易、准确、安全和经济的形式进行。但是现有的软件系统设计往往不具有这样的特性。<br><a id="more"></a></p>
-<h4 id="设计师的辩解">设计师的辩解</h4>
-<p>   面对人们的抱怨，系统设计师都有一套一模一样的辩解：用户需求的变化无常，使得系统设计无法跟上如此快速的变化，如果维护人员与原开发人员不是同一小组的话，就还会有很多沟通成本。  </p>
-<h4 id="真正的问题">真正的问题</h4>
-<ol>
-<li><p><strong>过于僵硬</strong><br>很难在现有的软件系统中加入一个新的功能，这是加入一个新功能，不仅仅意味着创建一个独立的模块，而是这个新增的模块会对其它的模块有影响，甚至会是其它的多个模块都有改动。</p>
-</li>
-<li><p><strong>过于脆弱</strong><br>与软件过于僵硬同时存在的，是软件系统在修改已有代码时过于脆弱。对一个地方的修改，往往会导致看上去没有关系的另一个地方发生故障。尽管在修改前会竭尽所能的去预测可能发生的故障地点。<br>由于这种设计上的缺陷使得项目经理不敢轻易的向系统中加入新的模块功能，这就造成了一个软件系统一旦开发完后，就很难在增加新的功能，僵硬化情况。</p>
-</li>
-<li><p><strong>复用率低</strong><br>所谓复用，就是指一个软件的组成部分，可以在同一项目的不同地方使用，也可以在另一个项目中重复使用。<br>每当程序员发现一段代码、函数、模块所做的事情是可以在新的模块、或者新系统中使用的时候，他们总是发现，这些已有的代码依赖于一大堆其它的东西，以至于很难将它们分开。最后，他们发现最好的办法就是不去“碰”这些已有的东西，而是重新写自己的代码。他们可能会使用源代码剪贴的办法，以最原始的复用方式，节省一些时间，这样的系统就有复用率低的问题。</p>
-</li>
-<li><p><strong>黏度过高</strong><br>有时候一个改动可以以保存原始设计意图和原始设计框架的方式进行，也可以以破坏原始意图和框架的方式进行。第一种办法无疑会带系统的扩展性有利，第二种办法是权宜之计，可以解决短期的问题，但是会牺牲中长期的利益。<br>如果第二种办法比第一种办法容易很多的话，程序员就有可能牺牲中长期的利益，采取权宜之计。在一个模块中搭建一个短路桥，或者在一个通用的逻辑中制造一个特例，以便解决眼前的需要</p>
-</li>
-</ol>
-<h2 id="_"> </h2>
-
-      
-    </div>
-    <footer>
-      
-        
-  
-  <div class="categories">
-    <a href="/categories/Architecture/">Architecture</a>
-  </div>
-
-        
-<!-- Baidu Button BEGIN -->
-<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
-<a class="bds_qzone"></a>
-<a class="bds_tsina"></a>
-<a class="bds_tqq"></a>
-<a class="bds_renren"></a>
-<a class="bds_t163"></a>
-<span class="bds_more"></span>
-<a class="shareCount"></a>
-</div>
-<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
-<script type="text/javascript" id="bdshell_js"></script>
-<script type="text/javascript">
-document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
-</script>
-<!-- Baidu Button END -->      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
- <nav id="pagination" >
-    
-    <a href="/2015/02/20/spring-ioc-container-sample/" class="alignleft prev" >上一页</a>
-    
-    
-    <a href="/2015/02/17/ioc-pattern/" class="alignright next" >下一页</a>
-    
-    <div class="clearfix"></div>
-</nav>
-
-
-
-<section id="comment">
-
-<!-- Duoshuo Comment BEGIN -->
-	<div class="ds-thread"></div>
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"krisjin"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = 'http://static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		|| document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- Duoshuo Comment END -->    
-</section>
-
 </div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">

@@ -5,16 +5,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>软件的可维护与可复用 | krisjin博客</title>
+  <title>protobuf入门 | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="软件系统的可维护性
-   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。     一个可维护性较好的系统，应当允许维护工作能够以容易、准确、安全和经济的形式进行。但是现有的软件系统设计往往不具有这样的特性。">
+  <meta name="description" content="protobuf简介
+protobuf是google提供的一个开源序列化框架，类似于XML，JSON这样的数据表示语言，其最大的特点是基于二进制，因此比传统的XML表示高效短小得多。虽然是二进制数据格式，但并没有因此变得复杂，开发人员通过按照一定的语法定义结构化的消息格式，然后送给命令行工具，工具将自动生成相关的类，可以支持java、c++、python等语言环境。通过将这些类包含在项目中，可以很轻松的调用相关方法来完成业务消息的序列化与反序列化工作。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="软件的可维护与可复用"/>
+  <meta property="og:title" content="protobuf入门"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -219,32 +219,25 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-18T02:40:59.000Z"><a href="/2015/02/18/software-maintenance-reuse/">2月 18 2015</a></time>
+        <time datetime="2015-02-23T03:12:36.000Z"><a href="/2015/02/23/protobuf-start/">2月 23 2015</a></time>
       
       
   
-    <h1 class="title">软件的可维护与可复用</h1>
+    <h1 class="title">protobuf入门</h1>
   
 
     </header>
     <div class="entry">
       
-        <h2 id="软件系统的可维护性">软件系统的可维护性</h2>
-<p>   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。<br>   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。<br>     一个可维护性较好的系统，应当允许维护工作能够以容易、准确、安全和经济的形式进行。但是现有的软件系统设计往往不具有这样的特性。<br><a id="more"></a></p>
-<h4 id="设计师的辩解">设计师的辩解</h4>
-<p>   面对人们的抱怨，系统设计师都有一套一模一样的辩解：用户需求的变化无常，使得系统设计无法跟上如此快速的变化，如果维护人员与原开发人员不是同一小组的话，就还会有很多沟通成本。  </p>
-<h4 id="真正的问题">真正的问题</h4>
+        <h3 id="protobuf简介">protobuf简介</h3>
+<p>protobuf是google提供的一个开源序列化框架，类似于XML，JSON这样的数据表示语言，其最大的特点是基于二进制，因此比传统的XML表示高效短小得多。虽然是二进制数据格式，但并没有因此变得复杂，开发人员通过按照一定的语法定义结构化的消息格式，然后送给命令行工具，工具将自动生成相关的类，可以支持java、c++、python等语言环境。通过将这些类包含在项目中，可以很轻松的调用相关方法来完成业务消息的序列化与反序列化工作。<a id="more"></a></p>
+<p>protobuf在google中是一个比较核心的基础库，作为分布式运算涉及到大量的不同业务消息的传递，如何高效简洁的表示、操作这些业务消息在google这样的大规模应用中是至关重要的。而protobuf这样的库正好是在效率、数据大小、易用性之间取得了很好的平衡。</p>
+<h3 id="protobuf_限定修饰符介绍：">protobuf 限定修饰符介绍：</h3>
 <ol>
-<li><p><strong>过于僵硬</strong><br>很难在现有的软件系统中加入一个新的功能，这是加入一个新功能，不仅仅意味着创建一个独立的模块，而是这个新增的模块会对其它的模块有影响，甚至会是其它的多个模块都有改动。</p>
-</li>
-<li><p><strong>过于脆弱</strong><br>与软件过于僵硬同时存在的，是软件系统在修改已有代码时过于脆弱。对一个地方的修改，往往会导致看上去没有关系的另一个地方发生故障。尽管在修改前会竭尽所能的去预测可能发生的故障地点。<br>由于这种设计上的缺陷使得项目经理不敢轻易的向系统中加入新的模块功能，这就造成了一个软件系统一旦开发完后，就很难在增加新的功能，僵硬化情况。</p>
-</li>
-<li><p><strong>复用率低</strong><br>所谓复用，就是指一个软件的组成部分，可以在同一项目的不同地方使用，也可以在另一个项目中重复使用。<br>每当程序员发现一段代码、函数、模块所做的事情是可以在新的模块、或者新系统中使用的时候，他们总是发现，这些已有的代码依赖于一大堆其它的东西，以至于很难将它们分开。最后，他们发现最好的办法就是不去“碰”这些已有的东西，而是重新写自己的代码。他们可能会使用源代码剪贴的办法，以最原始的复用方式，节省一些时间，这样的系统就有复用率低的问题。</p>
-</li>
-<li><p><strong>黏度过高</strong><br>有时候一个改动可以以保存原始设计意图和原始设计框架的方式进行，也可以以破坏原始意图和框架的方式进行。第一种办法无疑会带系统的扩展性有利，第二种办法是权宜之计，可以解决短期的问题，但是会牺牲中长期的利益。<br>如果第二种办法比第一种办法容易很多的话，程序员就有可能牺牲中长期的利益，采取权宜之计。在一个模块中搭建一个短路桥，或者在一个通用的逻辑中制造一个特例，以便解决眼前的需要</p>
-</li>
+<li>required必须的字段，如果不赋值就会抛出 com.google.protobuf.UninitializedMessageException: Message missing required fields: …异常</li>
+<li>optional可选字段，没什么好说的就是可有可无咯</li>
+<li>repeated可重复的字段可以用来表示数组，在这里我还小小的纠结了会，搞过去就好了（纠结了好一会才知道protobuf数组怎么定义）。其实定义数组很简单repeated string name=字段号;然后在赋值的刚开始用数组的形式来赋值，会抛出java.lang.IndexOutOfBoundsException: Index: 0, Size: 0的异常，我在想size为0，也就是说不能这样搞呀，然后看了下源码是com.google.protobuf.LazyStringList name_ = com.google.protobuf.LazyStringArrayList.EMPTY这样的，也就是说这个玩儿就是个集合嘛，所以赋值就用集合那套来搞定好了</li>
 </ol>
-<h2 id="_"> </h2>
 
       
     </div>
@@ -253,7 +246,7 @@
         
   
   <div class="categories">
-    <a href="/categories/Architecture/">Architecture</a>
+    <a href="/categories/protobuf/">protobuf</a>
   </div>
 
         
@@ -282,10 +275,10 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/20/spring-ioc-container-sample/" class="alignleft prev" >上一页</a>
+    <a href="/2015/02/23/netty-file-transport/" class="alignleft prev" >上一页</a>
     
     
-    <a href="/2015/02/17/ioc-pattern/" class="alignright next" >下一页</a>
+    <a href="/2015/02/23/spring-beanpostprocessor/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>

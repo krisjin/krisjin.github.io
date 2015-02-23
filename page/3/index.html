@@ -217,6 +217,109 @@
     <header>
       
         <div class="icon"></div>
+        <time datetime="2015-02-10T03:36:43.000Z"><a href="/2015/02/10/tcp-stick-problem-understand/">2月 10 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/10/tcp-stick-problem-understand/">理解TCP粘包问题之网络编程总结</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="协议简述">协议简述</h3>
+<ol>
+<li><strong>TCP/IP协议</strong> ：链路层，网络层，传输层，应用层。 　　</li>
+<li>以太网（Ethernet）的数据帧在链路层 　　</li>
+<li>IP包在网络层 　　</li>
+<li>TCP或UDP包在传输层 　　</li>
+<li>TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝  
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/10/tcp-stick-problem-understand/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-02-09T07:23:20.000Z"><a href="/2015/02/09/tcp-stick-package-unpacking/">2月 9 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/02/09/tcp-stick-package-unpacking/">tcp粘包拆包实例</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="1-TCP粘包/拆包">1.TCP粘包/拆包</h3>
+<p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。<br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/02/09/tcp-stick-package-unpacking/#more" class="more-link">阅读全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2015-02-06T08:55:50.000Z"><a href="/2015/02/06/netty-start-sample/">2月 6 2015</a></time>
       
       
@@ -328,7 +431,9 @@
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
   
-    <li><a href="/categories/netty/">netty</a><small>9</small></li>
+    <li><a href="/categories/netty/">netty</a><small>10</small></li>
+  
+    <li><a href="/categories/protobuf/">protobuf</a><small>1</small></li>
   
     <li><a href="/categories/spring/">spring</a><small>7</small></li>
   
