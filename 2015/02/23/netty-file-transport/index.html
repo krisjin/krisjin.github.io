@@ -230,8 +230,10 @@
       
         <p>文件传输通常采用FTP或者HTTP附件的方式，事实上通过TCP Socket+File的方式进行传输也有一定的应用场景，尽管不是主流，但是掌握文件传输的方式还是很重要的，特别是针对两个跨主机的JVM进程之间进行持久化数据的相互交换。<a id="more"></a></p>
 <p>下面使用netty实现文件传输：</p>
-<p><strong>文件服务器</strong><br>    public class FileServer {</p>
-<pre><code><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> InterruptedException {
+<p><strong>文件服务器</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileServer</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> InterruptedException {
 
     EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
     EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();
