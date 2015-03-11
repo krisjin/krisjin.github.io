@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Spring Xml配置文件之beans | krisjin博客</title>
+  <title>在线画图工具Processon | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。">
+  <meta name="description" content="最近在网上想寻找一个在线画流程图的工具，O(∩_∩)O~终于找到了一个https://www.processon.com ，支持各种流程图，优秀的资源也很多，着实不错哦。先上一张搜的一张关于netty 运行时流程图：">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Spring Xml配置文件之beans"/>
+  <meta property="og:title" content="在线画图工具Processon"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -218,26 +218,18 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-20T10:43:48.000Z"><a href="/2015/02/20/spring-xml-beans/">2月 20 2015</a></time>
+        <time datetime="2015-03-11T01:07:45.000Z"><a href="/2015/03/11/process-on/">3月 11 2015</a></time>
       
       
   
-    <h1 class="title">Spring Xml配置文件之beans</h1>
+    <h1 class="title">在线画图工具Processon</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。  <a id="more"></a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所有注册到容器的业务对象，在Sring中称之为Bean,所以，每个对象在XMl中的映射也自然而然的对应一个<em>bean</em>的元素。既然容器中可以管理很多的业务对象，那么把这么多的bean元素组织起来，就叫做beans。下面看下beans元素。</p>
-<h3 id="beans元素属性">beans元素属性</h3>
-<ol>
-<li><strong>default-lazy-init</strong>：其值可以指定为true和false,默认值是false。用来标识是否对所有的bean进行延迟初始化。</li>
-<li><strong>default-autowire</strong>：可以取值为no、byName、byType、constructor、default，默认为no。</li>
-<li><strong>default-init-method</strong>：如果所管理的bean按照某种规则，都有同样名称的初始化方法的话，可以在这里统一指定这个初始化方法名，而不用在没个bean上都重复单独指定。</li>
-<li><strong>default-destroy-method</strong>： 与default-init-method相对应，如果所管理的bean有按照某种规则使用了相同名称的对象销毁方法，可以通过这个属性统一指定。</li>
-</ol>
-<h3 id="import元素">import元素</h3>
-<p>通常情况下，可以根据模块功能或者层次关系，将配置信息分门别类地放到多个配置文件中。在加载主配置文件时，并将主配置文件所依赖的配置文件同时加载，可以在这个主配置文件中通过import元素对其所依赖的配置文件进行引用。</p>
+        <p>最近在网上想寻找一个在线画流程图的工具，O(∩_∩)O~终于找到了一个<a href="https://www.processon.com" title="https://www.processon.com" target="_blank" rel="external">https://www.processon.com</a> ，支持各种流程图，优秀的资源也很多，着实不错哦。先上一张搜的一张关于netty 运行时流程图：<a id="more"></a>  </p>
+<p><img src="/img/netty_run_time.png" alt=""></p>
 
       
     </div>
@@ -246,10 +238,15 @@
         
   
   <div class="categories">
-    <a href="/categories/spring/">spring</a>
+    <a href="/categories/Architecture/">Architecture</a>
   </div>
 
         
+  
+  <div class="tags">
+    <a href="/tags/流程图/">流程图</a>
+  </div>
+
 <!-- Baidu Button BEGIN -->
 <div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
 <a class="bds_qzone"></a>
@@ -275,10 +272,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/02/21/spring-injection-pattern/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/02/20/spring-ioc-container-sample/" class="alignright next" >下一页</a>
+    <a href="/2015/03/10/concurrent-history/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>

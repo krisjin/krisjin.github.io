@@ -5,15 +5,13 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Spring Xml配置文件之beans | krisjin博客</title>
+  <title>第 4 页 | krisjin博客</title>
   <meta name="author" content="krisjin">
-  
-  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Spring Xml配置文件之beans"/>
+  
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -200,7 +198,8 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+  <article class="post">
   
     <div class="gallery">
   <div class="photoset">
@@ -218,54 +217,29 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-02-20T10:43:48.000Z"><a href="/2015/02/20/spring-xml-beans/">2月 20 2015</a></time>
+        <time datetime="2015-02-05T02:46:02.000Z"><a href="/2015/02/05/mybatis-proxy-pattern/">2月 5 2015</a></time>
       
       
   
-    <h1 class="title">Spring Xml配置文件之beans</h1>
+    <h1 class="title"><a href="/2015/02/05/mybatis-proxy-pattern/">mybatis映射配置代理模式的使用</a></h1>
   
 
     </header>
     <div class="entry">
       
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。  <a id="more"></a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所有注册到容器的业务对象，在Sring中称之为Bean,所以，每个对象在XMl中的映射也自然而然的对应一个<em>bean</em>的元素。既然容器中可以管理很多的业务对象，那么把这么多的bean元素组织起来，就叫做beans。下面看下beans元素。</p>
-<h3 id="beans元素属性">beans元素属性</h3>
-<ol>
-<li><strong>default-lazy-init</strong>：其值可以指定为true和false,默认值是false。用来标识是否对所有的bean进行延迟初始化。</li>
-<li><strong>default-autowire</strong>：可以取值为no、byName、byType、constructor、default，默认为no。</li>
-<li><strong>default-init-method</strong>：如果所管理的bean按照某种规则，都有同样名称的初始化方法的话，可以在这里统一指定这个初始化方法名，而不用在没个bean上都重复单独指定。</li>
-<li><strong>default-destroy-method</strong>： 与default-init-method相对应，如果所管理的bean有按照某种规则使用了相同名称的对象销毁方法，可以通过这个属性统一指定。</li>
-</ol>
-<h3 id="import元素">import元素</h3>
-<p>通常情况下，可以根据模块功能或者层次关系，将配置信息分门别类地放到多个配置文件中。在加载主配置文件时，并将主配置文件所依赖的配置文件同时加载，可以在这个主配置文件中通过import元素对其所依赖的配置文件进行引用。</p>
-
+        <h2 id="1-mybatis映射简述">1.mybatis映射简述</h2>
+<p>在使用mybatis过程中，一直有一个疑惑，在定义的DAO层接口并没有实现，接口类是怎么与映射文件进行连接的。接口名称与映射文件必须保持一直，为什么一定要这样做呢。一个接口类怎么做到与映射文件进行连接并执行sql，查看源代码中发现使用jdk动态代理，下面以一个简单的实例来说明一下流程。<br>
       
     </div>
     <footer>
       
         
-  
-  <div class="categories">
-    <a href="/categories/spring/">spring</a>
-  </div>
-
+          <div class="alignleft">
+            <a href="/2015/02/05/mybatis-proxy-pattern/#more" class="more-link">阅读全文</a>
+          </div>
         
-<!-- Baidu Button BEGIN -->
-<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
-<a class="bds_qzone"></a>
-<a class="bds_tsina"></a>
-<a class="bds_tqq"></a>
-<a class="bds_renren"></a>
-<a class="bds_t163"></a>
-<span class="bds_more"></span>
-<a class="shareCount"></a>
-</div>
-<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
-<script type="text/javascript" id="bdshell_js"></script>
-<script type="text/javascript">
-document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
-</script>
-<!-- Baidu Button END -->      
+        
+      
       <div class="clearfix"></div>
     </footer>
   </div>
@@ -273,37 +247,15 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
 
 
- <nav id="pagination" >
-    
-    <a href="/2015/02/21/spring-injection-pattern/" class="alignleft prev" >上一页</a>
-    
-    
-    <a href="/2015/02/20/spring-ioc-container-sample/" class="alignright next" >下一页</a>
-    
-    <div class="clearfix"></div>
-</nav>
 
 
-
-<section id="comment">
-
-<!-- Duoshuo Comment BEGIN -->
-	<div class="ds-thread"></div>
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"krisjin"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = 'http://static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		|| document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- Duoshuo Comment END -->    
-</section>
-
-</div></div>
+<nav id="pagination">
+  
+    <a href="/page/3/" class="alignleft prev">上一页</a>
+  
+  
+  <div class="clearfix"></div>
+</nav></div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
