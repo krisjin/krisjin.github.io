@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Netty WebSocket协议实例 | krisjin博客</title>
+  <meta name="author" content="krisjin">
+  
+  <meta name="description" content="长期以来存在着各种技术让服务器得知有新数据可用是，立即将数据发送到客户端。这些技术种类繁多，例如“推送”活comet。最常用的的一种黑客手段是对服务器发起链接创建假象，被称为长轮询。利用长轮询，客户端可以打开指向服务器的HTTP连接，而服务器会一直保持连接打开，直到发送响应。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Netty WebSocket协议实例"/>
+  <meta property="og:site_name" content="krisjin博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//libs.baidu.com/jquery/1.8.0/jquery.min.js"></script>
+</head>
+
+
+<body>
+  <header id="header" class="inner">
+<div class="alignleft">
+  <h1><a href="/">krisjin博客</a></h1>
+  <h2><a href="/">一步一脚印</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+	<!--<li> <a href="/atom.xml">RSS</a> </li>-->
+<li> <a title="把这个链接拖到你的Chrome收藏夹工具栏中" href='javascript:(function() {
+	function c() {
+		var e = document.createElement("link");
+		e.setAttribute("type", "text/css");
+		e.setAttribute("rel", "stylesheet");
+		e.setAttribute("href", f);
+		e.setAttribute("class", l);
+		document.body.appendChild(e)
+	}
+ 
+	function h() {
+		var e = document.getElementsByClassName(l);
+		for (var t = 0; t < e.length; t++) {
+			document.body.removeChild(e[t])
+		}
+	}
+ 
+	function p() {
+		var e = document.createElement("div");
+		e.setAttribute("class", a);
+		document.body.appendChild(e);
+		setTimeout(function() {
+			document.body.removeChild(e)
+		}, 100)
+	}
+ 
+	function d(e) {
+		return {
+			height : e.offsetHeight,
+			width : e.offsetWidth
+		}
+	}
+ 
+	function v(i) {
+		var s = d(i);
+		return s.height > e && s.height < n && s.width > t && s.width < r
+	}
+ 
+	function m(e) {
+		var t = e;
+		var n = 0;
+		while (!!t) {
+			n += t.offsetTop;
+			t = t.offsetParent
+		}
+		return n
+	}
+ 
+	function g() {
+		var e = document.documentElement;
+		if (!!window.innerWidth) {
+			return window.innerHeight
+		} else if (e && !isNaN(e.clientHeight)) {
+			return e.clientHeight
+		}
+		return 0
+	}
+ 
+	function y() {
+		if (window.pageYOffset) {
+			return window.pageYOffset
+		}
+		return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+	}
+ 
+	function E(e) {
+		var t = m(e);
+		return t >= w && t <= b + w
+	}
+ 
+	function S() {
+		var e = document.createElement("audio");
+		e.setAttribute("class", l);
+		e.src = i;
+		e.loop = false;
+		e.addEventListener("canplay", function() {
+			setTimeout(function() {
+				x(k)
+			}, 500);
+			setTimeout(function() {
+				N();
+				p();
+				for (var e = 0; e < O.length; e++) {
+					T(O[e])
+				}
+			}, 15500)
+		}, true);
+		e.addEventListener("ended", function() {
+			N();
+			h()
+		}, true);
+		e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+		document.body.appendChild(e);
+		e.play()
+	}
+ 
+	function x(e) {
+		e.className += " " + s + " " + o
+	}
+ 
+	function T(e) {
+		e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+	}
+ 
+	function N() {
+		var e = document.getElementsByClassName(s);
+		var t = new RegExp("\\b" + s + "\\b");
+		for (var n = 0; n < e.length; ) {
+			e[n].className = e[n].className.replace(t, "")
+		}
+	}
+ 
+	var e = 30;
+	var t = 30;
+	var n = 350;
+	var r = 350;
+	var i = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake.mp3";
+	var s = "mw-harlem_shake_me";
+	var o = "im_first";
+	var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+	var a = "mw-strobe_light";
+	var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+	var l = "mw_added_css";
+	var b = g();
+	var w = y();
+	var C = document.getElementsByTagName("*");
+	var k = null;
+	for (var L = 0; L < C.length; L++) {
+		var A = C[L];
+		if (v(A)) {
+			if (E(A)) {
+				k = A;
+				break
+			}
+		}
+	}
+	if (A === null) {
+		console.warn("Could not find a node of the right size. Please try a different page.");
+		return
+	}
+	c();
+	S();
+	var O = [];
+	for (var L = 0; L < C.length; L++) {
+		var A = C[L];
+		if (v(A)) {
+			O.push(A)
+		}
+	}
+})()    '>High一下</a> </li>
+
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-03-13T15:26:36.000Z"><a href="/2015/03/13/netty-websocket/">3月 13 2015</a></time>
+      
+      
+  
+    <h1 class="title">Netty WebSocket协议实例</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>长期以来存在着各种技术让服务器得知有新数据可用是，立即将数据发送到客户端。这些技术种类繁多，例如“推送”活comet。最常用的的一种黑客手段是对服务器发起链接创建假象，被称为长轮询。利用长轮询，客户端可以打开指向服务器的HTTP连接，而服务器会一直保持连接打开，直到发送响应。<a id="more"></a>  </p>
+<p>WebSocket Server代码清单：</p>
+<pre><code><span class="keyword">import</span> io.netty.bootstrap.ServerBootstrap;
+<span class="keyword">import</span> io.netty.channel.Channel;
+<span class="keyword">import</span> io.netty.channel.ChannelInitializer;
+<span class="keyword">import</span> io.netty.channel.ChannelPipeline;
+<span class="keyword">import</span> io.netty.channel.EventLoopGroup;
+<span class="keyword">import</span> io.netty.channel.nio.NioEventLoopGroup;
+<span class="keyword">import</span> io.netty.channel.socket.SocketChannel;
+<span class="keyword">import</span> io.netty.channel.socket.nio.NioServerSocketChannel;
+<span class="keyword">import</span> io.netty.handler.codec.http.HttpObjectAggregator;
+<span class="keyword">import</span> io.netty.handler.codec.http.HttpServerCodec;
+<span class="keyword">import</span> io.netty.handler.stream.ChunkedWriteHandler;
+
+<span class="javadoc">/**
+ *<span class="javadoctag"> @author</span> krisjin
+ */</span>
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSocketServer</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>(<span class="keyword">int</span> port) <span class="keyword">throws</span> InterruptedException {
+    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    <span class="keyword">try</span> {
+        ServerBootstrap boot = <span class="keyword">new</span> ServerBootstrap();
+        boot.group(bossGroup, workerGroup);
+        boot.channel(NioServerSocketChannel.class);
+        boot.childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+            <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span>(SocketChannel ch) <span class="keyword">throws</span> Exception {
+                ChannelPipeline pipeline = ch.pipeline();
+                pipeline.addLast(<span class="string">"http-codec"</span>, <span class="keyword">new</span> HttpServerCodec());
+                pipeline.addLast(<span class="string">"aggregator"</span>, <span class="keyword">new</span> HttpObjectAggregator(<span class="number">65536</span>));
+                pipeline.addLast(<span class="string">"http-chunked"</span>, <span class="keyword">new</span> ChunkedWriteHandler());
+                pipeline.addLast(<span class="string">"handler"</span>, <span class="keyword">new</span> WebSocketServerHandler());
+            }
+
+        });
+        Channel ch = boot.bind(port).sync().channel();
+        System.out.println(<span class="string">"Web socket server started at port "</span> + port + <span class="string">'.'</span>);
+        System.out.println(<span class="string">"Open your browser to http://localhost:"</span> + port + <span class="string">'/'</span>);
+        ch.closeFuture().sync();
+
+    } <span class="keyword">finally</span> {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) <span class="keyword">throws</span> InterruptedException {
+
+    <span class="keyword">int</span> port = <span class="number">8080</span>;
+    <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+        <span class="keyword">try</span> {
+        port = Integer.parseInt(args[<span class="number">0</span>]);
+        } <span class="keyword">catch</span> (NumberFormatException e) {
+        e.printStackTrace();
+        }
+    }
+    <span class="keyword">new</span> WebSocketServer().run(port);
+
+    }
+}
+</code></pre><p>handler代码清单：</p>
+<pre><code><span class="keyword">import</span> io.netty.buffer.ByteBuf;
+<span class="keyword">import</span> io.netty.buffer.Unpooled;
+<span class="keyword">import</span> io.netty.channel.ChannelFuture;
+<span class="keyword">import</span> io.netty.channel.ChannelFutureListener;
+<span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;
+<span class="keyword">import</span> io.netty.channel.SimpleChannelInboundHandler;
+<span class="keyword">import</span> io.netty.handler.codec.http.DefaultFullHttpResponse;
+<span class="keyword">import</span> io.netty.handler.codec.http.FullHttpRequest;
+<span class="keyword">import</span> io.netty.handler.codec.http.FullHttpResponse;
+<span class="keyword">import</span> io.netty.handler.codec.http.HttpHeaders;
+<span class="keyword">import</span> io.netty.handler.codec.http.HttpResponseStatus;
+<span class="keyword">import</span> io.netty.handler.codec.http.HttpVersion;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketFrame;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+<span class="keyword">import</span> io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+<span class="keyword">import</span> io.netty.util.CharsetUtil;
+
+<span class="keyword">import</span> java.util.Date;
+
+<span class="javadoc">/**
+ *<span class="javadoctag"> @author</span> krisjin
+ */</span>
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSocketServerHandler</span> <span class="keyword">extends</span> <span class="title">SimpleChannelInboundHandler</span>&lt;<span class="title">Object</span>&gt; </span>{
+
+<span class="keyword">private</span> WebSocketServerHandshaker handshaker;
+
+<span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">messageReceived</span>(ChannelHandlerContext ctx, Object msg) <span class="keyword">throws</span> Exception {
+
+    <span class="keyword">if</span> (msg <span class="keyword">instanceof</span> FullHttpRequest) {
+        handleHttpRequest(ctx, (FullHttpRequest) msg);
+    } <span class="keyword">else</span> <span class="keyword">if</span> (msg <span class="keyword">instanceof</span> WebSocketFrame) {
+        handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+    }
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+    ctx.flush();
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleHttpRequest</span>(ChannelHandlerContext ctx, FullHttpRequest req) {
+    <span class="keyword">if</span> (!req.getDecoderResult().isSuccess() || !<span class="string">"websocket"</span>.equals(req.headers().get(<span class="string">"Upgrade"</span>))) {
+        sendHttpResponse(ctx, req, <span class="keyword">new</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
+        <span class="keyword">return</span>;
+    }
+
+    <span class="comment">// 构造握手响应返回，本机测试</span>
+    WebSocketServerHandshakerFactory wsFactory = <span class="keyword">new</span> WebSocketServerHandshakerFactory(<span class="string">"ws://localhost:8080/websocket"</span>, <span class="keyword">null</span>,
+            <span class="keyword">false</span>);
+
+    handshaker = wsFactory.newHandshaker(req);
+
+    <span class="keyword">if</span> (handshaker == <span class="keyword">null</span>) {
+        WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+    } <span class="keyword">else</span> {
+        handshaker.handshake(ctx.channel(), req);
+    }
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleWebSocketFrame</span>(ChannelHandlerContext ctx, WebSocketFrame frame) {
+
+    <span class="comment">// 判断是否是关闭链路的指令</span>
+    <span class="keyword">if</span> (frame <span class="keyword">instanceof</span> CloseWebSocketFrame) {
+        handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+        <span class="keyword">return</span>;
+    }
+    <span class="comment">// 判断是否是Ping消息</span>
+    <span class="keyword">if</span> (frame <span class="keyword">instanceof</span> PingWebSocketFrame) {
+        ctx.channel().write(<span class="keyword">new</span> PongWebSocketFrame(frame.content().retain()));
+        <span class="keyword">return</span>;
+    }
+
+    <span class="keyword">if</span> (!(frame <span class="keyword">instanceof</span> TextWebSocketFrame)) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException(String.format(<span class="string">"%s frame types not supported"</span>, frame.getClass().getName()));
+    }
+    <span class="comment">//返回应答消息</span>
+    String request= ((TextWebSocketFrame)frame).text();
+    System.out.println(String.format(<span class="string">"%s received %s"</span>, ctx.channel(), request));
+
+    ctx.channel().write(<span class="keyword">new</span> TextWebSocketFrame(request+<span class="string">" ,现在时刻："</span>+<span class="keyword">new</span> Date()));
+
+}
+
+<span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendHttpResponse</span>(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse resp) {
+    <span class="keyword">if</span> (resp.getStatus().code() != <span class="number">200</span>) {
+        ByteBuf buf = Unpooled.copiedBuffer(resp.getStatus().toString(), CharsetUtil.UTF_8);
+        resp.content().writeBytes(buf);
+        buf.release();
+        HttpHeaders.setContentLength(resp, req.content().readableBytes());
+    }
+    ChannelFuture f = ctx.channel().writeAndFlush(resp);
+    <span class="keyword">if</span> (!HttpHeaders.isKeepAlive(req) || resp.getStatus().code() != <span class="number">200</span>) {
+        f.addListener(ChannelFutureListener.CLOSE);
+    }
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span>(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+    cause.printStackTrace();
+    ctx.close();
+}
+
+}
+</code></pre><p>html客户端代码清单：</p>
+<pre><code><span class="doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;<span class="title">html</span>&gt;</span>
+<span class="tag">&lt;<span class="title">head</span>&gt;</span>
+<span class="tag">&lt;<span class="title">meta</span> <span class="attribute">charset</span>=<span class="value">"UTF-8"</span>&gt;</span>
+Netty WebSocket 时间服务器
+<span class="tag">&lt;/<span class="title">head</span>&gt;</span>
+<span class="tag">&lt;<span class="title">br</span>&gt;</span>
+<span class="tag">&lt;<span class="title">body</span>&gt;</span>
+<span class="tag">&lt;<span class="title">br</span>&gt;</span>
+<span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript">
+<span class="keyword">var</span> socket;
+<span class="keyword">if</span> (!<span class="built_in">window</span>.WebSocket) 
+{
+    <span class="built_in">window</span>.WebSocket = <span class="built_in">window</span>.MozWebSocket;
+}
+<span class="keyword">if</span> (<span class="built_in">window</span>.WebSocket) {
+    socket = <span class="keyword">new</span> WebSocket(<span class="string">"ws://localhost:8080/websocket"</span>);
+    socket.onmessage = <span class="function"><span class="keyword">function</span><span class="params">(event)</span> </span>{
+        <span class="keyword">var</span> ta = <span class="built_in">document</span>.getElementById(<span class="string">'responseText'</span>);
+        ta.value=<span class="string">""</span>;
+        ta.value = event.data
+    };
+    socket.onopen = <span class="function"><span class="keyword">function</span><span class="params">(event)</span> </span>{
+        <span class="keyword">var</span> ta = <span class="built_in">document</span>.getElementById(<span class="string">'responseText'</span>);
+        ta.value = <span class="string">"打开WebSocket服务正常，浏览器支持WebSocket!"</span>;
+    };
+    socket.onclose = <span class="function"><span class="keyword">function</span><span class="params">(event)</span> </span>{
+        <span class="keyword">var</span> ta = <span class="built_in">document</span>.getElementById(<span class="string">'responseText'</span>);
+        ta.value = <span class="string">""</span>;
+        ta.value = <span class="string">"WebSocket 关闭!"</span>; 
+    };
+}
+<span class="keyword">else</span>
+    {
+    alert(<span class="string">"抱歉，您的浏览器不支持WebSocket协议!"</span>);
+    }
+
+<span class="function"><span class="keyword">function</span> <span class="title">send</span><span class="params">(message)</span> </span>{
+    <span class="keyword">if</span> (!<span class="built_in">window</span>.WebSocket) { <span class="keyword">return</span>; }
+    <span class="keyword">if</span> (socket.readyState == WebSocket.OPEN) {
+        socket.send(message);
+    }
+    <span class="keyword">else</span>
+        {
+          alert(<span class="string">"WebSocket连接没有建立成功!"</span>);
+        }
+}
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+<span class="tag">&lt;<span class="title">form</span> <span class="attribute">onsubmit</span>=<span class="value">"return false;"</span>&gt;</span>
+<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"message"</span> <span class="attribute">value</span>=<span class="value">"Netty最佳实践"</span>/&gt;</span>
+<span class="tag">&lt;<span class="title">br</span>&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span>
+<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"button"</span> <span class="attribute">value</span>=<span class="value">"发送WebSocket请求消息"</span> <span class="attribute">onclick</span>=<span class="value">"send(this.form.message.value)"</span>/&gt;</span>
+<span class="tag">&lt;<span class="title">hr</span> <span class="attribute">color</span>=<span class="value">"blue"</span>/&gt;</span>
+<span class="tag">&lt;<span class="title">h3</span>&gt;</span>服务端返回的应答消息<span class="tag">&lt;/<span class="title">h3</span>&gt;</span>
+<span class="tag">&lt;<span class="title">textarea</span> <span class="attribute">id</span>=<span class="value">"responseText"</span> <span class="attribute">style</span>=<span class="value">"width:500px;height:300px;"</span>&gt;</span><span class="tag">&lt;/<span class="title">textarea</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">form</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">body</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">html</span>&gt;</span>
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/netty/">netty</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/netty/">netty</a>, <a href="/tags/websocket/">websocket</a>
+  </div>
+
+<!-- Baidu Button BEGIN -->
+<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
+<a class="bds_qzone"></a>
+<a class="bds_tsina"></a>
+<a class="bds_tqq"></a>
+<a class="bds_renren"></a>
+<a class="bds_t163"></a>
+<span class="bds_more"></span>
+<a class="shareCount"></a>
+</div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2015/03/12/netty-question/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+
+
+<section id="comment">
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->    
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:krisjin.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Architecture/">Architecture</a><small>2</small></li>
+  
+    <li><a href="/categories/NIO/">NIO</a><small>2</small></li>
+  
+    <li><a href="/categories/NLP/">NLP</a><small>1</small></li>
+  
+    <li><a href="/categories/concurrent/">concurrent</a><small>1</small></li>
+  
+    <li><a href="/categories/design-pattern/">design pattern</a><small>2</small></li>
+  
+    <li><a href="/categories/git/">git</a><small>1</small></li>
+  
+    <li><a href="/categories/life/">life</a><small>1</small></li>
+  
+    <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
+  
+    <li><a href="/categories/netty/">netty</a><small>12</small></li>
+  
+    <li><a href="/categories/protobuf/">protobuf</a><small>1</small></li>
+  
+    <li><a href="/categories/spring/">spring</a><small>7</small></li>
+  
+    <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
+  
+    <li><a href="/categories/thread/">thread</a><small>1</small></li>
+  
+    <li><a href="/categories/线程/">线程</a><small>0</small></li>
+  
+  </ul>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1683020051&verifier=2d7c2166&colors=99d9ea,ffffff,666666,0082cb,ecfbfd&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><section>
+Theme of <a href="https://github.com/krisjin">Light</a>, Improved from <a href="https://github.com/hexojs/hexo-theme-light">Light</a>, by <a href="/">krisjin</a> 
+</section>
+<div class="clearfix"></div>
+</footer>
+  <script src="//libs.baidu.com/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>
+
+
+<a href="https://github.com/krisjin" target="_blank"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_white_ffffff.png" alt="Fork me on GitHub"></a>
