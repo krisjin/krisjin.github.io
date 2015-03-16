@@ -5,13 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Netty ChannelPipeline | krisjin博客</title>
+  <title>Netty ChannelPipeline 详解 | krisjin博客</title>
   <meta name="author" content="krisjin">
+  
+  <meta name="description" content="ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Netty ChannelPipeline"/>
+  <meta property="og:title" content="Netty ChannelPipeline 详解"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -220,13 +222,62 @@
       
       
   
-    <h1 class="title">Netty ChannelPipeline</h1>
+    <h1 class="title">Netty ChannelPipeline 详解</h1>
   
 
     </header>
     <div class="entry">
       
-        
+        <p>ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。<a id="more"></a></p>
+<h2 id="ChannelPipeline的事件处理">ChannelPipeline的事件处理</h2>
+<hr>
+<p>下图展示了一个消息被ChannelPipeline的ChannelHandler链拦截和处理的全过程。</p>
+<pre><code>                                                       I/O Request
+ *                                            via {@link Channel} or
+ *                                        {@link ChannelHandlerContext}
+ *                                                      <span class="string">|</span>
+ *  +---------------------------------------------------+---------------+
+ *  <span class="string">|                           ChannelPipeline         |               |</span>
+ *  <span class="string">|                                                  \|/              |</span>
+ *  <span class="string">|    +----------------------------------------------+----------+    |</span>
+ *  <span class="string">|    |                   ChannelHandler  N                     |    |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|              /|\                                  |               |</span>
+ *  <span class="string">|               |                                  \|/              |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|    |                   ChannelHandler N-1                    |    |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|              /|\                                  .               |</span>
+ *  <span class="string">|               .                                   .               |</span>
+ *  <span class="string">| ChannelHandlerContext.fireIN_EVT() ChannelHandlerContext.OUT_EVT()|</span>
+ *  <span class="string">|          [method call]                      [method call]         |</span>
+ *  <span class="string">|               .                                   .               |</span>
+ *  <span class="string">|               .                                  \|/              |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|    |                   ChannelHandler  2                     |    |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|              /|\                                  |               |</span>
+ *  <span class="string">|               |                                  \|/              |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|    |                   ChannelHandler  1                     |    |</span>
+ *  <span class="string">|    +----------+-----------------------------------+----------+    |</span>
+ *  <span class="string">|              /|\                                  |               |</span>
+ *  +---------------+-----------------------------------+---------------+
+ *                  <span class="string">|                                  \|/</span>
+ *  +---------------+-----------------------------------+---------------+
+ *  <span class="string">|               |                                   |               |</span>
+ *  <span class="string">|       [ Socket.read() ]                    [ Socket.write() ]     |</span>
+ *  <span class="string">|                                                                   |</span>
+ *  <span class="string">|  Netty Internal I/O Threads (Transport Implementation)            |</span>
+ *  +-------------------------------------------------------------------+
+</code></pre><p>消息的读取和发送处理全流程描述如下：</p>
+<ol>
+<li>底层的SocketChannel read()方法读取ByteBuf,触发ChannelRead事件，由I/O线程NioEventLoop调用ChannelPipeline的fireChannelRead(Object msg)方法，将消息（Bytebuf）传输到ChannelPipeline中；</li>
+<li>消息依次被HeadHandler、ChannelHandler1、ChannelHandler2…..TailHandler拦截和处理，在这个过程中，任何ChannelHandler都可以中断当前的流程，结束消息的传递。</li>
+<li>调用ChannelHandlerContext的write方法发送消息，消息从TailHandler开始，途径ChannelHandlerN….ChannelHandler1、HeadHandler，最终被添加到消息发送缓冲区中等待刷新和发送，在此过程中也可以中断消息的传递，例如编码失败时，就需要中断流程，构造异常的Future返回。</li>
+</ol>
+<p>Netty中的事件分为inbound事件和outbound事件，inbound事件通常由I/O线程触发，例如TCP链路建立事件，链路关闭事件，读事件，异常通知事件等，它对应上图的左半部分。</p>
+
       
     </div>
     <footer>
