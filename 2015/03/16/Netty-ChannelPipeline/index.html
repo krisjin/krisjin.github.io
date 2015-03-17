@@ -277,7 +277,55 @@
 <li>调用ChannelHandlerContext的write方法发送消息，消息从TailHandler开始，途径ChannelHandlerN….ChannelHandler1、HeadHandler，最终被添加到消息发送缓冲区中等待刷新和发送，在此过程中也可以中断消息的传递，例如编码失败时，就需要中断流程，构造异常的Future返回。</li>
 </ol>
 <p>Netty中的事件分为inbound事件和outbound事件，inbound事件通常由I/O线程触发，例如TCP链路建立事件，链路关闭事件，读事件，异常通知事件等，它对应上图的左半部分。</p>
+<p><strong>触发inbound事件</strong>的方法如下：  </p>
+<ol>
+<li>public ChannelPipeline fireChannelRegistered()：Channel注册事件</li>
+<li>public ChannelHandlerContext fireChannelActive()：TCP链路建立成功，Channel激活事件</li>
+<li>public ChannelHandlerContext fireChannelRead(Object msg)：读事件</li>
+<li>public ChannelHandlerContext fireChannelReadComplete() ：读操作完成通知事件</li>
+<li>public ChannelHandlerContext fireExceptionCaught(Throwable cause)：异常通知事件</li>
+<li>public ChannelHandlerContext fireUserEventTriggered(Object event)：用户自定义事件</li>
+<li>public ChannelHandlerContext fireChannelWritabilityChanged()：Channel的可写状态变化通知事件</li>
+<li>public ChannelHandlerContext fireChannelInactive() ：TCP连接关闭，链路不可用通知事件</li>
+</ol>
+<p>outbound事件通常是由用户主动发起的网络I/O操作，例如用户发起的连接操作、绑定操作、消息发送等操作，它对应上图的右半部分。</p>
+<p><strong>触发outbound事件</strong>的方法如下：</p>
+<ol>
+<li>public ChannelFuture bind(final SocketAddress localAddress, final ChannelPromise promise)：绑定本地地址事件</li>
+<li><strong>public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise)</strong>：连接服务端事件</li>
+<li><strong>public ChannelFuture write(Object msg, ChannelPromise promise)</strong>：发送事件</li>
+<li><strong>public ChannelHandlerContext flush()</strong>：刷新事件</li>
+<li><strong>public ChannelHandlerContext read()</strong>：读事件</li>
+<li><strong>public ChannelFuture disconnect(ChannelPromise promise)</strong>：断开连接事件</li>
+<li><strong>public ChannelFuture close(ChannelPromise promise)</strong>：关闭当前Channel事件</li>
+</ol>
+<h2 id="自定义拦截器">自定义拦截器</h2>
+<hr>
+<p>ChannelPipeline通过ChannelHandler接口来实现事件的拦截和处理，由于ChannelHandler中的事件种类繁多，不同的ChannelHandler可能只需要关心其中的某一个或者几个事件，所以，通常ChannelHandler只需要继承ChannelHandlerAdapter类覆盖自己关心的方法即可。<br>例如下面的例子展示拦截Channel Active事件，打印TCP链路建立成功日志，代码如下：</p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelActiveInbound</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
 
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span>(ChannelHandlerContext ctx) <span class="keyword">throws</span> Exception {
+
+    System.out.println(<span class="string">"TCP Connected!"</span>);
+
+    ctx.fireChannelActive();
+}
+
+}
+</code></pre><p>下面的例子展示了如何在链路关闭的时候释放资源，示例代码如下：</p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelCloseOutbound</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span>(ChannelHandlerContext ctx, ChannelPromise promise)
+        <span class="keyword">throws</span> Exception {
+
+    System.out.println(<span class="string">"TCP Closing!"</span>);
+    ctx.close(promise);
+}
+
+}
+</code></pre>
       
     </div>
     <footer>
@@ -318,6 +366,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
 
  <nav id="pagination" >
+    
+    <a href="/2015/03/17/ubuntu14-install-mysql/" class="alignleft prev" >上一页</a>
     
     
     <a href="/2015/03/13/netty-thread-model/" class="alignright next" >下一页</a>
@@ -374,6 +424,8 @@ var duoshuoQuery = {short_name:"krisjin"};
     <li><a href="/categories/life/">life</a><small>1</small></li>
   
     <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
+  
+    <li><a href="/categories/mysql/">mysql</a><small>1</small></li>
   
     <li><a href="/categories/netty/">netty</a><small>13</small></li>
   

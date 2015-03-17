@@ -5,15 +5,13 @@
 <head>
   <meta charset="utf-8">
   
-  <title>NIO Scatter/Gather实例 | krisjin博客</title>
+  <title>mysql | krisjin博客</title>
   <meta name="author" content="krisjin">
-  
-  <meta name="description" content="Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel（译者注：Channel在中文经常翻译为通道）中读取或者写入到Channel的操作。分散（scatter）从Channel中读取是指在读操作时将读取的数据写入多个buffer中。因此，Channel将从Channel中读取的数据“分散（scatter）”到多个Buffer中。聚集（gather）写入Channel是指在写操作时将多个buffer的数据写入同一个Channel，因此，Channel 将多个Buffer中的数据“聚集（gather）”后发送到Channel。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="NIO Scatter/Gather实例"/>
+  
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -200,192 +198,25 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+<h2 class="archive-title category">mysql</h2>
+
+
+  <div class="archive">
     
-      <img src="">
+      <article class="post">
+        <div class="post-content">
+          <header>
+            <div class="icon"></div>
+            <time datetime="2015-03-17T06:49:55.000Z"><a href="/2015/03/17/ubuntu14-install-mysql/">3月 17 2015</a></time>
+            
+              <h1 class="title"><a href="/2015/03/17/ubuntu14-install-mysql/">ubuntu14安装mysql</a></h1>
+            
+          </header>
+        </div>
+      </article>
     
   </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2015-03-10T04:00:56.000Z"><a href="/2015/03/10/nio-scatter-gather/">3月 10 2015</a></time>
-      
-      
-  
-    <h1 class="title">NIO Scatter/Gather实例</h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <p>Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel（译者注：Channel在中文经常翻译为通道）中读取或者写入到Channel的操作。<br>分散（scatter）从Channel中读取是指在读操作时将读取的数据写入多个buffer中。因此，Channel将从Channel中读取的数据“分散（scatter）”到多个Buffer中。<br>聚集（gather）写入Channel是指在写操作时将多个buffer的数据写入同一个Channel，因此，Channel 将多个Buffer中的数据“聚集（gather）”后发送到Channel。<a id="more"></a></p>
-<p>scatter / gather经常用于需要将传输的数据分开处理的场合，例如传输一个由消息头和消息体组成的消息，你可能会将消息体和消息头分散到不同的buffer中，这样你可以方便的处理消息头和消息体。</p>
-<p>Scatter/Gather操作查看下图：</p>
-<p><img src="/img/scatter-gather.png" alt=""></p>
-<p><strong>代码清单：</strong></p>
-<pre><code><span class="keyword">import</span> java.io.FileNotFoundException;
-<span class="keyword">import</span> java.io.IOException;
-<span class="keyword">import</span> java.io.RandomAccessFile;
-<span class="keyword">import</span> java.nio.ByteBuffer;
-<span class="keyword">import</span> java.nio.channels.FileChannel;
-<span class="keyword">import</span> java.nio.channels.GatheringByteChannel;
-<span class="keyword">import</span> java.nio.channels.ScatteringByteChannel;
-
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScatterAndGather</span> </span>{
-
-<span class="keyword">static</span> String headers = <span class="string">"header:13byte "</span>;
-<span class="keyword">static</span> String bodys = <span class="string">"body:Scattering and Gathering example"</span>;
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    gather();
-    scatter();
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scatter</span>() {
-
-    ByteBuffer header = ByteBuffer.allocate(<span class="number">13</span>);
-    ByteBuffer body = ByteBuffer.allocate(<span class="number">100</span>);
-
-    ByteBuffer[] bufferArray = { header, body };
-
-    ScatteringByteChannel channel = getChannel();
-
-    <span class="keyword">try</span> {
-        channel.read(bufferArray);
-    } <span class="keyword">catch</span> (IOException e) {
-        e.printStackTrace();
-    }
-
-    header.rewind();
-    body.rewind();
-
-    String headerStr = convertBufferToString(header);
-    String bodyStr = convertBufferToString(body);
-    System.out.println(headerStr);
-    System.out.println(bodyStr);
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">gather</span>() {
-    ByteBuffer header = ByteBuffer.allocate(<span class="number">14</span>);
-    ByteBuffer body = ByteBuffer.allocate(<span class="number">100</span>);
-
-    header.put(headers.getBytes());
-    body.put(bodys.getBytes());
-
-    GatheringByteChannel channel = getChannel();
-
-    <span class="keyword">try</span> {
-        header.flip();
-        body.flip();
-        channel.write(<span class="keyword">new</span> ByteBuffer[] { header, body });
-    } <span class="keyword">catch</span> (IOException e) {
-        e.printStackTrace();
-    }
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> FileChannel <span class="title">getChannel</span>() {
-
-    RandomAccessFile raf = <span class="keyword">null</span>;
-    <span class="keyword">try</span> {
-        raf = <span class="keyword">new</span> RandomAccessFile(<span class="string">"e:/sg.txt"</span>, <span class="string">"rw"</span>);
-    } <span class="keyword">catch</span> (FileNotFoundException e) {
-        e.printStackTrace();
-    }
-
-    <span class="keyword">return</span> raf.getChannel();
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">convertBufferToString</span>(ByteBuffer buffer) {
-    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
-    <span class="keyword">while</span> (buffer.remaining() != <span class="number">0</span>) {
-        sb.append((<span class="keyword">char</span>) buffer.get());
-    }
-    <span class="keyword">return</span> sb.toString();
-}
-
-}
-</code></pre>
-      
-    </div>
-    <footer>
-      
-        
-  
-  <div class="categories">
-    <a href="/categories/NIO/">NIO</a>
-  </div>
-
-        
-  
-  <div class="tags">
-    <a href="/tags/nio/">nio</a>, <a href="/tags/scatter/">scatter</a>, <a href="/tags/gather/">gather</a>
-  </div>
-
-<!-- Baidu Button BEGIN -->
-<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
-<a class="bds_qzone"></a>
-<a class="bds_tsina"></a>
-<a class="bds_tqq"></a>
-<a class="bds_renren"></a>
-<a class="bds_t163"></a>
-<span class="bds_more"></span>
-<a class="shareCount"></a>
-</div>
-<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
-<script type="text/javascript" id="bdshell_js"></script>
-<script type="text/javascript">
-document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
-</script>
-<!-- Baidu Button END -->      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
- <nav id="pagination" >
-    
-    <a href="/2015/03/10/concurrent-history/" class="alignleft prev" >上一页</a>
-    
-    
-    <a href="/2015/03/09/it-idf-keyword/" class="alignright next" >下一页</a>
-    
-    <div class="clearfix"></div>
-</nav>
-
-
-
-<section id="comment">
-
-<!-- Duoshuo Comment BEGIN -->
-	<div class="ds-thread"></div>
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"krisjin"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = 'http://static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		|| document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- Duoshuo Comment END -->    
-</section>
-
 </div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">

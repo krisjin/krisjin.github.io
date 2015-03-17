@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>NIO Scatter/Gather实例 | krisjin博客</title>
+  <title>ubuntu14安装mysql | krisjin博客</title>
   <meta name="author" content="krisjin">
   
-  <meta name="description" content="Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel（译者注：Channel在中文经常翻译为通道）中读取或者写入到Channel的操作。分散（scatter）从Channel中读取是指在读操作时将读取的数据写入多个buffer中。因此，Channel将从Channel中读取的数据“分散（scatter）”到多个Buffer中。聚集（gather）写入Channel是指在写操作时将多个buffer的数据写入同一个Channel，因此，Channel 将多个Buffer中的数据“聚集（gather）”后发送到Channel。">
+  <meta name="description" content="使用ubuntu14搭建Java项目的运行环境确实方便不少，下面就在Ubuntu14下搭建Mysql。输入 sudo apt-get install mysql-server 命令即可">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="NIO Scatter/Gather实例"/>
+  <meta property="og:title" content="ubuntu14安装mysql"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -218,104 +218,67 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2015-03-10T04:00:56.000Z"><a href="/2015/03/10/nio-scatter-gather/">3月 10 2015</a></time>
+        <time datetime="2015-03-17T06:49:55.000Z"><a href="/2015/03/17/ubuntu14-install-mysql/">3月 17 2015</a></time>
       
       
   
-    <h1 class="title">NIO Scatter/Gather实例</h1>
+    <h1 class="title">ubuntu14安装mysql</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel（译者注：Channel在中文经常翻译为通道）中读取或者写入到Channel的操作。<br>分散（scatter）从Channel中读取是指在读操作时将读取的数据写入多个buffer中。因此，Channel将从Channel中读取的数据“分散（scatter）”到多个Buffer中。<br>聚集（gather）写入Channel是指在写操作时将多个buffer的数据写入同一个Channel，因此，Channel 将多个Buffer中的数据“聚集（gather）”后发送到Channel。<a id="more"></a></p>
-<p>scatter / gather经常用于需要将传输的数据分开处理的场合，例如传输一个由消息头和消息体组成的消息，你可能会将消息体和消息头分散到不同的buffer中，这样你可以方便的处理消息头和消息体。</p>
-<p>Scatter/Gather操作查看下图：</p>
-<p><img src="/img/scatter-gather.png" alt=""></p>
-<p><strong>代码清单：</strong></p>
-<pre><code><span class="keyword">import</span> java.io.FileNotFoundException;
-<span class="keyword">import</span> java.io.IOException;
-<span class="keyword">import</span> java.io.RandomAccessFile;
-<span class="keyword">import</span> java.nio.ByteBuffer;
-<span class="keyword">import</span> java.nio.channels.FileChannel;
-<span class="keyword">import</span> java.nio.channels.GatheringByteChannel;
-<span class="keyword">import</span> java.nio.channels.ScatteringByteChannel;
+        <p>使用ubuntu14搭建Java项目的运行环境确实方便不少，下面就在Ubuntu14下搭建Mysql。<br>输入 <strong>sudo apt-get install mysql-server</strong> 命令即可<a id="more"></a>  </p>
+<p><img src="/img/mysql-install-1.png" alt=""></p>
+<p>输入root密码</p>
+<p><img src="/img/mysql-install-2.png" alt=""></p>
+<p>安装成功页面</p>
+<p>成功安装之后输入：<strong>mysql -u root -p</strong> 登录mysql  </p>
+<h2 id="Ubuntu下mysql安装目录">Ubuntu下mysql安装目录</h2>
+<ul>
+<li>/usr/bin               客户端程序和mysql_install_db</li>
+<li>/var/lib/mysql         数据库和日志文件</li>
+<li>/var/run/mysqld        服务器</li>
+<li>/etc/mysql             配置文件my.cnf</li>
+<li>/usr/share/mysql       字符集，基准程序和错误消息</li>
+<li>/etc/init.d/mysql      启动mysql服务器</li>
+</ul>
+<h2 id="卸载Mysql">卸载Mysql</h2>
+<p> sudo apt-get autoremove —purge mysql-server-5.5<br>根据自己安装的版本进行卸载</p>
+<h2 id="更改默认字符集为_UTF8‘">更改默认字符集为 UTF8‘</h2>
+<p>为防止中文乱码，建议将数据库默认编码方式统一改为 utf8，默认是 latin1</p>
+<pre><code>[mysql]
+default-character-<span class="operator"><span class="keyword">set</span>=utf8
 
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScatterAndGather</span> </span>{
+[mysqld]
+<span class="built_in">character</span>-<span class="keyword">set</span>-<span class="keyword">server</span>=utf8</span>
+</code></pre><h2 id="添加启动服务">添加启动服务</h2>
+<pre><code><span class="keyword">cp</span> support-<span class="keyword">files</span>/mysql.server /etc/init.<span class="keyword">d</span>/mysqld   
+<span class="keyword">update</span>-rc.<span class="keyword">d</span> mysqld defaults
+</code></pre><p>移除启动服务： </p>
+<pre><code><span class="keyword">update</span>-rc.<span class="keyword">d</span> -<span class="keyword">f</span> mysqld <span class="built_in">remove</span>
+</code></pre><h2 id="启动_MySQL_服务">启动 MySQL 服务</h2>
+<pre><code>service mysqld <span class="operator"><span class="keyword">start</span>
 
-<span class="keyword">static</span> String headers = <span class="string">"header:13byte "</span>;
-<span class="keyword">static</span> String bodys = <span class="string">"body:Scattering and Gathering example"</span>;
+停止 MySQL 服务：
+service mysqld <span class="keyword">stop</span>
 
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {
-    gather();
-    scatter();
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scatter</span>() {
-
-    ByteBuffer header = ByteBuffer.allocate(<span class="number">13</span>);
-    ByteBuffer body = ByteBuffer.allocate(<span class="number">100</span>);
-
-    ByteBuffer[] bufferArray = { header, body };
-
-    ScatteringByteChannel channel = getChannel();
-
-    <span class="keyword">try</span> {
-        channel.read(bufferArray);
-    } <span class="keyword">catch</span> (IOException e) {
-        e.printStackTrace();
-    }
-
-    header.rewind();
-    body.rewind();
-
-    String headerStr = convertBufferToString(header);
-    String bodyStr = convertBufferToString(body);
-    System.out.println(headerStr);
-    System.out.println(bodyStr);
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">gather</span>() {
-    ByteBuffer header = ByteBuffer.allocate(<span class="number">14</span>);
-    ByteBuffer body = ByteBuffer.allocate(<span class="number">100</span>);
-
-    header.put(headers.getBytes());
-    body.put(bodys.getBytes());
-
-    GatheringByteChannel channel = getChannel();
-
-    <span class="keyword">try</span> {
-        header.flip();
-        body.flip();
-        channel.write(<span class="keyword">new</span> ByteBuffer[] { header, body });
-    } <span class="keyword">catch</span> (IOException e) {
-        e.printStackTrace();
-    }
-
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> FileChannel <span class="title">getChannel</span>() {
-
-    RandomAccessFile raf = <span class="keyword">null</span>;
-    <span class="keyword">try</span> {
-        raf = <span class="keyword">new</span> RandomAccessFile(<span class="string">"e:/sg.txt"</span>, <span class="string">"rw"</span>);
-    } <span class="keyword">catch</span> (FileNotFoundException e) {
-        e.printStackTrace();
-    }
-
-    <span class="keyword">return</span> raf.getChannel();
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">convertBufferToString</span>(ByteBuffer buffer) {
-    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
-    <span class="keyword">while</span> (buffer.remaining() != <span class="number">0</span>) {
-        sb.append((<span class="keyword">char</span>) buffer.get());
-    }
-    <span class="keyword">return</span> sb.toString();
-}
-
-}
+重启 MySQL 服务：
+service mysqld restart</span>
+</code></pre><h2 id="设置_root_用户密码">设置 root 用户密码</h2>
+<p>mysqladmin -u root password ‘root’</p>
+<h2 id="登录_MySQL">登录 MySQL</h2>
+<pre><code><span class="title">mysql</span> -u root –p
+</code></pre><p>随后需输入 root 用户密码（root）</p>
+<h2 id="清理_MySQL_用户">清理 MySQL 用户</h2>
+<pre><code><span class="operator"><span class="keyword">select</span> host, <span class="keyword">user</span>, <span class="keyword">password</span> <span class="keyword">from</span> mysql.<span class="keyword">user</span>;</span>
+<span class="operator"><span class="keyword">delete</span> <span class="keyword">from</span> mysql.<span class="keyword">user</span> <span class="keyword">where</span> <span class="keyword">password</span> = <span class="string">''</span>;</span>
+<span class="operator"><span class="keyword">flush</span> <span class="keyword">privileges</span>;</span>
+</code></pre><p>为了提高安全性，建议删除所有空密码的用户，仅保留 root@localhost 一个用户，以后可针对不同的数据库，创建不同的用户。</p>
+<h2 id="远程访问_MySQL">远程访问 MySQL</h2>
+<p>若需要通过 root 用户远程访问 MySQL，则需要修改 mysql.user 表的 host 为“%”。</p>
+<pre><code><span class="operator"><span class="keyword">update</span> mysql.<span class="keyword">user</span> <span class="keyword">set</span> host = <span class="string">'%'</span> <span class="keyword">where</span> <span class="keyword">user</span> = <span class="string">'root'</span>;</span>  
+<span class="operator"><span class="keyword">flush</span> <span class="keyword">privileges</span>;</span>
 </code></pre>
       
     </div>
@@ -324,13 +287,13 @@
         
   
   <div class="categories">
-    <a href="/categories/NIO/">NIO</a>
+    <a href="/categories/mysql/">mysql</a>
   </div>
 
         
   
   <div class="tags">
-    <a href="/tags/nio/">nio</a>, <a href="/tags/scatter/">scatter</a>, <a href="/tags/gather/">gather</a>
+    <a href="/tags/ubuntu/">ubuntu</a>, <a href="/tags/mysql/">mysql</a>
   </div>
 
 <!-- Baidu Button BEGIN -->
@@ -358,10 +321,8 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 
  <nav id="pagination" >
     
-    <a href="/2015/03/10/concurrent-history/" class="alignleft prev" >上一页</a>
     
-    
-    <a href="/2015/03/09/it-idf-keyword/" class="alignright next" >下一页</a>
+    <a href="/2015/03/16/Netty-ChannelPipeline/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>
