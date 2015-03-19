@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redis install | krisjin博客</title>
+  <meta name="author" content="krisjin">
+  
+  <meta name="description" content="Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="redis install"/>
+  <meta property="og:site_name" content="krisjin博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//libs.baidu.com/jquery/1.8.0/jquery.min.js"></script>
+</head>
+
+
+<body>
+  <header id="header" class="inner">
+<div class="alignleft">
+  <h1><a href="/">krisjin博客</a></h1>
+  <h2><a href="/">一步一脚印</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+	<!--<li> <a href="/atom.xml">RSS</a> </li>-->
+<li> <a title="把这个链接拖到你的Chrome收藏夹工具栏中" href='javascript:(function() {
+	function c() {
+		var e = document.createElement("link");
+		e.setAttribute("type", "text/css");
+		e.setAttribute("rel", "stylesheet");
+		e.setAttribute("href", f);
+		e.setAttribute("class", l);
+		document.body.appendChild(e)
+	}
+ 
+	function h() {
+		var e = document.getElementsByClassName(l);
+		for (var t = 0; t < e.length; t++) {
+			document.body.removeChild(e[t])
+		}
+	}
+ 
+	function p() {
+		var e = document.createElement("div");
+		e.setAttribute("class", a);
+		document.body.appendChild(e);
+		setTimeout(function() {
+			document.body.removeChild(e)
+		}, 100)
+	}
+ 
+	function d(e) {
+		return {
+			height : e.offsetHeight,
+			width : e.offsetWidth
+		}
+	}
+ 
+	function v(i) {
+		var s = d(i);
+		return s.height > e && s.height < n && s.width > t && s.width < r
+	}
+ 
+	function m(e) {
+		var t = e;
+		var n = 0;
+		while (!!t) {
+			n += t.offsetTop;
+			t = t.offsetParent
+		}
+		return n
+	}
+ 
+	function g() {
+		var e = document.documentElement;
+		if (!!window.innerWidth) {
+			return window.innerHeight
+		} else if (e && !isNaN(e.clientHeight)) {
+			return e.clientHeight
+		}
+		return 0
+	}
+ 
+	function y() {
+		if (window.pageYOffset) {
+			return window.pageYOffset
+		}
+		return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+	}
+ 
+	function E(e) {
+		var t = m(e);
+		return t >= w && t <= b + w
+	}
+ 
+	function S() {
+		var e = document.createElement("audio");
+		e.setAttribute("class", l);
+		e.src = i;
+		e.loop = false;
+		e.addEventListener("canplay", function() {
+			setTimeout(function() {
+				x(k)
+			}, 500);
+			setTimeout(function() {
+				N();
+				p();
+				for (var e = 0; e < O.length; e++) {
+					T(O[e])
+				}
+			}, 15500)
+		}, true);
+		e.addEventListener("ended", function() {
+			N();
+			h()
+		}, true);
+		e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+		document.body.appendChild(e);
+		e.play()
+	}
+ 
+	function x(e) {
+		e.className += " " + s + " " + o
+	}
+ 
+	function T(e) {
+		e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+	}
+ 
+	function N() {
+		var e = document.getElementsByClassName(s);
+		var t = new RegExp("\\b" + s + "\\b");
+		for (var n = 0; n < e.length; ) {
+			e[n].className = e[n].className.replace(t, "")
+		}
+	}
+ 
+	var e = 30;
+	var t = 30;
+	var n = 350;
+	var r = 350;
+	var i = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake.mp3";
+	var s = "mw-harlem_shake_me";
+	var o = "im_first";
+	var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+	var a = "mw-strobe_light";
+	var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+	var l = "mw_added_css";
+	var b = g();
+	var w = y();
+	var C = document.getElementsByTagName("*");
+	var k = null;
+	for (var L = 0; L < C.length; L++) {
+		var A = C[L];
+		if (v(A)) {
+			if (E(A)) {
+				k = A;
+				break
+			}
+		}
+	}
+	if (A === null) {
+		console.warn("Could not find a node of the right size. Please try a different page.");
+		return
+	}
+	c();
+	S();
+	var O = [];
+	for (var L = 0; L < C.length; L++) {
+		var A = C[L];
+		if (v(A)) {
+			O.push(A)
+		}
+	}
+})()    '>High一下</a> </li>
+
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-03-19T01:20:44.000Z"><a href="/2015/03/19/redis-install/">3月 19 2015</a></time>
+      
+      
+  
+    <h1 class="title">redis install</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。<a id="more"></a></p>
+<h2 id="安装">安装</h2>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># wget http://download.redis.io/releases/redis-2.8.19.tar.gz</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># tar xvfz redis-2.8.19.tar.gz</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cd redis-2.8.19#</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># make</span>
+</code></pre><p>编译完成后就会生成相关的二进制可执行文件，为了便于管理。创建3个目录分别用来存放可执行二进制文件、配置文件、数据持久化文件。将src目录下的二进制文件redis-benchmark、redis-check-aof、redis-check-dump、redis-cli、redis-sentinel（非必需）、redis-server拷贝到bin目录，配置文件redis.conf、sentinel.conf（非必需）拷贝到etc目录。</p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># mkdir -p /usr/local/redis/{bin,db,etc}</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-server /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-benchmark /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-check-aof /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-check-dump /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-cli /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-sentinel /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp redis.conf /usr/local/redis/etc/</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp sentinel.conf /usr/local/redis/etc</span>
+</code></pre><p>redis-server：Redis服务器的daemon启动程序，对应的默认配置文件redis.conf。<br>redis-benchmark：Redis性能测试工具。<br>redis-cli：Redis命令行操作工具，类似于mysql的控制台。<br>redis-check-aof/redis-check-dump：修复损坏的数据文件file.aof/dump.rdb。<br>redis-sentinel：用于管理多个Redis服务器（instance），为集群提供监控、提醒、自动故障迁移服务，对应的配置文件sentinel.conf。   </p>
+<h6 id="调整默认的相关参数">调整默认的相关参数</h6>
+<pre><code><span class="preprocessor">#以守护进程的模式运行实例</span>
+daemonize yes
+<span class="preprocessor">#指定日志文件的位置。默认为空，以守护进程运行时日志默认会发送到/dev/null设备，不以守护进程运行时日志输出到标准输出设备。</span>
+logfile <span class="string">"/var/log/redis.log"</span>
+<span class="preprocessor">#指定存放数据库文件的文件夹</span>
+dir <span class="string">"/usr/local/redis/db"</span>
+</code></pre><p>启动redis，可以看到redis默认监听TCP的6379端口</p>
+<p><strong>./redis-server ./etc/redis.conf</strong></p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># netstat -tpln</span>
+<span class="constant">Active</span> <span class="constant">Internet</span> connections (only servers)
+<span class="constant">Proto</span> <span class="constant">Recv</span>-<span class="constant">Q</span> <span class="constant">Send</span>-<span class="constant">Q</span> <span class="constant">Local</span> <span class="constant">Address</span>           <span class="constant">Foreign</span> <span class="constant">Address</span>         <span class="constant">State</span>       <span class="constant">PID</span>/<span class="constant">Program</span> name
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span><span class="symbol">:</span><span class="number">3306</span>          <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      <span class="number">1277</span>/mysqld     
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:</span><span class="number">6379</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      <span class="number">9308</span>/redis-server *
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">1.1</span><span class="symbol">:</span><span class="number">53</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      <span class="number">1444</span>/dnsmasq    
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span><span class="symbol">:</span><span class="number">631</span>           <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN</span>      <span class="number">3231</span>/cupsd      
+tcp6       <span class="number">0</span>      <span class="number">0</span> <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:</span><span class="number">6379</span>                 <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:*</span>                    <span class="constant">LISTEN</span>      <span class="number">9308</span>/redis-server *
+tcp6       <span class="number">0</span>      <span class="number">0</span> <span class="symbol">:</span><span class="symbol">:</span><span class="number">1</span><span class="symbol">:</span><span class="number">631</span>                 <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:*</span>                    <span class="constant">LISTEN</span>      <span class="number">3231</span>/cupsd      
+</code></pre><p>查看redis的日志时发现在启动的时候抛出了几条条警告：</p>
+<pre><code>[9390] 18 Mar 19:11:47.121 # WARNING overcommit_memory is <span class="operator"><span class="keyword">set</span> <span class="keyword">to</span> <span class="number">0</span>! Background save may fail under low memory condition. <span class="keyword">To</span> fix this issue <span class="keyword">add</span> <span class="string">'vm.overcommit_memory = 1'</span> <span class="keyword">to</span> /etc/sysctl.conf <span class="keyword">and</span> <span class="keyword">then</span> reboot <span class="keyword">or</span> run the command <span class="string">'sysctl vm.overcommit_memory=1'</span> <span class="keyword">for</span> this <span class="keyword">to</span> take effect.
+[<span class="number">9390</span>] <span class="number">18</span> Mar <span class="number">19</span>:<span class="number">11</span>:<span class="number">47.141</span> # WARNING you have Transparent Huge Pages (THP) support enabled <span class="keyword">in</span> your kernel. This will <span class="keyword">create</span> latency <span class="keyword">and</span> memory <span class="keyword">usage</span> issues <span class="keyword">with</span> Redis. <span class="keyword">To</span> fix this issue run the command <span class="string">'echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled'</span> <span class="keyword">as</span> root, <span class="keyword">and</span> <span class="keyword">add</span> it <span class="keyword">to</span> your /etc/rc.<span class="keyword">local</span> <span class="keyword">in</span> <span class="keyword">order</span> <span class="keyword">to</span> retain the setting <span class="keyword">after</span> a reboot. Redis must be restarted <span class="keyword">after</span> THP <span class="keyword">is</span> disabled.
+[<span class="number">9390</span>] <span class="number">18</span> Mar <span class="number">19</span>:<span class="number">11</span>:<span class="number">47.141</span> # WARNING: The TCP backlog setting <span class="keyword">of</span> <span class="number">511</span> cannot be enforced because /proc/sys/net/core/somaxconn <span class="keyword">is</span> <span class="keyword">set</span> <span class="keyword">to</span> the <span class="keyword">lower</span> <span class="keyword">value</span> <span class="keyword">of</span> <span class="number">128.</span></span>
+</code></pre><p>根据警告提示我们需要将内核参数vm.overcommit_memory设置为1，net.core.somaxconn设置成更大的数值，默认是128。编辑文件/etc/sysctl.conf，追加2行</p>
+<pre><code><span class="comment">#sysctl文件追加的参数</span>
+vm.<span class="variable">overcommit_memory =</span> <span class="number">1</span>
+net.core.<span class="variable">somaxconn =</span> <span class="number">1024</span>
+</code></pre><p>保存退出后，刷新系统内核参数，运行命令：sysctl -p</p>
+<p>关于这两个内核参数的解释：<br>vm.overcommit_memory<br>指定了内核针对内存分配的策略，其值可以是0、1、2。</p>
+<p>0， 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程。  </p>
+<p>1， 表示内核允许分配所有的物理内存，而不管当前的内存状态如何。</p>
+<p>2， 表示内核允许分配超过所有物理内存和交换空间总和的内存。<br>net.core.somaxconn<br>定义了系统中每一个端口最大的监听队列的长度,这是个全局的参数,默认值为128，在某些应用下可能会限制接收新TCP连接侦听队列的大小。</p>
+<p>4、用redis提供的命令行工具进行一些简单的操作</p>
+<p><strong>用redis提供的命令行工具进行一些简单的操作</strong></p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/usr/local/redis/bin</span><span class="comment"># ./redis-cli</span>
+<span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span><span class="symbol">:</span><span class="number">6379</span>&gt;
+<span class="comment">#查看redis的各种信息参数，内存、连接数、键值数等</span>
+<span class="input"><span class="prompt">127.0.0.1:6379&gt;</span> info</span>
+<span class="input"><span class="prompt">#查看所有的key值
+127.0.0.1:6379&gt;</span> keys *
+(empty list or set)</span>
+<span class="input"><span class="prompt">#插入并查看一个key值
+127.0.0.1:6379&gt;</span> set i <span class="number">123</span></span>
+<span class="input"><span class="prompt">OK
+127.0.0.1:6379&gt;</span> get i</span>
+<span class="input"><span class="prompt">"123"
+#list操作
+127.0.0.1:6379&gt;</span> sadd listTest <span class="number">1</span></span>
+<span class="input"><span class="prompt">(integer) 1
+127.0.0.1:6379&gt;</span> sadd listTest <span class="number">2</span></span>
+<span class="input"><span class="prompt">(integer) 1
+127.0.0.1:6379&gt;</span> sadd listTest <span class="number">3</span></span>
+<span class="input"><span class="prompt">(integer) 1
+127.0.0.1:6379&gt;</span> smembers listTest</span>
+<span class="number">1</span>) <span class="string">"1"</span>
+<span class="number">2</span>) <span class="string">"2"</span>
+<span class="number">3</span>) <span class="string">"3"</span>
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+        
+  
+  <div class="tags">
+    <a href="/tags/nosql/">nosql</a>, <a href="/tags/redis/">redis</a>
+  </div>
+
+<!-- Baidu Button BEGIN -->
+<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
+<a class="bds_qzone"></a>
+<a class="bds_tsina"></a>
+<a class="bds_tqq"></a>
+<a class="bds_renren"></a>
+<a class="bds_t163"></a>
+<span class="bds_more"></span>
+<a class="shareCount"></a>
+</div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    <a href="/2015/03/19/nio-selector/" class="alignleft prev" >上一页</a>
+    
+    
+    <a href="/2015/03/17/ubuntu14-install-mysql/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+
+
+<section id="comment">
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->    
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:krisjin.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Architecture/">Architecture</a><small>2</small></li>
+  
+    <li><a href="/categories/NIO/">NIO</a><small>3</small></li>
+  
+    <li><a href="/categories/NLP/">NLP</a><small>1</small></li>
+  
+    <li><a href="/categories/concurrent/">concurrent</a><small>1</small></li>
+  
+    <li><a href="/categories/design-pattern/">design pattern</a><small>2</small></li>
+  
+    <li><a href="/categories/git/">git</a><small>1</small></li>
+  
+    <li><a href="/categories/life/">life</a><small>1</small></li>
+  
+    <li><a href="/categories/mybatis/">mybatis</a><small>1</small></li>
+  
+    <li><a href="/categories/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/categories/netty/">netty</a><small>13</small></li>
+  
+    <li><a href="/categories/protobuf/">protobuf</a><small>1</small></li>
+  
+    <li><a href="/categories/spring/">spring</a><small>7</small></li>
+  
+    <li><a href="/categories/tcp/">tcp</a><small>1</small></li>
+  
+    <li><a href="/categories/thread/">thread</a><small>1</small></li>
+  
+    <li><a href="/categories/线程/">线程</a><small>0</small></li>
+  
+  </ul>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1683020051&verifier=2d7c2166&colors=99d9ea,ffffff,666666,0082cb,ecfbfd&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><section>
+Theme of <a href="https://github.com/krisjin">Light</a>, Improved from <a href="https://github.com/hexojs/hexo-theme-light">Light</a>, by <a href="/">krisjin</a> 
+</section>
+<div class="clearfix"></div>
+</footer>
+  <script src="//libs.baidu.com/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>
+
+
+<a href="https://github.com/krisjin" target="_blank"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_white_ffffff.png" alt="Fork me on GitHub"></a>
