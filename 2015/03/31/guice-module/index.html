@@ -5,13 +5,15 @@
 <head>
   <meta charset="utf-8">
   
-  <title>动态代理 | krisjin博客</title>
+  <title>Guice module研究 | krisjin博客</title>
   <meta name="author" content="krisjin">
+  
+  <meta name="description" content="模块化的配置信息，显然是基于接口的绑定。使用Injector实例">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="Guice module研究"/>
   <meta property="og:site_name" content="krisjin博客"/>
 
   
@@ -198,25 +200,118 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title tag">动态代理</h2>
-
-
-  <div class="archive">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
     
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-02-05T02:46:02.000Z"><a href="/2015/02/05/mybatis-proxy-pattern/">2月 5 2015</a></time>
-            
-              <h1 class="title"><a href="/2015/02/05/mybatis-proxy-pattern/">mybatis映射配置代理模式的使用</a></h1>
-            
-          </header>
-        </div>
-      </article>
+      <img src="">
     
   </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-03-30T16:08:14.000Z"><a href="/2015/03/31/guice-module/">3月 31 2015</a></time>
+      
+      
+  
+    <h1 class="title">Guice module研究</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>模块化的配置信息，显然是基于接口的绑定。使用Injector实例<br><a id="more"></a></p>
+<pre><code>  A module contributes configuration information, typically interface
+  bindings, which will be used to <span class="operator"><span class="keyword">create</span> an {@link Injector}. A Guice-based
+  application <span class="keyword">is</span> ultimately composed <span class="keyword">of</span> little more than a <span class="keyword">set</span> <span class="keyword">of</span>
+  {@code <span class="keyword">Module</span>}s <span class="keyword">and</span> <span class="keyword">some</span> bootstrapping code.
+
+  &lt;p&gt;Your <span class="keyword">Module</span> classes can <span class="keyword">use</span> a more streamlined syntax <span class="keyword">by</span> extending
+  {@link AbstractModule} rather than implementing this interface directly.
+
+  &lt;p&gt;<span class="keyword">In</span> addition <span class="keyword">to</span> the bindings configured via {@link #configure}, bindings
+  will be created <span class="keyword">for</span> <span class="keyword">all</span> methods annotated <span class="keyword">with</span> {@literal @}{@link Provides}.
+  <span class="keyword">Use</span> scope <span class="keyword">and</span> binding annotations <span class="keyword">on</span> these methods <span class="keyword">to</span> configure the
+  bindings.</span>
+</code></pre><p>类结构：</p>
+<p><img src="/img/am.png" alt=""></p>
+<p><img src="/img/abstractmodule.jpg" alt=""></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Guice/">Guice</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/guice/">guice</a>
+  </div>
+
+<!-- Baidu Button BEGIN -->
+<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare">
+<a class="bds_qzone"></a>
+<a class="bds_tsina"></a>
+<a class="bds_tqq"></a>
+<a class="bds_renren"></a>
+<a class="bds_t163"></a>
+<span class="bds_more"></span>
+<a class="shareCount"></a>
+</div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=3326447" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2015/03/30/why-use-jvm/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+
+
+<section id="comment">
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->    
+</section>
+
 </div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
