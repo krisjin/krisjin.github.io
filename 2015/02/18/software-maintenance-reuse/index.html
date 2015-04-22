@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>软件的可维护与可复用 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="软件系统的可维护性   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。     一个可维护性较好的系统，应当允许维护工作能够以容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件的可维护与可复用">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/18/software-maintenance-reuse/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="软件系统的可维护性   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。     一个可维护性较好的系统，应当允许维护工作能够以容">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="软件的可维护与可复用">
+<meta name="twitter:description" content="软件系统的可维护性   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。     一个可维护性较好的系统，应当允许维护工作能够以容">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-software-maintenance-reuse" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/18/software-maintenance-reuse/" class="article-date">
+  	<time datetime="2015-02-18T02:40:59.000Z" itemprop="datePublished">2月 18 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      软件的可维护与可复用
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Architecture/">Architecture</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="软件系统的可维护性">软件系统的可维护性</h2><p>   参见工作后，进入项目开发中，就会发现，一个软件需要开发半年或者几个月，但是维护则需要很多年，花在维护上面的的钱是花在开发上面的钱的两倍。<br>   一个软件开发人员必须认识到，软件的维护就是软件的再生。一个好的软件设计，必须能够允许新的设计要求以较为容易的和平稳的方式加入到已有的系统中去，从而使这个系统能够不断焕发出青春。<br>     一个可维护性较好的系统，应当允许维护工作能够以容易、准确、安全和经济的形式进行。但是现有的软件系统设计往往不具有这样的特性。<br><a id="more"></a></p>
+<h4 id="设计师的辩解">设计师的辩解</h4><p>   面对人们的抱怨，系统设计师都有一套一模一样的辩解：用户需求的变化无常，使得系统设计无法跟上如此快速的变化，如果维护人员与原开发人员不是同一小组的话，就还会有很多沟通成本。  </p>
+<h4 id="真正的问题">真正的问题</h4><ol>
+<li><p><strong>过于僵硬</strong><br>很难在现有的软件系统中加入一个新的功能，这是加入一个新功能，不仅仅意味着创建一个独立的模块，而是这个新增的模块会对其它的模块有影响，甚至会是其它的多个模块都有改动。</p>
+</li>
+<li><p><strong>过于脆弱</strong><br>与软件过于僵硬同时存在的，是软件系统在修改已有代码时过于脆弱。对一个地方的修改，往往会导致看上去没有关系的另一个地方发生故障。尽管在修改前会竭尽所能的去预测可能发生的故障地点。<br>由于这种设计上的缺陷使得项目经理不敢轻易的向系统中加入新的模块功能，这就造成了一个软件系统一旦开发完后，就很难在增加新的功能，僵硬化情况。</p>
+</li>
+<li><p><strong>复用率低</strong><br>所谓复用，就是指一个软件的组成部分，可以在同一项目的不同地方使用，也可以在另一个项目中重复使用。<br>每当程序员发现一段代码、函数、模块所做的事情是可以在新的模块、或者新系统中使用的时候，他们总是发现，这些已有的代码依赖于一大堆其它的东西，以至于很难将它们分开。最后，他们发现最好的办法就是不去“碰”这些已有的东西，而是重新写自己的代码。他们可能会使用源代码剪贴的办法，以最原始的复用方式，节省一些时间，这样的系统就有复用率低的问题。</p>
+</li>
+<li><p><strong>黏度过高</strong><br>有时候一个改动可以以保存原始设计意图和原始设计框架的方式进行，也可以以破坏原始意图和框架的方式进行。第一种办法无疑会带系统的扩展性有利，第二种办法是权宜之计，可以解决短期的问题，但是会牺牲中长期的利益。<br>如果第二种办法比第一种办法容易很多的话，程序员就有可能牺牲中长期的利益，采取权宜之计。在一个模块中搭建一个短路桥，或者在一个通用的逻辑中制造一个特例，以便解决眼前的需要</p>
+</li>
+</ol>
+<h2 id=""> </h2>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/20/spring-ioc-container-sample/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Spring容器之BeanFactory
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/17/ioc-pattern/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">IoC模式</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="software-maintenance-reuse" data-title="软件的可维护与可复用" data-url="http://krisjin.github.io/2015/02/18/software-maintenance-reuse/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

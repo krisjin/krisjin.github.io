@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Ubuntu14安装hadoop | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Hadoop的安装比较繁琐，有如下几个原因：其一，Hadoop有非常多的版本；其二，官方文档不尽详细，有时候更新脱节，Hadoop发展的太快了；其三，网上流传的各种文档，或者是根据某些需求定制，或者加入了不必须要的步骤，或者加入容易令人误解的步骤。其实安装是很重要的步骤，只有安装好了，才能谈及下一步。在本书撰写的时候，选用Hadoop的stable版安装。笔者的登录用户名是brian，大家可以根据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu14安装hadoop">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/04/hadoop-install/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="Hadoop的安装比较繁琐，有如下几个原因：其一，Hadoop有非常多的版本；其二，官方文档不尽详细，有时候更新脱节，Hadoop发展的太快了；其三，网上流传的各种文档，或者是根据某些需求定制，或者加入了不必须要的步骤，或者加入容易令人误解的步骤。其实安装是很重要的步骤，只有安装好了，才能谈及下一步。在本书撰写的时候，选用Hadoop的stable版安装。笔者的登录用户名是brian，大家可以根据">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ubuntu14安装hadoop">
+<meta name="twitter:description" content="Hadoop的安装比较繁琐，有如下几个原因：其一，Hadoop有非常多的版本；其二，官方文档不尽详细，有时候更新脱节，Hadoop发展的太快了；其三，网上流传的各种文档，或者是根据某些需求定制，或者加入了不必须要的步骤，或者加入容易令人误解的步骤。其实安装是很重要的步骤，只有安装好了，才能谈及下一步。在本书撰写的时候，选用Hadoop的stable版安装。笔者的登录用户名是brian，大家可以根据">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-hadoop-install" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/04/hadoop-install/" class="article-date">
+  	<time datetime="2015-04-04T06:50:39.000Z" itemprop="datePublished">4月 4 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Ubuntu14安装hadoop
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Hadoop/">Hadoop</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Hadoop的安装比较繁琐，有如下几个原因：其一，Hadoop有非常多的版本；其二，官方文档不尽详细，有时候<br>更新脱节，Hadoop发展的太快了；其三，网上流传的各种文档，或者是根据某些需求定制，或者加入了不必须要<br>的步骤，或者加入容易令人误解的步骤。其实安装是很重要的步骤，只有安装好了，才能谈及下一步。<br>在本书撰写的时候，选用Hadoop的stable版安装。<br>笔者的登录用户名是brian，大家可以根据自己的登录名更改命令，后面凡是出现brian的地方，都用自己的登录<br>用户名替换掉。<a id="more"></a></p>
+<h2 id="1-操作系统">1.操作系统</h2><p>操作系统是Ubuntu14</p>
+<p>如果操作系统其他版本的Ubuntu，在图形界面上会略有一点区别，但对安装影响不大。不同发行版的Linux的安<br>装Hadoop的过程基本类似，没太大的差别。</p>
+<h2 id="2-Hadoop的版本">2.Hadoop的版本</h2><p>Hadoop当前的stable版是1.2.1。</p>
+<h2 id="3-下载Hadoop">3.下载Hadoop</h2><h4 id="3-1_在Hadoop的主页上提供了多个下载链接。">3.1 在Hadoop的主页上提供了多个下载链接。</h4><p><a href="http://www.apache.org/dyn/closer.cgi/hadoop/common/" target="_blank" rel="external">http://www.apache.org/dyn/closer.cgi/hadoop/common/</a></p>
+<h4 id="3-2_任选一个下载站点如下：">3.2 任选一个下载站点如下：</h4><p><a href="http://mirror.esocc.com/apache/hadoop/common/" target="_blank" rel="external">http://mirror.esocc.com/apache/hadoop/common/</a></p>
+<h4 id="3-3_选择stable版，其实stable版就是1-2-1版：">3.3 选择stable版，其实stable版就是1.2.1版：</h4><p><a href="http://mirror.esocc.com/apache/hadoop/common/stable/" target="_blank" rel="external">http://mirror.esocc.com/apache/hadoop/common/stable/</a><br>在这个目录下有多个文件，是针对不同的linux发行版的，不需要全部下载。</p>
+<h4 id="3-4_下载hadoop-1-2-1-tar-gz_和_hadoop-1-2-1-tar-gz-mds">3.4 下载hadoop-1.2.1.tar.gz 和 hadoop-1.2.1.tar.gz.mds</h4><p>打开命令终端，下文的命令都是在终端里执行，为方便起见，命令都用引号引起。<br>将 stable版本的Hadoop的两个文件下载到“~/setup/hadoop”目录下，也就是”/home/brian/setup/hadoop”目录，<br>命令如下：  </p>
+<h5 id="3-4-1_“mkdir_-p_~/setup/hadoop”">3.4.1 “mkdir -p ~/setup/hadoop”</h5><p>mkdir 命令是创建新目录。”-p”参数的意思是，假如hadoop目录的上级目录不存在，也创建上级目录。在<br>终端里执行“man mkdir”，可以看到对这个命令的更详细的解释，按一下q键重新返回终端。<br>在命令终端里，”～”表示当前登录用户的主目录。比如说，在开机的时候，登录用户是brian，那么在命<br>令终端里，”~”就表示目录”/home/brian”，如果开机时候，登录用户是john，那么”~”就表示”/home/john”目录。</p>
+<h5 id="3-4-2_“cd_~/setup/hadoop”">3.4.2 “cd ~/setup/hadoop”</h5><p>cd就是change directory的缩写，切换当前目录。</p>
+<h5 id="3-4-3_“wget_http://mirror-esocc-com/apache/hadoop/common/stable/hadoop-1-2-1-tar-gz-mds“">3.4.3 “wget <a href="http://mirror.esocc.com/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz.mds" target="_blank" rel="external">http://mirror.esocc.com/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz.mds</a>“</h5><p>wget是下载文件的命令行工具，”man wget”有详细说明。  </p>
+<h5 id="3-4-4_“wget_http://mirror-esocc-com/apache/hadoop/common/stable/hadoop-1-2-1-tar-gz“">3.4.4 “wget <a href="http://mirror.esocc.com/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz" target="_blank" rel="external">http://mirror.esocc.com/apache/hadoop/common/stable/hadoop-1.2.1.tar.gz</a>“</h5><h5 id="3-4-5_“md5sum_hadoop-1-2-1-tar-gz”">3.4.5 “md5sum hadoop-1.2.1.tar.gz”</h5><p>md5sum 命令，计算一个文件的md5码。开源社区在提供源码下载的时候，会同时提供下载文件的md5<br>码。md5码是根据文件内容生成的32位字符串，不同的文件的md5码是不同的，如果下载出错，下载文件的md5码<br>跟正常文件的md5码是不一样的，由此检测下载是否正常，只有在极其罕见的情况下，才会出现不同的文件有相同<br>md5码。hadoop-1.2.1.tar.gz是一个比较大的文件，需要检查下载的文件是否完整，执行这个命令之后，会出现形<br>如”8D 79 04 80 56 17 C1 6C B2 27 D1 CC BF E9 38 5A hadoop-1.2.1.tar.gz”的字符串，前面的一串字符串就是32位的<br>md5校验码。</p>
+<h5 id="3-4-6_“cat_hadoop-1-2-1-tar-gz-mds”，">3.4.6 “cat hadoop-1.2.1.tar.gz.mds”，</h5><p>cat命令，cat是catenate的缩写，在标准输出上打印文件内容，通常标准输出就是屏幕。这个命令会在屏<br>幕上打印hadoop-1.2.1.tar.gz.mds 的内容，也就是一些校验码，在里面找到”md5”这一行，如果跟md5sum出来的一<br>致，则表明下载文件完整的，否则需要重新下载。</p>
+<h2 id="4-安装Java_JDK">4.安装Java JDK</h2><h4 id="4-1_在这里有jdk_1-7的下载">4.1 在这里有jdk 1.7的下载</h4><p><a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html" target="_blank" rel="external">http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html</a><br>如果是CPU是32位，选择下载Linux x86，如果CPU是64位的，选择Linux x64。一般来说，如果计算机是双<br>核的，肯定支持64位操作系统。或者可以运行”uname -a”命令看一下，在笔者的笔记本上运行这个命令结果如下：<br>Linux brian-i3 2.6.32-51-generic #113-Ubuntu SMP Wed Aug 21 19:46:35 UTC 2013 x86_64 GNU/Linux<br>后面的x86_64表明系统是64位的。<br>在这个页面，找 ” Java SE Development Kit 7u40”，注意，这里有一个选项，必须选择”Accept License<br>Agreement”，接受License才能下载。<br>下载的jdk 1.7，存放到 “/home/brian/setup/java-jdk-1.7/”目录。<br>下载的文件是”java-jdk-7u40-linux-i586.tar.gz”，java jdk的版本常常有更新，次版本号有可能会比40更高一点。</p>
+<h4 id="4-2_“sudo_su_-“">4.2 “sudo su -“</h4><p>切换到root用户，参考”man sudo”。这个命令会切换到root用户，也就是最高权限的用户。因为后面要执行的<br>jdk安装操作是在/usr/local目录下进行的，用root用户更方便。</p>
+<h5 id="4-3_“cd_/usr/local/lib”">4.3 “cd /usr/local/lib”</h5><h4 id="4-4_“tar_-zxvf_/home/brian/setup/java-jdk-1-7/java-jdk-7u40-linux-i586-tar-gz”">4.4 “tar -zxvf /home/brian/setup/java-jdk-1.7/java-jdk-7u40-linux-i586.tar.gz”</h4><p>tar 是 linux 下的打包和解压命令行工具，具体细节可以参考”man tar”。这个命令将 java-jdk-7u40-linuxi586.<br>tar.gz压缩包解压到当前目录下。解压缩完毕之后，执行”ls”，能看到当前目录下有一个新目录叫”jdk1.7.0_40”</p>
+<h4 id="4-5_配置环境变量：">4.5 配置环境变量：</h4><h5 id="4-5-1_“gedit_/etc/profile”">4.5.1 “gedit /etc/profile”</h5><p>gedit是linux下类似Windoes的记事本的编辑器，文件/etc/profile是linux下的配置文件。本命令会打开这个<br>配置文件，以备编辑。</p>
+<h5 id="4-5-2_添加配置">4.5.2 添加配置</h5><p>在/etc/profile文件末尾加上如下的三行代码：<br>export JAVA_HOME=/usr/local/lib/jdk1.7.0_40<br>export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>export PATH=$PATH:$JAVA_HOME/bin<br>保存文件，然后退出。<br>Linux系统，开机后会自动执行/etc/profile配置文件。export命令设置或者显示环境变量。上述三行代码，分<br>别设置了JAVA_HOME, CLASSPATH, PATH这三个环境变量。</p>
+<h5 id="4-5-3_“chown_root:root_-R_/usr/local/lib/jdk1-7-0_40”">4.5.3 “chown root:root -R /usr/local/lib/jdk1.7.0_40”</h5><p>chown命令，更改目录或者文件的拥有者。这条命令将 jdk1.7.0_40目录的拥有者改为root组的root用户。”-<br>R”参数是递归的意思，将 jdk1.7.0_40目录下连同子目录都进行更改。</p>
+<h5 id="4-5-4_“chmod_755_-R_/usr/local/lib/jdk1-7-0_40”">4.5.4 “chmod 755 -R /usr/local/lib/jdk1.7.0_40”</h5><p>chmod命令，更改目录和文件的模式。本命令将jdk1.7.0_40的模式改为拥有者可以读写执行，同组用户和<br>其他用户可读可执行不可写。“-R”参数同上，也是递归的意思。  </p>
+<h5 id="4-5-5_“source_/etc/profile”">4.5.5 “source /etc/profile”</h5><p>如果更改了/etc/profile配置文件，它只会在新的终端里生效，现在正在使用的终端是不会生效的。如果想让<br>它在正使用的终端也生效，需要用source命令运行一下配置文件。这条命令会让4.4.2的三个环境变量立即生效。这<br>条命令也可以简写成”. /etc/profile”。</p>
+<h5 id="4-5-6_“java_-version”">4.5.6 “java -version”</h5><p>这条命令检查jdk安装是否成功。运行这条命令，只要没有报错就表明安装成功了。</p>
+<h2 id="5-_安装hadoop">5. 安装hadoop</h2><h4 id="5-1_“su_brian”">5.1 “su brian”</h4><p>su命令，切换用户。安装jdk用的是root用户。现在切回brian用户。</p>
+<h4 id="5-2_“mkdir_-p_~/usr/hadoop”">5.2 “mkdir -p ~/usr/hadoop”</h4><p>创建Hadoop的安装目录</p>
+<h4 id="5-3_“cd_~/usr/hadoop”">5.3 “cd ~/usr/hadoop”</h4><h4 id="5-4_“tar_-xvzf_~/setup/hadoop/hadoop-1-2-1-tar-gz”">5.4 “tar -xvzf ~/setup/hadoop/hadoop-1.2.1.tar.gz”</h4><p>解压缩完毕后，就有目录~/usr/hadoop/hadoop-1.2.1，这是hadoop的主目录。</p>
+<h4 id="5-5_配置hadoop，参考了http://hadoop-apache-org/docs/stable/single_node_setup-pdf。">5.5 配置hadoop，参考了<a href="http://hadoop.apache.org/docs/stable/single_node_setup.pdf。" target="_blank" rel="external">http://hadoop.apache.org/docs/stable/single_node_setup.pdf。</a></h4><p>按照伪分布式进行配置，也就是用一个机器同时运行NameNode, SecondaryNameNode, DataNode, JobTracker,<br>TaskTracker 5个任务。</p>
+<h5 id="5-5-1_配置文件在~/usr/hadoop/hadoop-1-2-1/conf/目录下">5.5.1 配置文件在~/usr/hadoop/hadoop-1.2.1/conf/目录下</h5><h5 id="5-5-2_将core-site-xml_文件内容修改成如下：">5.5.2 将core-site.xml 文件内容修改成如下：</h5><pre><code><span class="variable">&lt;configuration&gt;</span>
+<span class="variable">&lt;property&gt;</span>
+<span class="variable">&lt;name&gt;</span>fs.<span class="keyword">default</span>.name<span class="variable">&lt;/name&gt;</span>
+<span class="variable">&lt;value&gt;</span>hdfs://localhost:<span class="number">9000</span><span class="variable">&lt;/value&gt;</span>
+<span class="variable">&lt;/property&gt;</span>
+<span class="variable">&lt;/configuration&gt;</span>
+</code></pre><h5 id="5-5-3_将mapred-site-xml文件内容修改如下：">5.5.3 将mapred-site.xml文件内容修改如下：</h5><pre><code><span class="tag">&lt;<span class="title">configuration</span>&gt;</span>
+<span class="tag">&lt;<span class="title">property</span>&gt;</span>
+<span class="tag">&lt;<span class="title">name</span>&gt;</span>mapred.job.tracker<span class="tag">&lt;/<span class="title">name</span>&gt;</span>
+<span class="tag">&lt;<span class="title">value</span>&gt;</span>localhost:9001<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">property</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">configuration</span>&gt;</span>
+</code></pre><h4 id="5-5-4_将hdfs-site-xml文件内容修改如下：">5.5.4 将hdfs-site.xml文件内容修改如下：</h4><pre><code><span class="tag">&lt;<span class="title">configuration</span>&gt;</span>
+<span class="tag">&lt;<span class="title">property</span>&gt;</span>
+<span class="tag">&lt;<span class="title">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="title">name</span>&gt;</span>
+<span class="tag">&lt;<span class="title">value</span>&gt;</span>1<span class="tag">&lt;/<span class="title">value</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">property</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">configuration</span>&gt;</span>
+</code></pre><h5 id="5-5-5_在hadoop-env-sh文件里添加如下一条语句：">5.5.5 在hadoop-env.sh文件里添加如下一条语句：</h5><p>export JAVA_HOME=/usr/local/lib/jdk1.7.0_40</p>
+<h2 id="6-_安装rsync和ssh">6. 安装rsync和ssh</h2><h4 id="6-1_“sudo_apt-get_install_ssh_rsync”">6.1 “sudo apt-get install ssh rsync”</h4><p>这条命令安装ssh和rsync。ssh是一个很著名的安全外壳协议Secure Shell Protocol。rsync是文件同步命令行工具。</p>
+<h4 id="6-2_配置ssh免登录">6.2 配置ssh免登录</h4><h5 id="6-2-1_“ssh-keygen_-t_dsa_-f_~/-ssh/id_dsa”">6.2.1 “ssh-keygen -t dsa -f ~/.ssh/id_dsa”</h5><p>执行这条命令生成ssh的公钥/私钥，执行过程中，会一些提示让输入字符，直接一路回车就可以。</p>
+<h5 id="6-2-2_“cat_~/-ssh/id_dsa-pub_&gt;&gt;_~/-ssh/authorized_keys”">6.2.2 “cat ~/.ssh/id_dsa.pub &gt;&gt; ~/.ssh/authorized_keys”</h5><p>ssh进行远程登录的时候需要输入密码，如果用公钥/私钥方式，就不需要输入密码了。上述方式就是设置公<br>钥/私钥登录。</p>
+<h5 id="6-2-3_“ssh_localhost”">6.2.3 “ssh localhost”</h5><p>第一次执行本命令，会出现一个提示，输入”yes”然后回车即可。</p>
+<h2 id="7-_启动hadoop">7. 启动hadoop</h2><h4 id="7-1_“cd_~/usr/hadoop/hadoop-1-2-1”">7.1 “cd ~/usr/hadoop/hadoop-1.2.1”</h4><h4 id="7-2_“-/bin/hadoop_namenode_-format”">7.2 “./bin/hadoop namenode -format”</h4><p>格式化NameNode。</p>
+<h4 id="7-3_“-/bin/start-all-sh”">7.3 “./bin/start-all.sh”</h4><p>启动所有节点，包括NameNode, SecondaryNameNode, JobTracker, TaskTracker, DataNode。</p>
+<h4 id="7-4_“jps”">7.4 “jps”</h4><p>检查各进程是否运行，这时，应该看到有6个java虚拟机的进程，分别是Jps, NameNode, SecondaryNameNode,<br>DataNode, JobTracker, TaskTracker，看到6 个是对的，表明启动成功。如果提示”jps”没安装或者找不到，执行一<br>次”source /etc/profile”即可。</p>
+<h2 id="8-_测试hadoop">8. 测试hadoop</h2><h4 id="8-1_“cd_~/usr/hadoop/hadoop-1-2-1”">8.1 “cd ~/usr/hadoop/hadoop-1.2.1”</h4><h4 id="8-2_“-/bin/hadoop_fs_-put_README-txt_readme-txt”">8.2 “./bin/hadoop fs -put README.txt readme.txt”</h4><p>将当前目录下的README.txt放到hadoop进行测试，这个README.txt是Hadoop的介绍文件，这里用它做测<br>试。这条命令将README.txt文件复制到Hadoop的分布式文件系统HDFS，重命名为readme.txt。</p>
+<h4 id="8-3_“-/bin/hadoop_jar_hadoop-examples-1-2-1-jar_wordcount_readme-txt_output”">8.3 “./bin/hadoop jar hadoop-examples-1.2.1.jar wordcount readme.txt output”</h4><p>运行hadoop 的examples 的wordcount，测试hadoop 的执行。这条语句用Hadoop 自带的examples 里的<br>wordcount程序，对readme.txt进行处理，处理后的结果放到HDFS的output目录。</p>
+<h4 id="8-4_“-/bin/hadoop_fs_-cat_output/part-r-00000”">8.4 “./bin/hadoop fs -cat output/part-r-00000”</h4><p>这条命令查看处理结果，part-r-00000文件存放wordcount的运行结果，cat命令将文件内容输出到屏幕，显示<br>字符的统计结果。这是一个简单的字符统计，wordcount只是做了简单的处理，所以会看到单词后面有标点符号。</p>
+<h2 id="9-_练习">9. 练习</h2><p>笔者做一次完整的安装是50分钟左右，其中下载Hadoop安装包和Java JDK安装包是半小时，操作部分用时20<br>分钟。新手第一次安装，2~5个小时内完成都是正常的。建议将Hadoop的安装过程按照上述流程走上三遍，熟悉每个<br>步骤，然后不看流程凭记忆做出来，重复练习多次次，以加深印象。如果再有时间的话，可以逐个研究里面涉及到<br>的各种命令，诸如wget, ssh, rsync等等。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/04/hadoop-operator-commond/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Hadoop基础操作命令
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/04/product-thinks/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">产品运营的思路</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="hadoop-install" data-title="Ubuntu14安装hadoop" data-url="http://krisjin.github.io/2015/04/04/hadoop-install/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

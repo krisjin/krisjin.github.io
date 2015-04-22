@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>zookeeper集群安装 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务，它包含一个简单的原语集，分布式应用程序可以基于它实现同步服务，配置维护和命名服务等。Zookeeper是hadoop的一个子项目，其发展历程无需赘述。在分布式应用中，由于工程师不能很好地使用锁机制，以及基于消息的协调机制不适合在某些应用中使用，因此需要有一种可靠的、可扩展的、分布式的、可配置的协调机制来统一系统的状态。Zookee">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zookeeper集群安装">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/23/zookeeper-cluster-install/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务，它包含一个简单的原语集，分布式应用程序可以基于它实现同步服务，配置维护和命名服务等。Zookeeper是hadoop的一个子项目，其发展历程无需赘述。在分布式应用中，由于工程师不能很好地使用锁机制，以及基于消息的协调机制不适合在某些应用中使用，因此需要有一种可靠的、可扩展的、分布式的、可配置的协调机制来统一系统的状态。Zookee">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zookeeper集群安装">
+<meta name="twitter:description" content="ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务，它包含一个简单的原语集，分布式应用程序可以基于它实现同步服务，配置维护和命名服务等。Zookeeper是hadoop的一个子项目，其发展历程无需赘述。在分布式应用中，由于工程师不能很好地使用锁机制，以及基于消息的协调机制不适合在某些应用中使用，因此需要有一种可靠的、可扩展的、分布式的、可配置的协调机制来统一系统的状态。Zookee">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-zookeeper-cluster-install" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/23/zookeeper-cluster-install/" class="article-date">
+  	<time datetime="2015-03-23T08:18:59.000Z" itemprop="datePublished">3月 23 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      zookeeper集群安装
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zookeeper/">zookeeper</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/分布式/">分布式</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/zookeeper/">zookeeper</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务，它包含一个简单的原语集，分布式应用程序可以基于它实现同步服务，配置维护和命名服务等。Zookeeper是hadoop的一个子项目，其发展历程无需赘述。在分布式应用中，由于工程师不能很好地使用锁机制，以及基于消息的协调机制不适合在某些应用中使用，因此需要有一种可靠的、可扩展的、分布式的、可配置的协调机制来统一系统的状态。Zookeeper的目的就在于此。本文简单分析zookeeper的工作原理，对于如何使用zookeeper不是本文讨论的重点。<a id="more"></a></p>
+<h2 id="下载Zookeeper安装包">下载Zookeeper安装包</h2><p>去官网下载： <a href="http://mirrors.cnnic.cn/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz" title="zookeeper-3.4.6.tar.gz " target="_blank" rel="external">http://mirrors.cnnic.cn/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz</a></p>
+<h2 id="环境准备">环境准备</h2><p>准备三台ubuntu虚拟机hostname分别为：</p>
+<ul>
+<li>zookeeper01</li>
+<li>zookeeper02</li>
+<li>zookeeper03</li>
+</ul>
+<h2 id="安装">安装</h2><p>将下载后的文件解压</p>
+<p>解压后修改配置文件zoo.cfg：</p>
+<pre><code><span class="preprocessor"># The number of milliseconds of each tick</span>
+tickTime=<span class="number">2000</span>
+<span class="preprocessor"># The number of ticks that the initial</span>
+<span class="preprocessor"># synchronization phase can take</span>
+initLimit=<span class="number">10</span>
+<span class="preprocessor"># The number of ticks that can pass between</span>
+<span class="preprocessor"># sending a request and getting an acknowledgement</span>
+syncLimit=<span class="number">5</span>
+<span class="preprocessor"># the directory where the snapshot is stored.</span>
+<span class="preprocessor"># do not use /tmp for storage, /tmp here is just</span>
+<span class="preprocessor"># example sakes.</span>
+dataDir=/home/zookeeper/data
+<span class="preprocessor"># the port at which the clients will connect</span>
+clientPort=<span class="number">2181</span>
+<span class="preprocessor"># the maximum number of client connections.</span>
+<span class="preprocessor"># increase this if you need to handle more clients</span>
+<span class="preprocessor">#maxClientCnxns=60</span>
+<span class="preprocessor">#</span>
+<span class="preprocessor"># Be sure to read the maintenance section of the</span>
+<span class="preprocessor"># administrator guide before turning on autopurge.</span>
+<span class="preprocessor">#</span>
+<span class="preprocessor"># http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance</span>
+<span class="preprocessor">#</span>
+<span class="preprocessor"># The number of snapshots to retain in dataDir</span>
+<span class="preprocessor">#autopurge.snapRetainCount=3</span>
+<span class="preprocessor"># Purge task interval in hours</span>
+<span class="preprocessor"># Set to "0" to disable auto purge feature</span>
+<span class="preprocessor">#autopurge.purgeInterval=1</span>
+<span class="preprocessor">#server.A = B:C:D </span>
+server.1=zookeeper01:<span class="number">2888</span>:<span class="number">3888</span>
+server.2=zookeeper02:<span class="number">2888</span>:<span class="number">3888</span>
+server.3=zookeeper03:<span class="number">2888</span>:<span class="number">3888</span>
+</code></pre><p>配置文件说明：</p>
+<ul>
+<li><p>tickTime ：基本事件单元，以毫秒为单位。这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。</p>
+</li>
+<li><p>dataDir ：存储内存中数据库快照的位置，顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。</p>
+</li>
+<li><p>clientPort ：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。</p>
+</li>
+<li><p>initLimit：这个配置项是用来配置 Zookeeper 接受客户端初始化连接时最长能忍受多少个心跳时间间隔数，当已经超过 5 个心跳的时间（也就是 tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是 5*2000=10 秒。</p>
+</li>
+<li><p>syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是 2*2000=4 秒</p>
+</li>
+<li><p>server.A = B:C:D : A表示这个是第几号服务器,B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader                </p>
+</li>
+</ul>
+<p><strong>创建数据目录</strong></p>
+<pre><code><span class="title">mkdir</span> -p /home/zookeeper/<span class="typedef"><span class="keyword">data</span></span>
+</code></pre><p><strong>在标识Server ID.</strong></p>
+<p>在/home/zookeeper/data目录中创建文件 myid 文件，每个文件中分别写入当前机器的server id，例如1.2.3.4这个机器，在/home/zookeeper/data目录的myid文件中写入数字<br>1.</p>
+<p>修改host文件：</p>
+<pre><code>vi <span class="regexp">/etc/</span>hosts
+</code></pre><p>文件清单：</p>
+<pre><code><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>       localhost
+<span class="number">192.168</span><span class="number">.244</span><span class="number">.131</span>  zookeeper01
+<span class="number">192.168</span><span class="number">.244</span><span class="number">.132</span>  zookeeper02
+<span class="number">192.168</span><span class="number">.244</span><span class="number">.133</span>  zookeeper03
+
+<span class="comment"># The following lines are desirable for IPv6 capable hosts</span>
+<span class="type-annotation">::</span><span class="number">1</span>     ip6-localhost ip6-loopback
+fe00<span class="type-annotation">::</span><span class="number">0</span> ip6-localnet
+ff00<span class="type-annotation">::</span><span class="number">0</span> ip6-mcastprefix
+ff02<span class="type-annotation">::</span><span class="number">1</span> ip6-allnodes
+ff02<span class="type-annotation">::</span><span class="number">2</span> ip6-allrouters
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/24/idea-quick-key/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          idea快捷键整理(持续更新)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/19/nio-selector/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">NIO多路复用器理解</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="zookeeper-cluster-install" data-title="zookeeper集群安装" data-url="http://krisjin.github.io/2015/03/23/zookeeper-cluster-install/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

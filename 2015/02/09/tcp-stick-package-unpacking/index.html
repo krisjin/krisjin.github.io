@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>tcp粘包拆包实例 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.TCP粘包/拆包TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tcp粘包拆包实例">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/09/tcp-stick-package-unpacking/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="1.TCP粘包/拆包TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。">
+<meta property="og:image" content="/img/tcp-stick.png">
+<meta property="og:image" content="/img/tcp-stick-problem.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tcp粘包拆包实例">
+<meta name="twitter:description" content="1.TCP粘包/拆包TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-tcp-stick-package-unpacking" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/09/tcp-stick-package-unpacking/" class="article-date">
+  	<time datetime="2015-02-09T07:23:20.000Z" itemprop="datePublished">2月 9 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      tcp粘包拆包实例
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="1-TCP粘包/拆包">1.TCP粘包/拆包</h3><p>TCP是个”流”协议，所谓流，就是没有界限的一串数据。大家可以想想河里的水，是连成一片的，其间并没有分界线。TCP底层并不了解上层业务数据的具体含义，它会根据TCP缓冲区的实际情况进行包的划分，所以在业务上认为，一个完整的包可能被TCP拆分成多个包进行发送，也有可能把多个小的包封装成一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。<br><a id="more"></a></p>
+<h3 id="2-TCP粘包拆包问题说明">2.TCP粘包拆包问题说明</h3><p>通过下图进行说明：</p>
+<p><img src="/img/tcp-stick.png" alt=""><br>假设客户端分别发送了两个数据包D1和D2给服务端，由于服务端一次读取的字节数是不确定的，所以可能存在以下四种情况。</p>
+<ol>
+<li>服务端分两次读取了两个独立的数据包，分别是D1和D2,没有粘包和拆包。</li>
+<li>服务端一次读取到了两个数据包，D1和D2粘合在一起，被称为TCP粘包。</li>
+<li>服务端分两次读取到了两个数据包，第一次读取了完整的D1包和D2包的部分内容，第二次读取到了D2包的剩余内容，这被称为ＴＣＰ拆包。</li>
+<li>服务端分两次读取到了两个数据包，第一次读取了D1包的部分内容D1_1,第二次读取了D1的剩余内容D1_2和D2包的整包。</li>
+</ol>
+<p>如果此时tcp接收滑窗非常小，而数据包D1和D2比较大。很有可能发生第五种情况，即服务端分多次才能将D1和D2包接收完全。</p>
+<h3 id="3-TCP粘包拆包发生的原因">3.TCP粘包拆包发生的原因</h3><p>问题产生的原因有三个，分别如下：</p>
+<ol>
+<li>应用程序写入的字节大小大于套接口发送缓冲区大小。</li>
+<li>进行MSS大小的TCP分段。</li>
+<li>以太网侦测的payload大于MTU进行IP分片。<br>图示：<br><img src="/img/tcp-stick-problem.png" alt=""></li>
+</ol>
+<h3 id="4-粘包问题的解决策略">4.粘包问题的解决策略</h3><p>由于底层的TCP无法理解上层的业务数据，所以在底层是无法保证数据包不被拆分和重组的，这个问题只能通过上层的应用协议栈设计来解决，根据业界的主流协议的解决方案如下：</p>
+<ol>
+<li>消息定长，例如每个报文的大小固定长度为200字节，如果不够，空位补空格。</li>
+<li>在包尾增加回车换行符进行分割，例如FTP协议。</li>
+<li>将消息分为消息头和消息体，消息头包含表示消息体总长度的字段，通常设计思路为消息头的第一个字段使用int32来表示消息的总长度。</li>
+<li>更复杂的应用层协议。</li>
+</ol>
+<h3 id="5-实例代码">5.实例代码</h3><p><strong>服务器端代码</strong><br>    public class TimeServer {</p>
+<pre><code><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> port)</span> <span class="keyword">throws</span> Exception </span>{
+
+    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    EventLoopGroup workderGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();
+    <span class="keyword">try</span> {
+        b.group(bossGroup, workderGroup).channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>).childHandler(<span class="keyword">new</span> ChildChannelHandler());
+
+        <span class="comment">// 绑定端口，同步等待成功</span>
+        ChannelFuture f = b.bind(port).sync();
+
+        <span class="comment">// 等待服务器端端口关闭</span>
+        f.channel().closeFuture().sync();
+
+    } <span class="keyword">finally</span> {
+        bossGroup.shutdownGracefully();
+        workderGroup.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildChannelHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>{
+
+    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel channel)</span> <span class="keyword">throws</span> Exception </span>{
+        channel.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
+        channel.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
+        channel.pipeline().addLast(<span class="keyword">new</span> TimeServerHandler());
+    }
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>{
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+
+    <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+        <span class="keyword">try</span> {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+
+        } <span class="keyword">catch</span> (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+    <span class="keyword">new</span> TimeServer().bind(port);
+}
+}
+</code></pre><p><strong>服务器端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">private</span> <span class="keyword">int</span> counter;
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>{
+
+    String body = (String) msg;
+
+    System.out.println(<span class="string">"The time server receive order :"</span> + body + <span class="string">" ; the counter is :"</span> + ++counter);
+
+    String currentTime = <span class="string">"QUERY TIME ORDER"</span>.equalsIgnoreCase(body) ? <span class="keyword">new</span> java.util.Date(System.currentTimeMillis())
+            .toString() : <span class="string">"BAD ORDER"</span>;
+
+    currentTime += System.getProperty(<span class="string">"line.separator"</span>);
+
+    ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
+    ctx.write(resp);
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>{
+    ctx.flush();
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>{
+    ctx.close();
+}
+
+}
+</code></pre><p><strong>客户端代码</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TimeClient</span> {
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> port, String host)</span> </span>{
+
+    <span class="comment">// 配置客户端NIO线程组</span>
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();
+
+    <span class="keyword">try</span> {
+        bootstrap.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> throws Exception </span>{
+                        ch.pipeline().addLast(<span class="keyword">new</span> LineBasedFrameDecoder(<span class="number">1024</span>));
+                        ch.pipeline().addLast(<span class="keyword">new</span> StringDecoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> TimeClientHandler());
+                    }
+
+                });
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture f = bootstrap.connect(host, port).sync();
+        <span class="comment">// 等待客户端链路关闭</span>
+        f.channel().closeFuture().sync();
+    } <span class="keyword">catch</span> (InterruptedException e) {
+        e.printStackTrace();
+    } <span class="keyword">finally</span> {
+
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>{
+    <span class="keyword">int</span> port = <span class="number">8888</span>;
+    <span class="keyword">try</span> {
+        <span class="keyword">if</span> (args.length &gt; <span class="number">0</span>) {
+            port = Integer.valueOf(args[<span class="number">0</span>]);
+        }
+    } <span class="keyword">catch</span> (NumberFormatException e) {
+        e.printStackTrace();
+    }
+    <span class="keyword">new</span> TimeClient().connect(port, <span class="string">"127.0.0.1"</span>);
+}
+}
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="keyword">private</span> <span class="keyword">int</span> counter;
+<span class="keyword">private</span> <span class="keyword">byte</span>[] req;
+
+<span class="function"><span class="keyword">public</span> <span class="title">TimeClientHandler</span><span class="params">()</span> </span>{
+    req = (<span class="string">"QUERY TIME ORDER"</span> + System.getProperty(<span class="string">"line.separator"</span>)).getBytes();
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>{
+
+    ByteBuf message = <span class="keyword">null</span>;
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) {
+        message = Unpooled.buffer(req.length);
+        message.writeBytes(req);
+        ctx.writeAndFlush(message);
+    }
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>{
+
+    String body = (String) msg;
+
+    System.out.println(<span class="string">"Now is :"</span> + body + <span class="string">" ; the counter is : "</span> + ++counter);
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>{
+    ctx.close();
+}
+}
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/10/tcp-stick-problem-understand/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          理解TCP粘包问题之网络编程总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/06/netty-start-sample/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">netty入门实例</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="tcp-stick-package-unpacking" data-title="tcp粘包拆包实例" data-url="http://krisjin.github.io/2015/02/09/tcp-stick-package-unpacking/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

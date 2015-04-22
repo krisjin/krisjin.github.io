@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>TF-IDF关键字提取 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TF-IDF关键字提取">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/09/it-idf-keyword/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TF-IDF关键字提取">
+<meta name="twitter:description" content="TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-it-idf-keyword" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/09/it-idf-keyword/" class="article-date">
+  	<time datetime="2015-03-09T01:32:47.000Z" itemprop="datePublished">3月 9 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      TF-IDF关键字提取
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/">NLP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TF-IDF/">TF-IDF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/关键字/">关键字</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/NLP/">NLP</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相关程度的度量或评级。除了TF-IDF以外，互联网上的搜索引擎还会使用基于连结分析的评级方法，以确定文件在搜寻结果中出现的顺序。 <a id="more"></a></p>
+<p><strong>想要了解更多请查看</strong>：<br><a href="http://www.ruanyifeng.com/blog/2013/03/tf-idf.html" title="TF-IDF与余弦相似性的应用（一）：自动提取关键词" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2013/03/tf-idf.html</a></p>
+<p><a href="http://zh.wikipedia.org/wiki/TF-IDF" title="TF-IDF" target="_blank" rel="external">http://zh.wikipedia.org/wiki/TF-IDF</a></p>
+<p>实现代码清单：</p>
+<pre><code>package net.snails.common.algorithm.keyword;
+
+<span class="literal">import</span> java.util.ArrayList;
+<span class="literal">import</span> java.util.Collections;
+<span class="literal">import</span> java.util.Comparator;
+<span class="literal">import</span> java.util.LinkedList;
+<span class="literal">import</span> java.util.<span class="built_in">List</span>;
+<span class="literal">import</span> java.util.<span class="built_in">Map</span>;
+<span class="literal">import</span> java.util.<span class="built_in">Map</span>.Entry;
+<span class="literal">import</span> java.util.TreeMap;
+<span class="literal">import</span> java.util.concurrent.atomic.AtomicInteger;
+
+<span class="literal">import</span> net.snails.common.algorithm.summary.StopWord;
+<span class="literal">import</span> net.snails.common.algorithm.util.CorpusLoad;
+
+<span class="literal">import</span> org.ansj.domain.Term;
+<span class="literal">import</span> org.ansj.splitWord.analysis.ToAnalysis;
+
+<span class="literal">import</span> com.google.common.base.Strings;
+
+<span class="dartdoc"><span class="markdown">/**
+ * TF-IDF关键词提取
+ * 
+ * @author krisjin
+ * 
+ */</span></span>
+public <span class="class"><span class="keyword">class</span> <span class="title">TFIDF</span> </span>{
+
+<span class="dartdoc"><span class="markdown">/**
+ * 语料文档总数
+ */</span></span>
+private <span class="built_in">int</span> DOC_NUM;
+
+<span class="dartdoc"><span class="markdown">/**
+ * 文档中划分的句子的词频统计
+ */</span></span>
+private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt;[] FRAGMENT_TF;
+
+<span class="dartdoc"><span class="markdown">/**
+ * 词频
+ */</span></span>
+private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; TF;
+
+<span class="dartdoc"><span class="markdown">/**
+ * 逆文档词频
+ */</span></span>
+private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Double&gt; IDF;
+
+<span class="dartdoc"><span class="markdown">/**
+ * 将文档 进行片段式的划分
+ * 
+ * @param doc
+ * @return
+ */</span></span>
+private <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; getFragmentList(<span class="built_in">String</span> doc) {
+    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; sentences = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">String</span>&gt;();
+
+    <span class="keyword">if</span> (doc == <span class="keyword">null</span>)
+        <span class="keyword">return</span> sentences;
+
+    <span class="built_in">String</span>[] senArr = doc.split(<span class="string">"[，,。:：“”？?！!；;]"</span>);
+
+    <span class="keyword">for</span> (<span class="built_in">String</span> sen : senArr) {
+        sen = sen.trim();
+        <span class="keyword">if</span> (Strings.isNullOrEmpty(sen))
+            <span class="keyword">continue</span>;
+        sentences.add(sen);
+    }
+
+    <span class="keyword">return</span> sentences;
+}
+
+private <span class="keyword">void</span> process(<span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; wordFragment) {
+    FRAGMENT_TF = <span class="keyword">new</span> <span class="built_in">Map</span>[wordFragment.size()];
+    TF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Integer&gt;();
+    IDF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Double&gt;();
+    <span class="built_in">int</span> index = <span class="number">0</span>;
+
+    <span class="keyword">for</span> (<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; frag : wordFragment) {
+        <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; tmpTF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Integer&gt;();
+        <span class="keyword">for</span> (<span class="built_in">String</span> word : frag) {
+            Integer freq = tmpTF.<span class="literal">get</span>(word);
+            freq = (freq == <span class="keyword">null</span> ? <span class="number">0</span> : freq) + <span class="number">1</span>;
+            tmpTF.put(word, freq);
+        }
+        FRAGMENT_TF[index] = tmpTF;
+
+        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : tmpTF.entrySet()) {
+            <span class="built_in">String</span> word = entry.getKey();
+            Integer freq = TF.<span class="literal">get</span>(word);
+
+            freq = (freq == <span class="keyword">null</span> ? <span class="number">0</span> : freq) + <span class="number">1</span>;
+            TF.put(word, freq);
+
+        }
+        ++index;
+    }
+
+    <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : TF.entrySet()) {
+        <span class="built_in">String</span> word = entry.getKey();
+
+        IDF.put(word, Math.log(DOC_NUM / (getIncludeWordDocs(FRAGMENT_TF, word) + <span class="number">1</span>)));
+
+    }
+
+}
+
+private <span class="built_in">int</span> getIncludeWordDocs(<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt;[] fragmentDocs, <span class="built_in">String</span> word) {
+    AtomicInteger ai = <span class="keyword">new</span> AtomicInteger();
+    <span class="keyword">for</span> (<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; frag : fragmentDocs) {
+
+        <span class="keyword">if</span> (frag.containsKey(word)) {
+            ai.incrementAndGet();
+        }
+    }
+    <span class="keyword">return</span> ai.<span class="literal">get</span>();
+}
+
+private <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; getKeywordList() {
+
+    <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Double&gt; result = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Double&gt;();
+
+    <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : TF.entrySet()) {
+
+        <span class="built_in">String</span> word = entry.getKey();
+        Integer freq = entry.getValue();
+
+        <span class="keyword">if</span> (IDF.containsKey(word)) {
+            <span class="built_in">double</span> val = ((<span class="built_in">double</span>) freq / (<span class="built_in">double</span>) TF.size()) * (IDF.<span class="literal">get</span>(word));
+            result.put(word, val);
+        } <span class="keyword">else</span> {
+            result.put(word, ((<span class="built_in">double</span>) freq / TF.size()));
+        }
+
+    }
+
+    <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt;(result.entrySet());
+
+    Collections.sort(list, <span class="keyword">new</span> MapValueComparator());
+    <span class="keyword">return</span> list;
+}
+
+private <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; getParticipleFragment(<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; sentences) {
+
+    <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; wordFragment = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt;();
+
+    <span class="keyword">for</span> (<span class="built_in">String</span> sens : sentences) {
+        <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; wordList = <span class="keyword">new</span> LinkedList&lt;<span class="built_in">String</span>&gt;();
+        <span class="built_in">List</span>&lt;Term&gt; termList = ToAnalysis.parse(sens);
+
+        <span class="keyword">for</span> (Term term : termList) {
+            <span class="keyword">if</span> (validateWord(term)) {
+                <span class="keyword">if</span> (!(term.item().name == <span class="keyword">null</span>)) {
+                    wordList.add(term.getName());
+                }
+            }
+        }
+
+        <span class="keyword">if</span> (wordList.size() &gt; <span class="number">0</span>)
+            wordFragment.add(wordList);
+    }
+
+    DOC_NUM = wordFragment.size();
+
+    <span class="keyword">return</span> wordFragment;
+}
+
+public <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; extractKeyword(<span class="built_in">String</span> doc, <span class="built_in">int</span> size) {
+
+    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; result = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">String</span>&gt;();
+
+    <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; fragList = getParticipleFragment(getFragmentList(doc));
+
+    process(fragList);
+
+    <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; keywords = getKeywordList();
+
+    <span class="keyword">if</span> (keywords.size() &lt;= size) {
+        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt; entry : keywords) {
+            result.add(entry.getKey());
+        }
+    } <span class="keyword">else</span> {
+        <span class="built_in">int</span> i = <span class="number">1</span>;
+        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt; entry : keywords) {
+            result.add(entry.getKey());
+            <span class="keyword">if</span> (i == size)
+                <span class="keyword">break</span>;
+            i++;
+        }
+    }
+
+    <span class="keyword">return</span> result;
+}
+
+public <span class="literal">static</span> boolean validateWord(Term term) {
+    <span class="keyword">if</span> (term.getNatureStr().startsWith(<span class="string">"n"</span>) || term.getNatureStr().startsWith(<span class="string">"v"</span>) || term.getNatureStr().startsWith(<span class="string">"d"</span>)
+            || term.getNatureStr().startsWith(<span class="string">"a"</span>)) {
+        <span class="keyword">if</span> (!StopWord.contains(term.getName())) {
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+}
+
+}
+
+<span class="class"><span class="keyword">class</span> <span class="title">MapValueComparator</span> <span class="keyword">implements</span> <span class="title">Comparator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">String</span>, <span class="title">Double</span>&gt;&gt; </span>{
+
+public <span class="built_in">int</span> compare(Entry&lt;<span class="built_in">String</span>, Double&gt; o1, Entry&lt;<span class="built_in">String</span>, Double&gt; o2) {
+    <span class="keyword">return</span> o2.getValue().compareTo(o1.getValue());
+}
+
+public <span class="literal">static</span> <span class="keyword">void</span> main(<span class="built_in">String</span>[] args) {
+
+    TFIDF ti = <span class="keyword">new</span> TFIDF();
+
+    <span class="built_in">String</span> corpus = CorpusLoad.getText(<span class="string">"extract.txt"</span>);
+
+    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; kds = ti.extractKeyword(corpus, <span class="number">12</span>);
+
+    <span class="keyword">for</span> (<span class="built_in">String</span> k : kds) {
+        System.out.println(k);
+    }
+
+}
+}
+</code></pre><p>上述代码简单实现了TF-IDF算法，欢迎讨论！</p>
+<p>github 查看：<a href="https://github.com/zoopaper/common-algorithm.git" target="_blank" rel="external">https://github.com/zoopaper/common-algorithm.git</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/10/nio-scatter-gather/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          NIO Scatter/Gather实例
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/06/set-up-git-server/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CentOS上搭建Git Server</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="it-idf-keyword" data-title="TF-IDF关键字提取" data-url="http://krisjin.github.io/2015/03/09/it-idf-keyword/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

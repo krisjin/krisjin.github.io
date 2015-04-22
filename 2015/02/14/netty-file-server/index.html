@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>netty实现http文件服务器 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Http介绍Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="netty实现http文件服务器">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/14/netty-file-server/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="Http介绍Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="netty实现http文件服务器">
+<meta name="twitter:description" content="Http介绍Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-netty-file-server" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/14/netty-file-server/" class="article-date">
+  	<time datetime="2015-02-13T16:07:01.000Z" itemprop="datePublished">2月 14 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      netty实现http文件服务器
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Http介绍">Http介绍</h3><p>Http(超文本传输协议)协议是建立在TCP传输协议之上的应用成协议,Http由于便捷、快速的方式，适用于分布式超媒体信息系统。Http是目前Web开发的主流协议，基于Http的应用非常广泛，因此掌握HTTP的开发非常重要。由于netty的HTTP协议栈是基于netty的NIO通信框架开发的，所以netty的HTTP协议也是异步非阻塞的。<br><a id="more"></a><br>具体的关于HTTP及Netyy的实现细节在以后的章节在写，先上实例代码：</p>
+<h3 id="实例代码">实例代码</h3><p><strong>服务端：</strong><br>    public class HttpFileServer {</p>
+<pre><code>public void run(final <span class="built_in">int</span> port, final <span class="type">String</span> url) throws <span class="type">InterruptedException</span> {
+
+    <span class="type">EventLoopGroup</span> bossGroup = <span class="keyword">new</span> <span class="type">NioEventLoopGroup</span><span class="literal">()</span>;
+    <span class="type">EventLoopGroup</span> workerGroup = <span class="keyword">new</span> <span class="type">NioEventLoopGroup</span><span class="literal">()</span>;
+
+    <span class="keyword">try</span> {
+        <span class="type">ServerBootstrap</span> boot = <span class="keyword">new</span> <span class="type">ServerBootstrap</span><span class="literal">()</span>;
+
+        boot.group(bossGroup, workerGroup).channel(<span class="type">NioServerSocketChannel</span>.<span class="keyword">class</span>)
+                .childHandler(<span class="keyword">new</span> <span class="type">ChannelInitializer</span>&lt;<span class="type">SocketChannel</span>&gt;<span class="literal">()</span> {
+
+                    @<span class="type">Override</span>
+                    protected void initChannel(<span class="type">SocketChannel</span> ch) throws <span class="type">Exception</span> {
+                        ch.pipeline<span class="literal">()</span>.addLast(<span class="string">"http-decoder"</span>, <span class="keyword">new</span> <span class="type">HttpRequestDecoder</span><span class="literal">()</span>);
+                        ch.pipeline<span class="literal">()</span>.addLast(<span class="string">"http-aggregator"</span>, <span class="keyword">new</span> <span class="type">HttpObjectAggregator</span>(<span class="number">65536</span>));
+                        ch.pipeline<span class="literal">()</span>.addLast(<span class="string">"http-encoder"</span>, <span class="keyword">new</span> <span class="type">HttpResponseEncoder</span><span class="literal">()</span>);
+                        ch.pipeline<span class="literal">()</span>.addLast(<span class="string">"http-chunked"</span>, <span class="keyword">new</span> <span class="type">ChunkedWriteHandler</span><span class="literal">()</span>);
+                        ch.pipeline<span class="literal">()</span>.addLast(<span class="string">"fileServerHandler"</span>, <span class="keyword">new</span> <span class="type">HttpFileServerHandler</span>(url));
+                    }
+
+                });
+        <span class="type">ChannelFuture</span> cf =boot.bind(<span class="string">"127.0.0.1"</span>,port).sync<span class="literal">()</span>;
+        <span class="type">System</span>.out.println(<span class="string">"Http文件目录服务器启动：http://127.0.0.1:"</span>+port+url);
+        cf.channel<span class="literal">()</span>.closeFuture<span class="literal">()</span>.sync<span class="literal">()</span>;
+
+    } finally {
+        bossGroup.shutdownGracefully<span class="literal">()</span>;
+        workerGroup.shutdownGracefully<span class="literal">()</span>;
+
+    }
+
+}
+
+public static void main(<span class="type">String</span><span class="literal">[]</span> args) throws <span class="type">InterruptedException</span> {
+    <span class="type">String</span> url=<span class="string">"/src/main/java/"</span>;
+
+    <span class="keyword">new</span> <span class="type">HttpFileServer</span><span class="literal">()</span>.run(<span class="number">8080</span>, url);
+
+}
+
+}
+</code></pre><p><strong>服务端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> HttpFileServerHandler <span class="keyword">extends</span> SimpleChannelInboundHandler&lt;FullHttpRequest&gt; {
+
+HttpMethod GET = <span class="keyword">new</span> HttpMethod(<span class="string">"GET"</span>);
+
+<span class="keyword">private</span> String url;
+
+<span class="keyword">private</span> <span class="keyword">final</span> Pattern ALLOWED_FILE_NAME = Pattern.<span class="keyword">compile</span>(<span class="string">"[A-Za-z0-9][-_A-Za-z0-9\\.]*"</span>);
+
+<span class="keyword">private</span> <span class="keyword">final</span> Pattern INSECURE_URI = Pattern.<span class="keyword">compile</span>(<span class="string">".*[&lt;&gt;&amp;\"].*"</span>);
+
+<span class="keyword">public</span> HttpFileServerHandler(String url) {
+    <span class="keyword">this</span>.url = url;
+}
+
+@Override
+<span class="keyword">protected</span> <span class="keyword">void</span> messageReceived(ChannelHandlerContext ctx, FullHttpRequest request) <span class="keyword">throws</span> Exception {
+
+    <span class="keyword">if</span> (!request.getDecoderResult().isSuccess()) {
+        sendError(ctx, HttpResponseStatus.BAD_REQUEST);
+        <span class="keyword">return</span>;
+    }
+
+    <span class="keyword">if</span> (request.getMethod() != HttpMethod.GET) {
+        sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED);
+        <span class="keyword">return</span>;
+    }
+    <span class="keyword">final</span> String uri = request.getUri();
+    <span class="keyword">final</span> String path = sanitizeUri(uri);
+    <span class="keyword">if</span> (path == <span class="keyword">null</span>) {
+        sendError(ctx, HttpResponseStatus.FORBIDDEN);
+        <span class="keyword">return</span>;
+    }
+
+    <span class="keyword">File</span> <span class="keyword">file</span> = <span class="keyword">new</span> <span class="keyword">File</span>(path);
+
+    <span class="keyword">if</span> (<span class="keyword">file</span>.isHidden() || !<span class="keyword">file</span>.exists()) {
+        sendError(ctx, HttpResponseStatus.NOT_FOUND);
+        <span class="keyword">return</span>;
+    }
+
+    <span class="keyword">if</span> (<span class="keyword">file</span>.isDirectory()) {
+        <span class="keyword">if</span> (uri.endsWith(<span class="string">"/"</span>)) {
+            sendList(ctx, <span class="keyword">file</span>);
+        } <span class="keyword">else</span> {
+            sendRedirect(ctx, uri + <span class="string">'/'</span>);
+        }
+        <span class="keyword">return</span>;
+    }
+
+    <span class="keyword">if</span> (!<span class="keyword">file</span>.isFile()) {
+        sendError(ctx, HttpResponseStatus.FORBIDDEN);
+        <span class="keyword">return</span>;
+    }
+
+    RandomAccessFile randomAccessFile = <span class="keyword">null</span>;
+
+    <span class="keyword">try</span> {
+        randomAccessFile = <span class="keyword">new</span> RandomAccessFile(<span class="keyword">file</span>, <span class="string">"r"</span>);
+    } <span class="keyword">catch</span> (FileNotFoundException e) {
+        sendError(ctx, HttpResponseStatus.NO_CONTENT);
+        <span class="keyword">return</span>;
+    }
+    <span class="keyword">long</span> fileLength = randomAccessFile.length();
+    HttpResponse response = <span class="keyword">new</span> DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+    HttpHeaders.setContentLength(response, fileLength);
+    setContentTypeHeader(response, <span class="keyword">file</span>);
+
+    <span class="keyword">if</span> (HttpHeaders.isKeepAlive(request)) {
+        response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+    }
+    ctx.<span class="keyword">write</span>(response);
+    ChannelFuture sendFileFuture;
+
+    sendFileFuture = ctx.<span class="keyword">write</span>(<span class="keyword">new</span> ChunkedFile(randomAccessFile, <span class="number">0</span>, fileLength, <span class="number">8192</span>), ctx.newProgressivePromise());
+    sendFileFuture.addListener(<span class="keyword">new</span> ChannelProgressiveFutureListener() {
+
+        @Override
+        <span class="keyword">public</span> <span class="keyword">void</span> operationComplete(ChannelProgressiveFuture future) <span class="keyword">throws</span> Exception {
+
+            System.err.<span class="keyword">println</span>(future.channel() + <span class="string">" transfer complete"</span>);
+
+        }
+
+        @Override
+        <span class="keyword">public</span> <span class="keyword">void</span> operationProgressed(ChannelProgressiveFuture future, <span class="keyword">long</span> progress, <span class="keyword">long</span> total)
+                <span class="keyword">throws</span> Exception {
+            <span class="keyword">if</span> (total &lt; <span class="number">0</span>) {
+                System.err.<span class="keyword">println</span>(future.channel() + <span class="string">" transfer progress : "</span> + progress);
+            } <span class="keyword">else</span> {
+                System.err.<span class="keyword">println</span>(future.channel() + <span class="string">" transfer progress : "</span> + progress + <span class="string">" / "</span> + total);
+            }
+        }
+    });
+
+    ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+    <span class="keyword">if</span> (!HttpHeaders.isKeepAlive(request)) {
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+    }
+
+}
+
+@Override
+<span class="keyword">public</span> <span class="keyword">void</span> exceptionCaught(ChannelHandlerContext ctx, Throwable cause) <span class="keyword">throws</span> Exception {
+
+    cause.printStackTrace();
+    <span class="keyword">if</span> (ctx.channel().isActive()) {
+        sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+<span class="keyword">private</span> <span class="keyword">void</span> sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
+    FullHttpResponse response = <span class="keyword">new</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(
+            <span class="string">"Failure :"</span> + status + <span class="string">"\r\n"</span>, CharsetUtil.UTF_8));
+    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, <span class="string">"text/plain; charset=UTF-8"</span>);
+    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+}
+
+<span class="keyword">public</span> String sanitizeUri(String uri) {
+
+    <span class="comment">// Decode the path.</span>
+    <span class="keyword">try</span> {
+        uri = URLDecoder.decode(uri, <span class="string">"UTF-8"</span>);
+    } <span class="keyword">catch</span> (UnsupportedEncodingException e) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(e);
+    }
+
+    <span class="keyword">if</span> (uri.isEmpty() || uri.charAt(<span class="number">0</span>) != <span class="string">'/'</span>) {
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="comment">// Convert file separators.</span>
+    uri = uri.replace(<span class="string">'/'</span>, <span class="keyword">File</span>.separatorChar);
+
+    <span class="comment">// Simplistic dumb security check.</span>
+    <span class="comment">// You will have to do something serious in the production environment.</span>
+    <span class="keyword">if</span> (uri.contains(<span class="keyword">File</span>.separator + <span class="string">'.'</span>) || uri.contains(<span class="string">'.'</span> + <span class="keyword">File</span>.separator) || uri.charAt(<span class="number">0</span>) == <span class="string">'.'</span>
+            || uri.charAt(uri.length() - <span class="number">1</span>) == <span class="string">'.'</span> || INSECURE_URI.matcher(uri).matches()) {
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+    }
+
+    <span class="comment">// Convert to absolute path.</span>
+    <span class="keyword">return</span> System.getProperty(<span class="string">"user.dir"</span>) + <span class="keyword">File</span>.separator + uri;
+}
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> sendList(ChannelHandlerContext ctx, <span class="keyword">File</span> <span class="keyword">file</span>) {
+    FullHttpResponse response = <span class="keyword">new</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, <span class="string">"text/html; charset=UTF-8"</span>);
+    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+
+    String dirPath = <span class="keyword">file</span>.getPath();
+
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;!DOCTYPE html&gt;\r\n"</span>);
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;html&gt;&lt;head&gt;&lt;title&gt;"</span>);
+    sb.<span class="keyword">append</span>(dirPath);
+    sb.<span class="keyword">append</span>(<span class="string">"目录："</span>);
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;/title&gt;&lt;/head&gt;&lt;body&gt;\r\n"</span>);
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;h3&gt;"</span>);
+    sb.<span class="keyword">append</span>(dirPath).<span class="keyword">append</span>(<span class="string">"目录："</span>);
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;/h3&gt;\r\n"</span>);
+
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;ul&gt;"</span>);
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;li&gt;&lt;a href=\"../\"&gt;..&lt;/a&gt;&lt;/li&gt;\r\n"</span>);
+
+    <span class="keyword">for</span> (<span class="keyword">File</span> f : <span class="keyword">file</span>.listFiles()) {
+        <span class="keyword">if</span> (f.isHidden() || !f.canRead()) {
+            <span class="keyword">continue</span>;
+        }
+        String name = f.getName();
+        <span class="keyword">if</span> (!ALLOWED_FILE_NAME.matcher(name).matches()) {
+            <span class="keyword">continue</span>;
+        }
+
+        sb.<span class="keyword">append</span>(<span class="string">"&lt;li&gt;&lt;a href=\""</span>);
+        sb.<span class="keyword">append</span>(name);
+        sb.<span class="keyword">append</span>(<span class="string">"\"&gt;"</span>);
+        sb.<span class="keyword">append</span>(name);
+        sb.<span class="keyword">append</span>(<span class="string">"&lt;/a&gt;&lt;/li&gt;\r\n"</span>);
+
+    }
+
+    sb.<span class="keyword">append</span>(<span class="string">"&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;\r\n"</span>);
+
+    ByteBuf buffer = Unpooled.copiedBuffer(sb, CharsetUtil.UTF_8);
+    response.content().writeBytes(buffer);
+    buffer.release();
+
+    <span class="comment">// Close the connection as soon as the error message is sent.</span>
+    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+}
+
+<span class="keyword">public</span> <span class="keyword">void</span> sendRedirect(ChannelHandlerContext ctx, String newUri) {
+    FullHttpResponse response = <span class="keyword">new</span> DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND);
+    response.headers().set(HttpHeaders.Names.LOCATION, newUri);
+    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+
+}
+
+<span class="keyword">private</span> <span class="keyword">void</span> setContentTypeHeader(HttpResponse response, <span class="keyword">File</span> <span class="keyword">file</span>) {
+
+    MimetypesFileTypeMap mimeTypeMap = <span class="keyword">new</span> MimetypesFileTypeMap();
+    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, mimeTypeMap.getContentType(<span class="keyword">file</span>.getPath()));
+}
+
+}
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/16/channel-detail/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          netty channel详解
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/13/netty-serializable-sample/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">netty序列化实现</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="netty-file-server" data-title="netty实现http文件服务器" data-url="http://krisjin.github.io/2015/02/14/netty-file-server/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

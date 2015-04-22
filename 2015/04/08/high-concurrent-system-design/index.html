@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>高并发系统设计 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
+一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高并发系统设计">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/08/high-concurrent-system-design/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
+一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高并发系统设计">
+<meta name="twitter:description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
+一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-high-concurrent-system-design" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/08/high-concurrent-system-design/" class="article-date">
+  	<time datetime="2015-04-08T14:51:57.000Z" itemprop="datePublished">4月 8 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      高并发系统设计
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/concurrent/">concurrent</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。</p>
+<h2 id="一、引子">一、引子</h2><p>最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。<a id="more"></a></p>
+<h2 id="二、服务器内部设计">二、服务器内部设计</h2><p>服务器设计涉及Socket的阻塞/非阻塞，操作系统IO的同步和异步（之前被人问到过两次。第一次让我说说知道的网络模型，我说ISO模型和TCP/IP模型，结果被鄙视了。最后人说了解linux epoll吗？不了解呀！汉，回去查资料才知道是这回事。第二次让我说说知道线程模型，汉！这个名词感觉没有听说过,线程？模型？半同步/半异步，领导者/跟随者知道吗。再汉，我知道同步/异步，还有半同步/半异步？啥呀？领导者/跟随者，我现在没有领导。回去一顿恶补，原来是ACE框架里边经常有这样的提法，Reactor属于同步/半同步，PREACTOR属于领导者/跟随者模式。瀑布汗。小插曲一段，这些不懂没关系，下边我慢慢分解），事件分离器，线程池等。内部设计希望通过各个模块的给出一个简单设计，经过您的进一步的组合和打磨，就可以实现一个基本的高并发服务器。</p>
+<h3 id="1-_Java高并发服务器">1. Java高并发服务器</h3><p>Java设计高并发服务器相对比较简单。直接是用ServerSocket或者Channel+selector实现。前者属于同步IO设计，后者采用了模拟的异步IO。为什么说模拟的异步IO呢？记得网上看到一篇文章分析了java的selector。在windows上通过建立一个127.0.0.1到127.0.0.1的连接实现IO的异步通知。在linux上通过建立一个管道实现IO的异步通知。考虑到高并并发系统的要求和java上边的异步IO的限制（通常操作系统同时打开的文件数是有限制的）和效率问题，java的高并发服务器设计不做展开深入的分析，可以参考C高并发服务器的分析做同样的设计。</p>
+<h3 id="2-_C高并发服务器设计">2. C高并发服务器设计</h3><h4 id="1)_基本概念">1) 基本概念</h4><p>Ø  阻塞和非阻塞socket<br>所谓阻塞Socket，是指其完成指定的任务之前不允许程序调用另一个函数，在Windows下还会阻塞本线程消息的发送。所谓非阻塞Socket，是指操作启动之后，如果可以立即得到结果就返回结果，否则返回表示结果需要等待的错误信息，不等待任务完成函数就返回。一个比较有意思的问题是accept的Socket是阻塞的还是非阻塞的呢？下边是MSDN上边的一段话：The accept function extracts thefirst connection on the queue of pending connections on socket s. It thencreates and returns a handle to the new socket. The newly created socket is thesocket that will handle the actual connection; it has the same properties assocket s, including the asynchronous events registered with the WSAAsyncSelector WSAEventSelect functions.<br>Ø  同步/异步IO<br>有两种类型的文件IO同步：同步文件IO和异步文件IO。异步文件IO也就是重叠IO。</p>
+<p>在同步文件IO中，线程启动一个IO操作然后就立即进入等待状态，直到IO操作完成后才醒来继续执行。而异步文件IO方式中，线程发送一个IO请求到内核，然后继续处理其他的事情，内核完成IO请求后，将会通知线程IO操作完成了。</p>
+<p>如果IO请求需要大量时间执行的话，异步文件IO方式可以显著提高效率，因为在线程等待的这段时间内，CPU将会调度其他线程进行执行，如果没有其他线程需要执行的话，这段时间将会浪费掉（可能会调度操作系统的零页线程）。如果IO请求操作很快，用异步IO方式反而还低效，还不如用同步IO方式。 </p>
+<p>同步IO在同一时刻只允许一个IO操作，也就是说对于同一个文件句柄的IO操作是序列化的，即使使用两个线程也不能同时对同一个文件句柄同时发出读写操作。重叠IO允许一个或多个线程同时发出IO请求。异步IO在请求完成时，通过将文件句柄设为有信号状态来通知应用程序，或者应用程序通过GetOverlappedResult察看IO请求是否完成，也可以通过一个事件对象来通知应用程序。高并发系统通常采用异步IO方式提高系统性能。</p>
+<p>Ø  事件分离器<br>事件分离器的概念是针对异步IO来说的。在同步IO的情况下，执行操作等待返回结果，不要事件分离器。异步IO的时候，发送请求后，结果是通过事件通知的。这是产生了事件分离器的需求。事件分离器主要任务是管理和分离不同文件描述符上的所发生的事件，让后通知相应的事件，派发相应的动作。下边是lighthttpd事件分离器定义：</p>
+<pre><code><span class="comment">/** 
+ * fd-event handler for select(), poll() andrt-signals on Linux 2.4 
+ * 
+ */</span>  
+<span class="keyword">typedef</span> <span class="keyword">struct</span> fdevents {  
+         fdevent_handler_t type;  
+
+         fdnode **fdarray;  
+         size_t maxfds;  
+
+<span class="preprocessor">#ifdef USE_LINUX_SIGIO  </span>
+         <span class="keyword">int</span> in_sigio;  
+         <span class="keyword">int</span> signum;  
+         sigset_t sigset;  
+         siginfo_t siginfo;  
+         <span class="built_in">bitset</span> *sigbset;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_LINUX_EPOLL  </span>
+         <span class="keyword">int</span> epoll_fd;  
+         <span class="keyword">struct</span> epoll_event *epoll_events;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_POLL  </span>
+         <span class="keyword">struct</span> pollfd *pollfds;  
+
+         size_t size;  
+         size_t used;  
+
+         buffer_int unused;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_SELECT  </span>
+         fd_set select_read;  
+         fd_set select_write;  
+         fd_set select_error;  
+
+         fd_set select_set_read;  
+         fd_set select_set_write;  
+         fd_set select_set_error;  
+
+         <span class="keyword">int</span> select_max_fd;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_SOLARIS_DEVPOLL  </span>
+         <span class="keyword">int</span> devpoll_fd;  
+         <span class="keyword">struct</span> pollfd *devpollfds;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_FREEBSD_KQUEUE  </span>
+         <span class="keyword">int</span> kq_fd;  
+         <span class="keyword">struct</span> kevent *kq_results;  
+         <span class="built_in">bitset</span> *kq_bevents;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+<span class="preprocessor">#ifdef USE_SOLARIS_PORT  </span>
+         <span class="keyword">int</span> port_fd;  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+         <span class="keyword">int</span> (*reset)(<span class="keyword">struct</span> fdevents *ev);  
+         <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">struct</span> fdevents *ev);  
+
+         <span class="keyword">int</span> (*event_add)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fde_ndx, <span class="keyword">int</span> fd,<span class="keyword">int</span> events);  
+         <span class="keyword">int</span> (*event_del)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fde_ndx, <span class="keyword">int</span> fd);  
+         <span class="keyword">int</span> (*event_get_revent)(<span class="keyword">struct</span> fdevents *ev, size_t ndx);  
+         <span class="keyword">int</span> (*event_get_fd)(<span class="keyword">struct</span> fdevents *ev, size_t ndx);  
+
+         <span class="keyword">int</span> (*event_next_fdndx)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> ndx);  
+
+         <span class="keyword">int</span> (*poll)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> timeout_ms);  
+
+         <span class="keyword">int</span> (*fcntl_set)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fd);  
+} fdevents;  
+
+fdevents *fdevent_init(size_tmaxfds, fdevent_handler_t type);  
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_reset</span><span class="params">(fdevents*ev)</span></span>;  
+<span class="function"><span class="keyword">void</span> <span class="title">fdevent_free</span><span class="params">(fdevents*ev)</span></span>;  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_event_add</span><span class="params">(fdevents*ev, <span class="keyword">int</span> *fde_ndx, <span class="keyword">int</span> fd, <span class="keyword">int</span> events)</span></span>;  
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_event_del</span><span class="params">(fdevents*ev, <span class="keyword">int</span> *fde_ndx, <span class="keyword">int</span> fd)</span></span>;  
+intfdevent_event_get_revent(fdevents *ev, size_t ndx);  
+intfdevent_event_get_fd(fdevents *ev, size_t ndx);  
+fdevent_handlerfdevent_get_handler(fdevents *ev, <span class="keyword">int</span> fd);  
+<span class="keyword">void</span> *fdevent_get_context(fdevents *ev, <span class="keyword">int</span> fd);  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_event_next_fdndx</span><span class="params">(fdevents*ev, <span class="keyword">int</span> ndx)</span></span>;  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_poll</span><span class="params">(fdevents *ev,<span class="keyword">int</span> timeout_ms)</span></span>;  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_register</span><span class="params">(fdevents*ev, <span class="keyword">int</span> fd, fdevent_handler handler, <span class="keyword">void</span> *ctx)</span></span>;  
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_unregister</span><span class="params">(fdevents*ev, <span class="keyword">int</span> fd)</span></span>;  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_fcntl_set</span><span class="params">(fdevents*ev, <span class="keyword">int</span> fd)</span></span>;  
+
+intfdevent_select_init(fdevents *ev);  
+<span class="function"><span class="keyword">int</span> <span class="title">fdevent_poll_init</span><span class="params">(fdevents*ev)</span></span>;  
+intfdevent_linux_rtsig_init(fdevents *ev);  
+intfdevent_linux_sysepoll_init(fdevents *ev);  
+intfdevent_solaris_devpoll_init(fdevents *ev);  
+intfdevent_freebsd_kqueue_init(fdevents *ev);  
+</code></pre><p>具体系统的事件操作通过：<br>fdevent_freebsd_kqueue.c<br>fdevent_linux_rtsig.c<br>fdevent_linux_sysepoll.c<br>fdevent_poll.c<br>fdevent_select.c<br>fdevent_solaris_devpoll.c<br>几个文件实现。</p>
+<p>Ø  线程池<br>线程池基本上比较简单，实现线程的借入和借出，创建和销毁。最完好可以做到通过一个事件触发一个线程开始工作。下边给出一个简单的，没有实现根据事件触发的，linux和windows通用的线程池模型：</p>
+<pre><code>spthread.h  
+<span class="preprocessor">#ifndef __spthread_hpp__  </span>
+<span class="preprocessor">#<span class="keyword">define</span> __spthread_hpp__  </span>
+
+<span class="preprocessor">#ifndef WIN32  </span>
+
+<span class="comment">/// pthread  </span>
+
+<span class="preprocessor">#<span class="keyword">include</span> &lt;pthread.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;unistd.h&gt;  </span>
+
+<span class="keyword">typedef</span> <span class="keyword">void</span> *sp_thread_result_t;  
+<span class="keyword">typedef</span> pthread_mutex_tsp_thread_mutex_t;  
+<span class="keyword">typedef</span> pthread_cond_t  sp_thread_cond_t;  
+<span class="keyword">typedef</span> pthread_t       sp_thread_t;  
+<span class="keyword">typedef</span> pthread_attr_t  sp_thread_attr_t;  
+
+<span class="preprocessor">#definesp_thread_mutex_init(m,a)  pthread_mutex_init(m,a)  </span>
+<span class="preprocessor">#definesp_thread_mutex_destroy(m) pthread_mutex_destroy(m)  </span>
+<span class="preprocessor">#definesp_thread_mutex_lock(m)    pthread_mutex_lock(m)  </span>
+<span class="preprocessor">#<span class="keyword">define</span> sp_thread_mutex_unlock(m)   pthread_mutex_unlock(m)  </span>
+
+<span class="preprocessor">#definesp_thread_cond_init(c,a)   pthread_cond_init(c,a)  </span>
+<span class="preprocessor">#definesp_thread_cond_destroy(c)  pthread_cond_destroy(c)  </span>
+<span class="preprocessor">#definesp_thread_cond_wait(c,m)   pthread_cond_wait(c,m)  </span>
+<span class="preprocessor">#definesp_thread_cond_signal(c)   pthread_cond_signal(c)  </span>
+
+<span class="preprocessor">#definesp_thread_attr_init(a)       pthread_attr_init(a)  </span>
+<span class="preprocessor">#definesp_thread_attr_setdetachstate pthread_attr_setdetachstate  </span>
+<span class="preprocessor">#defineSP_THREAD_CREATE_DETACHED    PTHREAD_CREATE_DETACHED  </span>
+
+<span class="preprocessor">#<span class="keyword">define</span> sp_thread_self    pthread_self  </span>
+<span class="preprocessor">#<span class="keyword">define</span> sp_thread_create  pthread_create  </span>
+
+<span class="preprocessor">#<span class="keyword">define</span> SP_THREAD_CALL  </span>
+<span class="function"><span class="keyword">typedef</span> <span class="title">sp_thread_result_t</span> <span class="params">( *sp_thread_func_t )</span><span class="params">( <span class="keyword">void</span> * args )</span></span>;  
+
+<span class="preprocessor">#<span class="keyword">define</span> sp_sleep(x) sleep(x)  </span>
+
+<span class="preprocessor">#<span class="keyword">else</span><span class="comment">///////////////////////////////////////////////////////////////////////  </span></span>
+
+<span class="comment">// win32 thread  </span>
+
+<span class="preprocessor">#<span class="keyword">include</span> &lt;winsock2.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;process.h&gt;  </span>
+
+<span class="keyword">typedef</span> <span class="keyword">unsigned</span> sp_thread_t;  
+
+<span class="keyword">typedef</span> unsignedsp_thread_result_t;  
+<span class="preprocessor">#<span class="keyword">define</span> SP_THREAD_CALL__stdcall  </span>
+<span class="function"><span class="keyword">typedef</span> <span class="title">sp_thread_result_t</span> <span class="params">(__stdcall * sp_thread_func_t )</span><span class="params">( <span class="keyword">void</span> * args )</span></span>;  
+
+<span class="keyword">typedef</span> HANDLE  sp_thread_mutex_t;  
+<span class="keyword">typedef</span> HANDLE  sp_thread_cond_t;  
+<span class="keyword">typedef</span> DWORD   sp_thread_attr_t;  
+
+<span class="preprocessor">#defineSP_THREAD_CREATE_DETACHED 1  </span>
+<span class="preprocessor">#<span class="keyword">define</span> sp_sleep(x)Sleep(1000*x)  </span>
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_mutex_init</span><span class="params">(sp_thread_mutex_t * mutex, <span class="keyword">void</span> * attr )</span>  
+</span>{  
+         *mutex = CreateMutex( NULL, FALSE, NULL );  
+         <span class="keyword">return</span> NULL == * mutex ? GetLastError() : <span class="number">0</span>;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_mutex_destroy</span><span class="params">(sp_thread_mutex_t * mutex )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = CloseHandle( *mutex );  
+
+         <span class="keyword">return</span> <span class="number">0</span> == ret ? GetLastError() : <span class="number">0</span>;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_mutex_lock</span><span class="params">(sp_thread_mutex_t * mutex )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = WaitForSingleObject( *mutex, INFINITE );  
+         <span class="keyword">return</span> WAIT_OBJECT_0 == ret ? <span class="number">0</span> : GetLastError();  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_mutex_unlock</span><span class="params">(sp_thread_mutex_t * mutex )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = ReleaseMutex( *mutex );  
+         <span class="keyword">return</span> <span class="number">0</span> != ret ? <span class="number">0</span> : GetLastError();  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_cond_init</span><span class="params">(sp_thread_cond_t * cond, <span class="keyword">void</span> * attr )</span>  
+</span>{  
+         *cond = CreateEvent( NULL, FALSE, FALSE, NULL );  
+         <span class="keyword">return</span> NULL == *cond ? GetLastError() : <span class="number">0</span>;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_cond_destroy</span><span class="params">(sp_thread_cond_t * cond )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = CloseHandle( *cond );  
+         <span class="keyword">return</span> <span class="number">0</span> == ret ? GetLastError() : <span class="number">0</span>;  
+}  
+
+<span class="comment">/* 
+Caller MUST be holding themutex lock; the 
+lock is released and the calleris blocked waiting 
+on 'cond'. When 'cond' issignaled, the mutex 
+is re-acquired before returningto the caller. 
+*/</span>  
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_cond_wait</span><span class="params">(sp_thread_cond_t * cond, sp_thread_mutex_t * mutex )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = <span class="number">0</span>;  
+
+         sp_thread_mutex_unlock( mutex );  
+
+         ret = WaitForSingleObject( *cond, INFINITE );  
+
+         sp_thread_mutex_lock( mutex );  
+
+         <span class="keyword">return</span> WAIT_OBJECT_0 == ret ? <span class="number">0</span> : GetLastError();  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_cond_signal</span><span class="params">(sp_thread_cond_t * cond )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = SetEvent( *cond );  
+         <span class="keyword">return</span> <span class="number">0</span> == ret ? GetLastError() : <span class="number">0</span>;  
+}  
+
+<span class="function">sp_thread_t <span class="title">sp_thread_self</span><span class="params">()</span>  
+</span>{  
+         <span class="keyword">return</span> GetCurrentThreadId();  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_attr_init</span><span class="params">(sp_thread_attr_t * attr )</span>  
+</span>{  
+         *attr = <span class="number">0</span>;  
+         <span class="keyword">return</span> <span class="number">0</span>;  
+}  
+
+intsp_thread_attr_setdetachstate( sp_thread_attr_t * attr, <span class="keyword">int</span> detachstate )  
+{  
+         *attr |= detachstate;  
+         <span class="keyword">return</span> <span class="number">0</span>;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">sp_thread_create</span><span class="params">(sp_thread_t * thread, sp_thread_attr_t * attr,  
+                   sp_thread_func_t myfunc, <span class="keyword">void</span> * args )</span>  
+</span>{  
+         <span class="comment">// _beginthreadex returns 0 on an error  </span>
+         HANDLE h = (HANDLE)_beginthreadex( NULL, <span class="number">0</span>, myfunc, args, <span class="number">0</span>,thread );  
+         <span class="keyword">return</span> h &gt; <span class="number">0</span> ? <span class="number">0</span> : GetLastError();  
+}  
+
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+threadpool.h  
+<span class="comment">/** 
+ * threadpool.h 
+ * 
+ * This file declares the functionalityassociated with 
+ * your implementation of a threadpool. 
+ */</span>  
+
+<span class="preprocessor">#ifndef __threadpool_h__  </span>
+<span class="preprocessor">#<span class="keyword">define</span> __threadpool_h__  </span>
+
+<span class="preprocessor">#ifdef __cplusplus  </span>
+<span class="keyword">extern</span> <span class="string">"C"</span> {  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+
+<span class="comment">// maximum number of threadsallowed in a pool  </span>
+<span class="preprocessor">#<span class="keyword">define</span> MAXT_IN_POOL 200  </span>
+
+<span class="comment">// You must hide the internaldetails of the threadpool  </span>
+<span class="comment">// structure from callers, thusdeclare threadpool of type "void".  </span>
+<span class="comment">// In threadpool.c, you willuse type conversion to coerce  </span>
+<span class="comment">// variables of type"threadpool" back and forth to a  </span>
+<span class="comment">// richer, internal type.  (See threadpool.c for details.)  </span>
+
+<span class="keyword">typedef</span> <span class="keyword">void</span> *threadpool;  
+
+<span class="comment">// "dispatch_fn"declares a typed function pointer.  A  </span>
+<span class="comment">// variable of type"dispatch_fn" points to a function  </span>
+<span class="comment">// with the followingsignature:  </span>
+<span class="comment">//  </span>
+<span class="comment">//     void dispatch_function(void *arg);  </span>
+
+<span class="function"><span class="keyword">typedef</span> <span class="title">void</span><span class="params">(*dispatch_fn)</span><span class="params">(<span class="keyword">void</span> *)</span></span>;  
+
+<span class="comment">/** 
+ * create_threadpool creates a fixed-sizedthread 
+ * pool. If the function succeeds, it returns a (non-NULL) 
+ * "threadpool", else it returnsNULL. 
+ */</span>  
+threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool);  
+
+
+<span class="comment">/** 
+ * dispatch sends a thread off to do somework.  If 
+ * all threads in the pool are busy, dispatchwill 
+ * block until a thread becomes free and isdispatched. 
+ * 
+ * Once a thread is dispatched, this functionreturns 
+ * immediately. 
+ * 
+ * The dispatched thread calls into thefunction 
+ * "dispatch_to_here" with argument"arg". 
+ */</span>  
+intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here,  
+               <span class="keyword">void</span> *arg);  
+
+<span class="comment">/** 
+ * destroy_threadpool kills the threadpool,causing 
+ * all threads in it to commit suicide, andthen 
+ * frees all the memory associated with thethreadpool. 
+ */</span>  
+voiddestroy_threadpool(threadpool destroyme);  
+
+<span class="preprocessor">#ifdef __cplusplus  </span>
+}  
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+
+<span class="preprocessor">#<span class="keyword">endif</span>  </span>
+threadpool.c  
+<span class="comment">/** 
+ * threadpool.c 
+ * 
+ * This file will contain your implementation ofa threadpool. 
+ */</span>  
+
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;  </span>
+<span class="comment">//#include &lt;unistd.h&gt;  </span>
+<span class="comment">//#include &lt;sp_thread.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;string.h&gt;  </span>
+
+<span class="preprocessor">#<span class="keyword">include</span>"threadpool.h"  </span>
+<span class="preprocessor">#<span class="keyword">include</span> "spthread.h"  </span>
+
+<span class="keyword">typedef</span> <span class="keyword">struct</span> _thread_st {  
+         sp_thread_t id;  
+         sp_thread_mutex_t mutex;  
+         sp_thread_cond_t cond;  
+         dispatch_fn fn;  
+         <span class="keyword">void</span> *arg;  
+         threadpool parent;  
+} _thread;  
+
+<span class="comment">// _threadpool is the internalthreadpool structure that is  </span>
+<span class="comment">// cast to type"threadpool" before it given out to callers  </span>
+<span class="keyword">typedef</span> <span class="keyword">struct</span> _threadpool_st {  
+         <span class="comment">// you should fill in this structure with whatever you need  </span>
+         sp_thread_mutex_t tp_mutex;  
+         sp_thread_cond_t tp_idle;  
+         sp_thread_cond_t tp_full;  
+         sp_thread_cond_t tp_empty;  
+         _thread ** tp_list;  
+         <span class="keyword">int</span> tp_index;  
+         <span class="keyword">int</span> tp_max_index;  
+         <span class="keyword">int</span> tp_stop;  
+
+         <span class="keyword">int</span> tp_total;  
+} _threadpool;  
+
+threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool)  
+{  
+         _threadpool *pool;  
+
+         <span class="comment">// sanity check the argument  </span>
+         <span class="keyword">if</span> ((num_threads_in_pool &lt;= <span class="number">0</span>) || (num_threads_in_pool&gt; MAXT_IN_POOL))  
+                   <span class="keyword">return</span> NULL;  
+
+         pool = (_threadpool *) <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(_threadpool));  
+         <span class="keyword">if</span> (pool == NULL) {  
+                   <span class="built_in">fprintf</span>(stderr, <span class="string">"Out of memory creating a newthreadpool!\n"</span>);  
+                   <span class="keyword">return</span> NULL;  
+         }  
+
+         <span class="comment">// add your code here to initialize the newly createdthreadpool  </span>
+         sp_thread_mutex_init( &amp;pool-&gt;tp_mutex, NULL );  
+         sp_thread_cond_init( &amp;pool-&gt;tp_idle, NULL );  
+         sp_thread_cond_init( &amp;pool-&gt;tp_full, NULL );  
+         sp_thread_cond_init( &amp;pool-&gt;tp_empty, NULL );  
+         pool-&gt;tp_max_index = num_threads_in_pool;  
+         pool-&gt;tp_index = <span class="number">0</span>;  
+         pool-&gt;tp_stop = <span class="number">0</span>;  
+         pool-&gt;tp_total = <span class="number">0</span>;  
+         pool-&gt;tp_list = ( _thread ** )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>( <span class="keyword">void</span> * ) *MAXT_IN_POOL );  
+         <span class="built_in">memset</span>( pool-&gt;tp_list, <span class="number">0</span>, <span class="keyword">sizeof</span>( <span class="keyword">void</span> * ) * MAXT_IN_POOL);  
+
+         <span class="keyword">return</span> (threadpool) pool;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">save_thread</span><span class="params">( _threadpool *pool, _thread * thread )</span>  
+</span>{  
+         <span class="keyword">int</span> ret = -<span class="number">1</span>;  
+
+         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt; pool-&gt;tp_max_index ) {  
+                   pool-&gt;tp_list[ pool-&gt;tp_index ] = thread;  
+                   pool-&gt;tp_index++;  
+                   ret = <span class="number">0</span>;  
+
+                   sp_thread_cond_signal( &amp;pool-&gt;tp_idle );  
+
+                   <span class="keyword">if</span>( pool-&gt;tp_index &gt;= pool-&gt;tp_total ) {  
+                            sp_thread_cond_signal(&amp;pool-&gt;tp_full );  
+                   }  
+         }  
+
+         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">return</span> ret;  
+}  
+
+<span class="function">sp_thread_result_tSP_THREAD_CALL <span class="title">wrapper_fn</span><span class="params">( <span class="keyword">void</span> * arg )</span>  
+</span>{  
+         _thread * thread = (_thread*)arg;  
+         _threadpool * pool = (_threadpool*)thread-&gt;parent;  
+
+         <span class="keyword">for</span>( ; <span class="number">0</span> == ((_threadpool*)thread-&gt;parent)-&gt;tp_stop; ){  
+                   thread-&gt;fn( thread-&gt;arg );  
+
+                   <span class="keyword">if</span>( <span class="number">0</span> !=((_threadpool*)thread-&gt;parent)-&gt;tp_stop ) <span class="keyword">break</span>;  
+
+                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
+                   <span class="keyword">if</span>( <span class="number">0</span> == save_thread( thread-&gt;parent, thread )) {  
+                            sp_thread_cond_wait(&amp;thread-&gt;cond, &amp;thread-&gt;mutex );  
+                            sp_thread_mutex_unlock(&amp;thread-&gt;mutex );  
+                   } <span class="keyword">else</span> {  
+                            sp_thread_mutex_unlock(&amp;thread-&gt;mutex );  
+                            sp_thread_cond_destroy(&amp;thread-&gt;cond );  
+                            sp_thread_mutex_destroy(&amp;thread-&gt;mutex );  
+
+                            <span class="built_in">free</span>( thread );  
+                            <span class="keyword">break</span>;  
+                   }  
+         }  
+
+         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+         pool-&gt;tp_total--;  
+         <span class="keyword">if</span>( pool-&gt;tp_total &lt;= <span class="number">0</span> ) sp_thread_cond_signal(&amp;pool-&gt;tp_empty );  
+         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">return</span> <span class="number">0</span>;  
+}  
+
+intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here, <span class="keyword">void</span>*arg)  
+{  
+         <span class="keyword">int</span> ret = <span class="number">0</span>;  
+
+         _threadpool *pool = (_threadpool *) from_me;  
+         sp_thread_attr_t attr;  
+         _thread * thread = NULL;  
+
+         <span class="comment">// add your code here to dispatch a thread  </span>
+         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt;= <span class="number">0</span> &amp;&amp; pool-&gt;tp_total&gt;= pool-&gt;tp_max_index ) {  
+                   sp_thread_cond_wait( &amp;pool-&gt;tp_idle,&amp;pool-&gt;tp_mutex );  
+         }  
+
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt;= <span class="number">0</span> ) {  
+                   _thread * thread = ( _thread * )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>(_thread ) );  
+                   <span class="built_in">memset</span>( &amp;( thread-&gt;id ), <span class="number">0</span>, <span class="keyword">sizeof</span>(thread-&gt;id ) );  
+                   sp_thread_mutex_init( &amp;thread-&gt;mutex, NULL);  
+                   sp_thread_cond_init( &amp;thread-&gt;cond, NULL );  
+                   thread-&gt;fn = dispatch_to_here;  
+                   thread-&gt;arg = arg;  
+                   thread-&gt;parent = pool;  
+
+                   sp_thread_attr_init( &amp;attr );  
+                   sp_thread_attr_setdetachstate( &amp;attr,SP_THREAD_CREATE_DETACHED );  
+
+                   <span class="keyword">if</span>( <span class="number">0</span> == sp_thread_create( &amp;thread-&gt;id,&amp;attr, wrapper_fn, thread ) ) {  
+                            pool-&gt;tp_total++;  
+                            <span class="built_in">printf</span>( <span class="string">"create thread#%ld\n"</span>,thread-&gt;id );  
+                   } <span class="keyword">else</span> {  
+                            ret = -<span class="number">1</span>;  
+                            <span class="built_in">printf</span>( <span class="string">"cannot createthread\n"</span> );  
+                            sp_thread_mutex_destroy(&amp;thread-&gt;mutex );  
+                            sp_thread_cond_destroy(&amp;thread-&gt;cond );  
+                            <span class="built_in">free</span>( thread );  
+                   }  
+         } <span class="keyword">else</span> {  
+                   pool-&gt;tp_index--;  
+                   thread = pool-&gt;tp_list[ pool-&gt;tp_index ];  
+                   pool-&gt;tp_list[ pool-&gt;tp_index ] = NULL;  
+
+                   thread-&gt;fn = dispatch_to_here;  
+                   thread-&gt;arg = arg;  
+                   thread-&gt;parent = pool;  
+
+                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
+                   sp_thread_cond_signal( &amp;thread-&gt;cond ) ;  
+                   sp_thread_mutex_unlock ( &amp;thread-&gt;mutex );  
+         }  
+
+         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">return</span> ret;  
+}  
+
+<span class="function"><span class="keyword">void</span> <span class="title">destroy_threadpool</span><span class="params">(threadpooldestroyme)</span>  
+</span>{  
+         _threadpool *pool = (_threadpool *) destroyme;  
+
+         <span class="comment">// add your code here to kill a threadpool  </span>
+         <span class="keyword">int</span> i = <span class="number">0</span>;  
+
+         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt; pool-&gt;tp_total ) {  
+                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) tofinish\n"</span>, pool-&gt;tp_total - pool-&gt;tp_index );  
+                   sp_thread_cond_wait( &amp;pool-&gt;tp_full,&amp;pool-&gt;tp_mutex );  
+         }  
+
+         pool-&gt;tp_stop = <span class="number">1</span>;  
+
+         <span class="keyword">for</span>( i = <span class="number">0</span>; i &lt; pool-&gt;tp_index; i++ ) {  
+                   _thread * thread = pool-&gt;tp_list[ i ];  
+
+                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
+                   sp_thread_cond_signal( &amp;thread-&gt;cond ) ;  
+                   sp_thread_mutex_unlock ( &amp;thread-&gt;mutex );  
+         }  
+
+         <span class="keyword">if</span>( pool-&gt;tp_total &gt; <span class="number">0</span> ) {  
+                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) toexit\n"</span>, pool-&gt;tp_total );  
+                   sp_thread_cond_wait( &amp;pool-&gt;tp_empty,&amp;pool-&gt;tp_mutex );  
+         }  
+
+         <span class="keyword">for</span>( i = <span class="number">0</span>; i &lt; pool-&gt;tp_index; i++ ) {  
+                   <span class="built_in">free</span>( pool-&gt;tp_list[ i ] );  
+                   pool-&gt;tp_list[ i ] = NULL;  
+         }  
+
+         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+
+         pool-&gt;tp_index = <span class="number">0</span>;  
+
+         sp_thread_mutex_destroy( &amp;pool-&gt;tp_mutex );  
+         sp_thread_cond_destroy( &amp;pool-&gt;tp_idle );  
+         sp_thread_cond_destroy( &amp;pool-&gt;tp_full );  
+         sp_thread_cond_destroy( &amp;pool-&gt;tp_empty );  
+
+         <span class="built_in">free</span>( pool-&gt;tp_list );  
+         <span class="built_in">free</span>( pool );  
+}  
+</code></pre><p>2)    常见的设计模式<br>根据Socket的阻塞非阻塞，IO的同步和异步。可以分为如下4中情形<br>阻塞同步     |    阻塞异步<br><strong><strong>_</strong></strong>|<strong><strong><strong>__</strong></strong></strong><br>非阻塞同步  |   非阻塞异步</p>
+<p>阻塞同步方式是原始的方式，也是许多教科书上介绍的方式，因为Socket和IO默认的为阻塞和同步方式。基本流程如下：</p>
+<pre><code>listen_fd = socket<span class="list">( <span class="keyword">AF_INET</span>,SOCK_STREAM,<span class="number">0</span> )</span>  
+bind<span class="list">( <span class="keyword">listen_fd</span>, <span class="list">(<span class="keyword">struct</span> sockaddr*)</span><span class="keyword">&amp;my_addr</span>, sizeof<span class="list">(<span class="keyword">struct</span> sockaddr_in)</span>)</span>  
+listen<span class="list">( <span class="keyword">listen_fd</span>,<span class="number">1</span> )</span>  
+accept<span class="list">( <span class="keyword">listen_fd</span>,  <span class="list">(<span class="keyword">struct</span> sockaddr*)</span><span class="keyword">&amp;remote_addr</span>,<span class="keyword">&amp;addr_len</span> )</span>  
+recv<span class="list">( <span class="keyword">accept_fd</span> ,<span class="keyword">&amp;in_buf</span> ,<span class="number">1024</span> ,<span class="number">0</span> )</span>  
+close<span class="list">(<span class="keyword">accept_fd</span>)</span> 
+</code></pre><p>阻塞异步方式有所改进，但是Socket的阻塞方式，前一个连接没有处理完成，下一个连接不能接入，是高并发服务器所不可接收的方式。只不过在上边阻塞同步方式的基础上使用select（严格来说select是一种IO多路服用技术。因为linux尚没有完整的实现异步IO，而winsock实在理解socket没有linux上面那么直观。，这里为了方便，没有做严格的区分）或者其它异步IO方式。<br>非阻塞同步方式，通过设置socket选项为NONBLOCK，可以很快的接收连接，但是处理采用同步IO方式，服务器处理性能也比较差。<br>上边三种方式不做深入介绍。下边主要从非阻塞异步IO方式介绍。<br>非阻塞异步IO方式中，由于异步IO方式在同一系统可能有多种实现，不同系统也有不同实现，下边介绍几种常见的IO方式和服务器框架。</p>
+<p>Ø  Select<br>Select采用轮训注册的fd方式。是一种比较老的IO多路服用实现方式，效率相对要差一些。Select方式在windows和linux上都支持。<br>基本框架如下：</p>
+<pre><code><span class="keyword">socket</span>( AF_INET,SOCK_STREAM,<span class="number">0</span> )  
+<span class="keyword">fcntl</span>(listen_fd, F_SETFL,flags|O_NONBLOCK);  
+<span class="keyword">bind</span>( listen_fd, (structsockaddr *)&amp;my_addr,sizeof(struct sockaddr_in))  
+<span class="keyword">listen</span>( listen_fd,<span class="number">1</span> )  
+FD_ZERO( &amp;fd_sets );  
+FD_SET(listen_fd,&amp;fd_sets);  
+<span class="keyword">for</span>(k=<span class="number">0</span>; k&lt;=i; k++){  
+         FD_SET(accept_fds[k],&amp;fd_sets);  
+}  
+events = <span class="keyword">select</span>( max_fd + <span class="number">1</span>,&amp;fd_sets, NULL, NULL, NULL );  
+<span class="keyword">if</span>(FD_ISSET(listen_fd,&amp;fd_sets) ){  
+accept_fd = <span class="keyword">accept</span>( listen_fd, (structsockaddr *)&amp;remote_addr,&amp;addr_len );  
+}  
+<span class="keyword">for</span>( j=<span class="number">0</span>; j&lt;=i; j++ ){  
+         <span class="keyword">if</span>( FD_ISSET(accept_fds[j],&amp;fd_sets) ){  
+                   <span class="keyword">recv</span>( accept_fds[j] ,&amp;in_buf ,<span class="number">1024</span> ,<span class="number">0</span> );  
+         }  
+}  
+</code></pre><p>Ø  Epoll<br>Epoll是linux2.6内核以后支持的一种高性能的IO多路服用技术。服务器框架如下：<br>[cpp] view plaincopy</p>
+<pre><code><span class="title">socket</span>( <span class="type">AF_INET</span>,<span class="type">SOCK_STREAM</span>,<span class="number">0</span> )  
+<span class="title">fcntl</span>(listen_fd, <span class="type">F_SETFL</span>,flags|<span class="type">O_NONBLOCK</span>);  
+<span class="title">bind</span>( listen_fd, (structsockaddr *)&amp;my_addr,sizeof(struct sockaddr_in))  
+<span class="title">listen</span>( listen_fd,<span class="number">1</span> )  
+<span class="title">epoll_ctl</span>(epfd,<span class="type">EPOLL_CTL_ADD</span>,listen_fd,&amp;ev);  
+<span class="title">ev_s</span> = epoll_wait(epfd,events,<span class="number">20</span>,<span class="number">500</span> );  
+<span class="title">for</span>(i=<span class="number">0</span>; i&lt;ev_s;i++){  
+                   <span class="keyword">if</span>(events[i].<span class="typedef"><span class="keyword">data</span>.fd==listen_fd)<span class="container">{  
+                            <span class="title">accept_fd</span> = <span class="title">accept</span>( <span class="title">listen_fd</span>,(<span class="title">structsockaddr</span> *)&amp;<span class="title">remote_addr</span>,&amp;<span class="title">addr_len</span> );  
+                            <span class="title">fcntl</span>(<span class="title">accept_fd</span>, <span class="type">F_SETFL</span>,<span class="title">flags</span>|<span class="type">O_NONBLOCK</span>);  
+                            <span class="title">epoll_ctl</span>(<span class="title">epfd</span>,<span class="type">EPOLL_CTL_ADD</span>,<span class="title">accept_fd</span>,&amp;<span class="title">ev</span>);  
+                   }</span>  </span>
+                   <span class="keyword">else</span> <span class="keyword">if</span>(events[i].events&amp;<span class="type">EPOLLIN</span>){  
+                            recv( events[i].<span class="typedef"><span class="keyword">data</span>.fd ,&amp;in_buf,1024 ,0 );  </span>
+                   }  
+}  
+</code></pre><p>Ø  AIO<br>在windows上微软实现了异步IO，通过AIO可以方便的实现高并发的服务器。框架如下：<br>[cpp] view plaincopy</p>
+<pre><code>WSAStartup<span class="list">( <span class="number">0</span>x0202 ,  &amp; wsaData)</span>  
+CreateIoCompletionPort<span class="list">(<span class="keyword">INVALID_HANDLE_VALUE</span>,NULL,  <span class="number">0</span> ,  <span class="number">0</span> )</span>  
+WSASocket<span class="list">(<span class="keyword">AF_INET</span>,SOCK_STREAM,  <span class="number">0</span> , NULL,  <span class="number">0</span> , WSA_FLAG_OVERLAPPED)</span>  
+bind<span class="list">(<span class="keyword">Listen</span>, <span class="list">(<span class="keyword">PSOCKADDR</span>)</span>  &amp; InternetAddr,  sizeof <span class="list">(<span class="keyword">InternetAddr</span>)</span>)</span>  
+listen<span class="list">(<span class="keyword">Listen</span>,  <span class="number">5</span> )</span>  
+WSAAccept<span class="list">(<span class="keyword">Listen</span>, NULL, NULL,NULL,  <span class="number">0</span> )</span>  
+PerHandleData  = <span class="list">(<span class="keyword">LPPER_HANDLE_DATA</span>)</span> GlobalAlloc<span class="list">(<span class="keyword">GPTR</span>, sizeof <span class="list">(<span class="keyword">PER_HANDLE_DATA</span>)</span>  
+CreateIoCompletionPort<span class="list">(<span class="list">(<span class="keyword">HANDLE</span>)</span>Accept, CompletionPort, <span class="list">(<span class="keyword">DWORD</span>)</span> PerHandleData, <span class="number">0</span> )</span>  
+PerIoData= <span class="list">(<span class="keyword">LPPER_IO_OPERATION_DATA</span>)</span>GlobalAlloc<span class="list">(<span class="keyword">GPTR</span>, sizeof <span class="list">(<span class="keyword">PER_IO_OPERATION_DATA</span>)</span>)</span>  
+WSARecv<span class="list">(<span class="keyword">Accept</span>,&amp;<span class="list">(<span class="keyword">PerIoData-&gt;DataBuf</span>)</span>,<span class="number">1</span>,<span class="keyword">&amp;RecvBytes</span>,<span class="keyword">&amp;Flags</span>,&amp;<span class="list">(<span class="keyword">PerIoData-&gt;Overlapped</span>)</span>, NULL)</span>  
+<span class="list">(<span class="keyword">GetQueuedCompletionStatus</span><span class="list">(<span class="keyword">CompletionPort</span>,  &amp; BytesTransferred,  
+         <span class="list">(<span class="keyword">LPDWORD</span>)</span> &amp; PerHandleData,<span class="list">(<span class="keyword">LPOVERLAPPED</span>  <span class="variable">* )  &amp; PerIoData, INFINITE)  
+if  (PerIoData -&gt; BytesRECV  &gt; PerIoData -&gt; BytesSEND){  
+WSASend(PerHandleData-&gt; Socket,  &amp; (PerIoData -&gt;DataBuf),  1 ,  &amp; SendBytes,  0 ,  
+             &amp; (PerIoData -&gt;Overlapped), NULL)  
+}  </span></span></span></span></span>
+</code></pre><p>3)    引入线程池和事件分离器后<br>由于上边只是单纯的使用非阻塞Socket和异步IO的方式。提高了接收连接和处理的速度。但是还是不能解决两个客户端同时连接的问题。这时就需要引入多线程机制。引入多线程后，又有许多策略。Linux上通常采用主进程负责接收连接，之后fork子进程处理连接。Windows通常采用线程池方式，避免线程创建和销毁的开销，当然linux上也可以采用线程池方式。采用多进程和多线程方式后。事件处理也可以再优化，定义一个简单的事件处理器，把所有事件放入一个队列，各个线程去事件队列取相应的事件，然后自己开始工作。这就是我上边提到的半同步/半异步方式了。如果线程工作的时候是接收到连接后，自己处理后续的发送和接收，然后选出另外一个线程作为领导继续接收连接，其它线程作为追随者。这就是领导者/追随者模式了。具体可以参考ACE的Reactor和Preactor的具体实现。半同步和/半异步网上也有很多的讨论，可以自己深入研究。代码就比较复杂了，这里就不给出代码了。给出一个linux下类似，相对简单的fork子进程+epoll方式的实现：</p>
+<pre><code><span class="preprocessor">#<span class="keyword">include</span>&lt;sys/socket.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;sys/wait.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;netinet/in.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;netinet/tcp.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;sys/epoll.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;sys/sendfile.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;sys/stat.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;unistd.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;string.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;strings.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;fcntl.h&gt;  </span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;errno.h&gt;  </span>
+
+<span class="preprocessor">#<span class="keyword">define</span> HANDLE_INFO   1  </span>
+<span class="preprocessor">#<span class="keyword">define</span> HANDLE_SEND   2  </span>
+<span class="preprocessor">#<span class="keyword">define</span> HANDLE_DEL    3  </span>
+<span class="preprocessor">#<span class="keyword">define</span> HANDLE_CLOSE  4  </span>
+
+<span class="preprocessor">#<span class="keyword">define</span> MAX_REQLEN         1024  </span>
+<span class="preprocessor">#<span class="keyword">define</span> MAX_PROCESS_CONN    3  </span>
+<span class="preprocessor">#<span class="keyword">define</span> FIN_CHAR           0x00  </span>
+<span class="preprocessor">#<span class="keyword">define</span> SUCCESS  0  </span>
+<span class="preprocessor">#<span class="keyword">define</span> ERROR   -1  </span>
+
+<span class="keyword">typedef</span> <span class="keyword">struct</span> event_handle{  
+    <span class="keyword">int</span> socket_fd;  
+    <span class="keyword">int</span> file_fd;  
+    <span class="keyword">int</span> file_pos;  
+    <span class="keyword">int</span> epoll_fd;  
+    <span class="keyword">char</span> request[MAX_REQLEN];  
+    <span class="keyword">int</span> request_len;  
+    <span class="keyword">int</span> ( * read_handle )( <span class="keyword">struct</span> event_handle * ev );  
+    <span class="keyword">int</span> ( * write_handle )( <span class="keyword">struct</span> event_handle * ev );  
+    <span class="keyword">int</span> handle_method;  
+} EV,* EH;  
+<span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">( * EVENT_HANDLE )</span><span class="params">( <span class="keyword">struct</span> event_handle * ev )</span></span>;  
+
+<span class="function"><span class="keyword">int</span> <span class="title">create_listen_fd</span><span class="params">( <span class="keyword">int</span> port )</span></span>{  
+    <span class="keyword">int</span> listen_fd;  
+    <span class="keyword">struct</span> sockaddr_inmy_addr;  
+    <span class="keyword">if</span>( ( listen_fd = socket( AF_INET, SOCK_STREAM, <span class="number">0</span> ) ) == -<span class="number">1</span> ){  
+        perror( <span class="string">"create socket error"</span> );  
+        <span class="built_in">exit</span>( <span class="number">1</span> );  
+    }  
+    <span class="keyword">int</span> flag;  
+    <span class="keyword">int</span> olen = <span class="keyword">sizeof</span>(<span class="keyword">int</span>);  
+    <span class="keyword">if</span>( setsockopt( listen_fd, SOL_SOCKET, SO_REUSEADDR  
+                       , (<span class="keyword">const</span> <span class="keyword">void</span> *)&amp;flag, olen ) == -<span class="number">1</span> ){  
+        perror( <span class="string">"setsockopt error"</span> );  
+    }  
+    flag = <span class="number">5</span>;  
+    <span class="keyword">if</span>( setsockopt( listen_fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &amp;flag, olen ) == -<span class="number">1</span> ){  
+        perror( <span class="string">"setsockopt error"</span> );  
+    }  
+    flag = <span class="number">1</span>;  
+    <span class="keyword">if</span>( setsockopt( listen_fd, IPPROTO_TCP, TCP_CORK, &amp;flag, olen ) == -<span class="number">1</span> ){  
+        perror( <span class="string">"setsockopt error"</span> );  
+    }  
+    <span class="keyword">int</span> flags = fcntl( listen_fd, F_GETFL, <span class="number">0</span> );  
+    fcntl( listen_fd, F_SETFL, flags|O_NONBLOCK );  
+    my_addr.sin_family = AF_INET;  
+    my_addr.sin_port = htons( port );  
+    my_addr.sin_addr.s_addr = INADDR_ANY;  
+    bzero( &amp;( my_addr.sin_zero ), <span class="number">8</span> );  
+    <span class="keyword">if</span>( bind( listen_fd, ( <span class="keyword">struct</span> sockaddr * )&amp;my_addr,  
+    <span class="keyword">sizeof</span>( <span class="keyword">struct</span> sockaddr_in ) ) == -<span class="number">1</span> ) {  
+        perror( <span class="string">"bind error"</span> );  
+        <span class="built_in">exit</span>( <span class="number">1</span> );  
+    }  
+    <span class="keyword">if</span>( listen( listen_fd, <span class="number">1</span> ) == -<span class="number">1</span> ){  
+        perror( <span class="string">"listen error"</span> );  
+        <span class="built_in">exit</span>( <span class="number">1</span> );  
+    }  
+    <span class="keyword">return</span> listen_fd;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">create_accept_fd</span><span class="params">( <span class="keyword">int</span> listen_fd )</span></span>{  
+    <span class="keyword">int</span> addr_len = <span class="keyword">sizeof</span>( <span class="keyword">struct</span> sockaddr_in );  
+    <span class="keyword">struct</span> sockaddr_inremote_addr;  
+    <span class="keyword">int</span> accept_fd = accept( listen_fd,  
+        ( <span class="keyword">struct</span> sockaddr * )&amp;remote_addr, &amp;addr_len );  
+    <span class="keyword">int</span> flags = fcntl( accept_fd, F_GETFL, <span class="number">0</span> );  
+    fcntl( accept_fd, F_SETFL, flags|O_NONBLOCK );  
+    <span class="keyword">return</span> accept_fd;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">fork_process</span><span class="params">( <span class="keyword">int</span> process_num )</span></span>{  
+    <span class="keyword">int</span> i;  
+    <span class="keyword">int</span> pid=-<span class="number">1</span>;  
+    <span class="keyword">for</span>( i = <span class="number">0</span>; i &lt; process_num; i++ ){  
+        <span class="keyword">if</span>( pid != <span class="number">0</span> ){  
+            pid = fork();  
+        }  
+    }  
+    <span class="keyword">return</span> pid;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">init_evhandle</span><span class="params">(EH ev,<span class="keyword">int</span> socket_fd,<span class="keyword">int</span> epoll_fd,EVENT_HANDLEr_handle,EVENT_HANDLE w_handle)</span></span>{  
+    ev-&gt;epoll_fd = epoll_fd;  
+    ev-&gt;socket_fd = socket_fd;  
+    ev-&gt;read_handle = r_handle;  
+    ev-&gt;write_handle = w_handle;  
+    ev-&gt;file_pos = <span class="number">0</span>;  
+    ev-&gt;request_len = <span class="number">0</span>;  
+    ev-&gt;handle_method = <span class="number">0</span>;  
+    <span class="built_in">memset</span>( ev-&gt;request, <span class="number">0</span>, <span class="number">1024</span> );  
+}  
+<span class="comment">//accept-&gt;accept_queue-&gt;request-&gt;request_queue-&gt;output-&gt;output_queue  </span>
+<span class="comment">//multi process sendfile  </span>
+<span class="function"><span class="keyword">int</span> <span class="title">parse_request</span><span class="params">(EH ev)</span></span>{  
+    ev-&gt;request_len--;  
+    *( ev-&gt;request + ev-&gt;request_len - <span class="number">1</span> ) = <span class="number">0x00</span>;  
+    <span class="keyword">int</span> i;  
+    <span class="keyword">for</span>( i=<span class="number">0</span>; i&lt;ev-&gt;request_len; i++ ){  
+        <span class="keyword">if</span>( ev-&gt;request[i] == <span class="string">':'</span> ){  
+            ev-&gt;request_len = ev-&gt;request_len-i-<span class="number">1</span>;  
+            <span class="keyword">char</span> temp[MAX_REQLEN];  
+            <span class="built_in">memcpy</span>( temp, ev-&gt;request, i );  
+            ev-&gt;handle_method = atoi( temp );  
+            <span class="built_in">memcpy</span>( temp, ev-&gt;request+i+<span class="number">1</span>, ev-&gt;request_len );  
+            <span class="built_in">memcpy</span>( ev-&gt;request, temp, ev-&gt;request_len );  
+            <span class="keyword">break</span>;  
+        }  
+    }  
+    <span class="comment">//handle_request(ev );  </span>
+    <span class="comment">//registerto epoll EPOLLOUT  </span>
+
+    <span class="keyword">struct</span> epoll_eventev_temp;  
+    ev_temp.data.ptr = ev;  
+    ev_temp.events = EPOLLOUT|EPOLLET;  
+    epoll_ctl( ev-&gt;epoll_fd, EPOLL_CTL_MOD, ev-&gt;socket_fd, &amp;ev_temp );  
+    <span class="keyword">return</span> SUCCESS;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">handle_request</span><span class="params">(EH ev)</span></span>{  
+    <span class="keyword">struct</span> statfile_info;  
+    <span class="keyword">switch</span>( ev-&gt;handle_method ){  
+        <span class="keyword">case</span> HANDLE_INFO:  
+            ev-&gt;file_fd = open( ev-&gt;request, O_RDONLY );  
+            <span class="keyword">if</span>( ev-&gt;file_fd == -<span class="number">1</span> ){  
+               send( ev-&gt;socket_fd, <span class="string">"open file failed\n"</span>, <span class="built_in">strlen</span>(<span class="string">"open file failed\n"</span>), <span class="number">0</span> );  
+               <span class="keyword">return</span> -<span class="number">1</span>;  
+            }  
+            fstat(ev-&gt;file_fd, &amp;file_info);  
+            <span class="keyword">char</span> info[MAX_REQLEN];  
+            <span class="built_in">sprintf</span>(info,<span class="string">"filelen:%d\n"</span>,file_info.st_size);  
+            send( ev-&gt;socket_fd, info, <span class="built_in">strlen</span>( info ), <span class="number">0</span> );  
+            <span class="keyword">break</span>;  
+        <span class="keyword">case</span> HANDLE_SEND:  
+            ev-&gt;file_fd = open( ev-&gt;request, O_RDONLY );  
+            <span class="keyword">if</span>( ev-&gt;file_fd == -<span class="number">1</span> ){  
+               send( ev-&gt;socket_fd, <span class="string">"open file failed\n"</span>, <span class="built_in">strlen</span>(<span class="string">"open file failed\n"</span>), <span class="number">0</span> );  
+               <span class="keyword">return</span> -<span class="number">1</span>;  
+            }  
+            fstat(ev-&gt;file_fd, &amp;file_info);  
+            sendfile( ev-&gt;socket_fd, ev-&gt;file_fd, <span class="number">0</span>, file_info.st_size );  
+            <span class="keyword">break</span>;  
+        <span class="keyword">case</span> HANDLE_DEL:  
+            <span class="keyword">break</span>;  
+        <span class="keyword">case</span> HANDLE_CLOSE:  
+            <span class="keyword">break</span>;  
+    }  
+    finish_request( ev );  
+    <span class="keyword">return</span> SUCCESS;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">finish_request</span><span class="params">(EH ev)</span></span>{  
+    close(ev-&gt;socket_fd);  
+    close(ev-&gt;file_fd);  
+    ev-&gt;handle_method = -<span class="number">1</span>;  
+    clean_request( ev );  
+    <span class="keyword">return</span> SUCCESS;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">clean_request</span><span class="params">(EH ev)</span></span>{  
+    <span class="built_in">memset</span>( ev-&gt;request, <span class="number">0</span>, MAX_REQLEN );  
+    ev-&gt;request_len = <span class="number">0</span>;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">read_hook_v2</span><span class="params">( EH ev )</span></span>{  
+    <span class="keyword">char</span> in_buf[MAX_REQLEN];  
+    <span class="built_in">memset</span>( in_buf, <span class="number">0</span>, MAX_REQLEN );  
+    <span class="keyword">int</span> recv_num = recv( ev-&gt;socket_fd, &amp;in_buf, MAX_REQLEN, <span class="number">0</span> );  
+    <span class="keyword">if</span>( recv_num ==<span class="number">0</span> ){  
+        close( ev-&gt;socket_fd );  
+        <span class="keyword">return</span> ERROR;  
+    }  
+    <span class="keyword">else</span>{  
+        <span class="comment">//checkifoverflow  </span>
+        <span class="keyword">if</span>( ev-&gt;request_len &gt; MAX_REQLEN-recv_num ){  
+            close( ev-&gt;socket_fd );  
+           clean_request( ev );  
+        }  
+        <span class="built_in">memcpy</span>( ev-&gt;request + ev-&gt;request_len, in_buf, recv_num );  
+        ev-&gt;request_len += recv_num;  
+        <span class="keyword">if</span>( recv_num == <span class="number">2</span> &amp;&amp; ( !<span class="built_in">memcmp</span>( &amp;in_buf[recv_num-<span class="number">2</span>], <span class="string">"\r\n"</span>, <span class="number">2</span> ) ) ){  
+           parse_request(ev);  
+        }  
+    }  
+    <span class="keyword">return</span> recv_num;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">write_hook_v1</span><span class="params">( EH ev )</span></span>{  
+    <span class="keyword">struct</span> statfile_info;  
+    ev-&gt;file_fd = open( ev-&gt;request, O_RDONLY );  
+    <span class="keyword">if</span>( ev-&gt;file_fd == ERROR ){  
+        send( ev-&gt;socket_fd, <span class="string">"openfile failed\n"</span>, <span class="built_in">strlen</span>(<span class="string">"openfile failed\n"</span>), <span class="number">0</span> );  
+        <span class="keyword">return</span> ERROR;  
+    }  
+    fstat(ev-&gt;file_fd, &amp;file_info);  
+    <span class="keyword">int</span> write_num;  
+    <span class="keyword">while</span>(<span class="number">1</span>){  
+        write_num = sendfile( ev-&gt;socket_fd, ev-&gt;file_fd, (off_t *)&amp;ev-&gt;file_pos, <span class="number">10240</span> );  
+        ev-&gt;file_pos += write_num;  
+        <span class="keyword">if</span>( write_num == ERROR ){  
+            <span class="keyword">if</span>( errno == EAGAIN ){  
+               <span class="keyword">break</span>;  
+            }  
+        }  
+        <span class="keyword">else</span> <span class="keyword">if</span>( write_num == <span class="number">0</span> ){  
+            <span class="built_in">printf</span>( <span class="string">"writed:%d\n"</span>, ev-&gt;file_pos );  
+            <span class="comment">//finish_request(ev );  </span>
+            <span class="keyword">break</span>;  
+        }  
+    }  
+    <span class="keyword">return</span> SUCCESS;  
+}  
+
+<span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>{  
+    <span class="keyword">int</span> listen_fd = create_listen_fd( <span class="number">3389</span> );  
+    <span class="keyword">int</span> pid = fork_process( <span class="number">3</span> );  
+    <span class="keyword">if</span>( pid == <span class="number">0</span> ){  
+        <span class="keyword">int</span> accept_handles = <span class="number">0</span>;  
+        <span class="keyword">struct</span> epoll_eventev, events[<span class="number">20</span>];  
+        <span class="keyword">int</span> epfd = epoll_create( <span class="number">256</span> );  
+        <span class="keyword">int</span> ev_s = <span class="number">0</span>;  
+
+        ev.data.fd = listen_fd;  
+        ev.events = EPOLLIN|EPOLLET;  
+        epoll_ctl( epfd, EPOLL_CTL_ADD, listen_fd, &amp;ev );  
+        <span class="keyword">struct</span> event_handleev_handles[<span class="number">256</span>];  
+        <span class="keyword">for</span>( ;; ){  
+            ev_s = epoll_wait( epfd, events, <span class="number">20</span>, <span class="number">500</span> );  
+            <span class="keyword">int</span> i = <span class="number">0</span>;  
+            <span class="keyword">for</span>( i = <span class="number">0</span>; i&lt;ev_s; i++ ){  
+               <span class="keyword">if</span>( events[i].data.fd == listen_fd ){  
+                   <span class="keyword">if</span>( accept_handles &lt; MAX_PROCESS_CONN ){  
+                       accept_handles++;  
+                       <span class="keyword">int</span> accept_fd = create_accept_fd( listen_fd );  
+                       init_evhandle(&amp;ev_handles[accept_handles],accept_fd,epfd,read_hook_v2,write_hook_v1);  
+                       ev.data.ptr = &amp;ev_handles[accept_handles];  
+                       ev.events = EPOLLIN|EPOLLET;  
+                       epoll_ctl( epfd, EPOLL_CTL_ADD, accept_fd, &amp;ev );  
+                   }  
+               }  
+               <span class="keyword">else</span> <span class="keyword">if</span>( events[i].events&amp;EPOLLIN ){  
+                   EVENT_HANDLE current_handle = ( ( EH )( events[i].data.ptr ) )-&gt;read_handle;  
+                   EH current_event = ( EH )( events[i].data.ptr );  
+                   ( *current_handle )( current_event );  
+               }  
+               <span class="keyword">else</span> <span class="keyword">if</span>( events[i].events&amp;EPOLLOUT ){  
+                   EVENT_HANDLE current_handle = ( ( EH )( events[i].data.ptr ) )-&gt;write_handle;  
+                   EH current_event = ( EH )( events[i].data.ptr );  
+                   <span class="keyword">if</span>( ( *current_handle )( current_event )  == <span class="number">0</span> ){  
+                       accept_handles--;  
+                   }  
+               }  
+            }  
+        }  
+    }  
+    <span class="keyword">else</span>{  
+        <span class="comment">//managerthe process  </span>
+        <span class="keyword">int</span> child_process_status;  
+        wait( &amp;child_process_status );  
+    }  
+
+    <span class="keyword">return</span> SUCCESS;  
+}  
+</code></pre><h2 id="三-_分布式系统设计">三. 分布式系统设计</h2><p>前面讲述了分布式系统中的核心的服务器的实现。可以是http服务器，缓存服务器，分布式文件系统等的内部实现。下边主要从一个高并发的大型网站出发，看一个高并发系统的设计。下边是一个高并发系统的逻辑结构：</p>
+<p>主要是参考这篇文章<a href="http://www.chinaz.com/web/2010/0310/108211.shtml。下边主要想从这个架构的各个部分的实现展开。" target="_blank" rel="external">http://www.chinaz.com/web/2010/0310/108211.shtml。下边主要想从这个架构的各个部分的实现展开。</a></p>
+<ol>
+<li>缓存系统<br>缓存是每一个高并发，高可用系统不可或缺的模块。下边就几个常见缓存系统系统进行介绍。<br>Squid<br>Squid作为一个前端缓存，通常部署在网络的离用户最近的地方，通过缓存网站的页面，使用户不必每次都跑到服务器去取数据，提高系统响应和性能。实现应该比较简单：一个带有存储功能的代理。用户访问页面的时候，由它代理，然后存储请求结果，下次再访问的时候，查看是否需要更新，有更新就去服务器取新数据，否则直接返回用户页面。</li>
+</ol>
+<p>Ehcache<br>Ehcache是一个对象缓存系统。通常在J2EE中配合Hibernate使用，这里请原谅作者本人之前是做J2EE开发的，其它使用方式暂不是很了解。应用查询数据库，对经常需要查询，却更新不频繁的数据，可以放入ehcache缓存，提高访问速度。Ehcahe支持内存缓存和硬盘两种方式，支持分布式缓存。数据缓存的基本原理就是：为需要缓存的对象建立一个map，临时对象放入map，查询的时候先查询map，没有找到再查找数据库。关机时可以序列化到硬盘。分布式缓存没有研究过。<br>页面缓存和动态页面静态化<br>在大型网站经常使用的一种缓存技术就是动态页面的缓存。由于动态页面经常更新，上边的缓存就不起作用了。通常会采用SSI(Server side include)等技术将动态页面的或者页面片段进行缓存。<br>还有一种就是动态页面静态化。下边是一本讲spring的书中给出的j2EE中的动态页面静态化的示例：<br>[java] view plaincopy</p>
+<pre><code><span class="comment">/** 
+ * 动态内容静态化的Filter。将变化非常缓慢的动态文件生成静态文件。 
+ */</span>  
+<span class="keyword">package</span> com.zsl.cache.<span class="built_in">filter</span>;  
+
+<span class="keyword">import</span> java.io.File;  
+<span class="keyword">import</span> java.io.IOException;  
+<span class="keyword">import</span> java.io.UnsupportedEncodingException;  
+<span class="keyword">import</span> java.net.URLEncoder;  
+<span class="keyword">import</span> java.util.Map;  
+
+importjavax.management.RuntimeErrorException;  
+importjavax.servlet.FilterChain;  
+importjavax.servlet.ServletException;  
+importjavax.servlet.ServletRequest;  
+importjavax.servlet.ServletResponse;  
+importjavax.servlet.http.HttpServletRequest;  
+importjavax.servlet.http.HttpServletResponse;  
+
+importorg.apache.commons.io.FilenameUtils;  
+importorg.apache.http.HttpResponse;  
+importorg.springframework.core.io.Resource;  
+
+importcom.sun.xml.bind.v2.runtime.output.Encoded;  
+
+
+<span class="comment">/** 
+ * @author zsl 
+ * 
+ */</span>  
+<span class="keyword">public</span> class FileCacheFilterextends AbstractCacheFilter{  
+         <span class="keyword">private</span> <span class="keyword">String</span> root;  
+
+         <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">String</span> SUFFIX = <span class="string">".html"</span>;  
+
+         <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> setFileDir(Resource dir){  
+                   <span class="keyword">try</span> {  
+                            File f = dir.getFile();  
+                            f.mkdirs();  
+                            <span class="keyword">if</span>(!f.isDirectory()){  
+                                     <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"Invalid directory: "</span>+f.getPath());  
+                            }  
+                            <span class="keyword">if</span>(!f.canWrite())  
+                                     <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"Cannot write to directory: "</span>+f.getPath());  
+                            root = f.getPath();  
+
+                            <span class="keyword">if</span>(!root.endsWith(<span class="string">"/"</span>)&amp;&amp;!root.endsWith(<span class="string">"//"</span>))  
+                                     root = root+<span class="string">"/"</span>;  
+                   } <span class="keyword">catch</span> (IOException e) {  
+                            <span class="comment">// TODO Auto-generated catch block  </span>
+                            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(e);  
+                   }  
+         }  
+
+         <span class="keyword">public</span> <span class="keyword">void</span> afterPropertiesSet() <span class="keyword">throws</span> Exception {  
+                   <span class="keyword">super</span>.afterPropertiesSet();  
+                   <span class="keyword">if</span>(!<span class="keyword">new</span> File(root).isDirectory()){  
+                            <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"No directory: "</span>+root);  
+                   }  
+         }  
+
+         <span class="keyword">public</span> <span class="keyword">void</span> doFilter(ServletRequest request,ServletResponseresponse,FilterChain chain) <span class="keyword">throws</span> IOException,ServletException {  
+                   HttpServletRequest httpRequest =(HttpServletRequest)request;  
+                   <span class="keyword">String</span> <span class="variable">key</span> = getKey(httpRequest);  
+                   <span class="keyword">if</span>(<span class="variable">key</span> == <span class="keyword">null</span>){  
+                            chain.doFilter(request,response);  
+                   }<span class="keyword">else</span>{  
+                            File file = key2File(<span class="variable">key</span>);  
+                            <span class="keyword">if</span>(file.isFile()){  
+                                     HttpServletResponse httpResponse= (HttpServletResponse)response;  
+                                     httpResponse.setContentType(getContentType());  
+                                     httpResponse.setHeader(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>);  
+                                     httpResponse.setContentLength((<span class="built_in">int</span>)file.length());  
+                                     FileUtil.readFil(file,httpResponse.getOutputStream());  
+                            }<span class="keyword">else</span>{  
+                                     <span class="comment">//缓存未找到文件  </span>
+                                     HttpServletResponse httpResponse= (HttpServletResponse)response;  
+                                     CachedResponseWrapper wrapper =<span class="keyword">new</span> CachedResponseWrapper(httpResponse);  
+                                     chain.doFilter(request,response);  
+                                     <span class="keyword">if</span>(wrapper.getStatus() ==HttpServletResponse.SC_OK){  
+                                               <span class="built_in">byte</span>[] data =GZipUtil.gzip(wrapper.getResponseData());  
+                                               FileUtil.writeFile(file,data);  
+                                               httpResponse.setContentType(getContentType());  
+                                               httpResponse.setHeader(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>);  
+                                               httpResponse.setContentLength(data.length);  
+                                               httpResponse.getOutputStream().write(data);  
+                                     }  
+                            }  
+                   }  
+
+         }  
+
+         <span class="keyword">private</span> File key2File(<span class="keyword">String</span> <span class="variable">key</span>){  
+                   <span class="built_in">int</span>  hash =<span class="variable">key</span>.hashCode();  
+                   <span class="built_in">int</span> dir1 = (hash &amp;<span class="number">0xff00</span>)&gt;&gt;<span class="number">8</span>;  
+                   <span class="built_in">int</span> dir2 = hash &amp; <span class="number">0xff</span>;  
+                   <span class="keyword">String</span>  dir= root+dir1+<span class="string">"/"</span>+dir2;  
+                   File fdir = <span class="keyword">new</span> File(dir);  
+                   <span class="keyword">if</span>(!fdir.isAbsolute()){  
+                            <span class="keyword">if</span>(!fdir.mkdirs()){  
+                                     <span class="keyword">return</span> <span class="keyword">null</span>;  
+                            }  
+                   }  
+                   <span class="keyword">return</span> newFile(dir+<span class="string">"/"</span>+encode(<span class="variable">key</span>)+SUFFIX);  
+         }  
+
+         <span class="keyword">private</span> <span class="keyword">String</span> encode(<span class="keyword">String</span> <span class="variable">key</span>){  
+                   <span class="keyword">try</span> {  
+                            <span class="keyword">return</span> URLEncoder.encode(<span class="variable">key</span>,<span class="string">"UTF-8"</span>);  
+                   } <span class="keyword">catch</span> (UnsupportedEncodingException e) {  
+                            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);  
+                   }  
+
+         }  
+
+         <span class="keyword">public</span> <span class="keyword">void</span> remove(<span class="keyword">String</span> url,Map&lt;<span class="keyword">String</span>,<span class="keyword">String</span>&gt;parameters){  
+                   <span class="keyword">String</span> <span class="variable">key</span> =getKey(HttpServletRequestFactory.create(url,parameters));  
+                   <span class="keyword">if</span>(<span class="variable">key</span> != <span class="keyword">null</span>){  
+                            FileUtil.remveFile(key2File(<span class="variable">key</span>));  
+                   }  
+         }  
+}  
+</code></pre><p>书中给到的另外一个客户端缓存，不知道该归那类：</p>
+<pre><code><span class="comment">/** 
+ * 网页静态资源（gif图像，css资源的缓存时间设置filter，避免频繁请求静态资源 
+ */</span>  
+<span class="keyword">package</span> com.zsl.cache.<span class="built_in">filter</span>;  
+
+<span class="keyword">import</span> java.io.IOException;  
+<span class="keyword">import</span> java.util.Enumeration;  
+<span class="keyword">import</span> java.util.Map;  
+
+importjavax.servlet.FilterChain;  
+importjavax.servlet.FilterConfig;  
+importjavax.servlet.ServletException;  
+<span class="keyword">import</span> javax.servlet.Filter;  
+importjavax.servlet.ServletRequest;  
+importjavax.servlet.ServletResponse;  
+importjavax.servlet.http.HttpServletRequest;  
+importjavax.servlet.http.HttpServletResponse;  
+
+importorg.apache.commons.collections.<span class="built_in">map</span>.HashedMap;  
+importorg.apache.commons.logging.Log;  
+importorg.apache.commons.logging.LogFactory;  
+
+
+<span class="comment">/** 
+ * @author zsl 
+ * 
+ */</span>  
+<span class="keyword">public</span> class ExpireFilterimplements Filter {  
+
+         <span class="keyword">private</span> Log <span class="built_in">log</span> = LogFactory.getLog(ExpireFilter.class);  
+
+         <span class="keyword">private</span> Map&lt;<span class="keyword">String</span>, Long&gt; <span class="built_in">map</span> = <span class="keyword">new</span> HashedMap();  
+
+         @Override  
+         <span class="keyword">public</span> <span class="keyword">void</span> destroy() {  
+                   <span class="built_in">log</span>.info(<span class="string">"destory ExpiredFilter"</span>);  
+         }  
+
+         @Override  
+         <span class="keyword">public</span> <span class="keyword">void</span> doFilter(ServletRequest request, ServletResponseresponse,  
+                            FilterChain chain) <span class="keyword">throws</span> IOException,ServletException {  
+                            <span class="keyword">String</span> uriString =((HttpServletRequest)request).getRequestURI();  
+                            <span class="built_in">int</span> n = uriString.lastIndexOf(<span class="string">'.'</span>);  
+                            <span class="keyword">if</span>(n!= -<span class="number">1</span>){  
+                                     <span class="keyword">String</span> ext =uriString.substring(n);  
+                                     Long <span class="built_in">exp</span> = <span class="built_in">map</span>.<span class="built_in">get</span>(ext);  
+                                     <span class="keyword">if</span>(<span class="built_in">exp</span> != <span class="keyword">null</span>){  
+                                               HttpServletResponseresp = (HttpServletResponse)response;  
+                                               resp.setHeader(<span class="string">"Expires"</span>,System.currentTimeMillis()+<span class="built_in">exp</span>*<span class="number">1000</span>+<span class="string">""</span>);  
+                                     }  
+                            }  
+                            chain.doFilter(request,response);  
+         }  
+
+         @Override  
+         <span class="keyword">public</span> <span class="keyword">void</span> init(FilterConfig config) throwsServletException {  
+                   Enumeration em = config.getInitParameterNames();  
+                   <span class="keyword">while</span>(em.hasMoreElements()){  
+                            <span class="keyword">String</span> paramName =em.nextElement().toString();  
+                            <span class="keyword">String</span> paramValue = config.getInitParameter(paramName);  
+                            <span class="keyword">try</span> {  
+                                     <span class="built_in">int</span> time =Integer.valueOf(paramValue);  
+                                     <span class="keyword">if</span>(time&gt;<span class="number">0</span>){  
+                                               <span class="built_in">log</span>.info(<span class="string">"set"</span>+paramName + <span class="string">" expired seconds: "</span>+time);  
+                                               <span class="built_in">map</span>.put(paramName, newLong(time));  
+                                     }  
+                            } <span class="keyword">catch</span> (Exception e) {  
+                                     <span class="built_in">log</span>.warn(<span class="string">"Exception ininitilizing ExpiredFilter."</span>,e);  
+                            }  
+                   }  
+         }  
+}  
+</code></pre><ol>
+<li>负载均衡系统<br>Ø  负载均衡策略<br>负载均衡策略有随机分配，平均分配，分布式一致性hash等。随机分配就是通过随机数选择一个服务器来服务。平均分配就是一次循环分配一次。分布式一致性hash算法，比较负载，把资源和节点映射到一个换上，然后通过一定的算法资源对应到节点上，使得添加和去掉服务器变得非常容易，减少对其它服务器的影响。很有名的一个算法，据说是P2P的基础。了解不是很深，就不详细说了，要露马脚了。<br>Ø  软件负载均衡<br>软件负载均衡可以采用很多方案，常见的几个方案有：<br>基于DNS的负载均衡，通过DNS正向区域的配置，将一个域名根据一定的策略解析到多个ip地址，实现负载均衡，这里需要DNS服务器的配合。<br>基于LVS的负载均衡。LVS可以将多个linux服务器做成一个虚拟的服务器，对外提供服务器，实现负载均衡。<br>基于Iptables的负载均衡。Iptables可以通过做nat，对外提供一个虚拟IP，对内映射到多个服务器实现负载均衡。基本上可以和硬件均衡方案一致了，这里的linux服务器相当于一台路由器。<br>Ø  硬件负载均衡<br>基于路由器的负载均衡，在路由器上配置nat实现负载均衡。对外网一个虚拟IP，内网映射几个内网IP。<br>一些网络设备厂商也提供了一些负载均衡的设备，如F5，不过价格不菲哦。<br>数据库的负载均衡<br>数据库的负载均衡可以是数据库厂商提供的集群方案。<br>――――――――――――――――――――――――――――――――――――――<br>今天先写到这里，这个题目太大了，东西太多。后边是将来要写的。还没有组织出来。<br>好多东西也没有展开。东西太多了。<br>――――――――――――――――――――――――――――――――――――――<br>分布式文件系统<br>Gfs<br>hfs<br>Map Reduce系统</li>
+</ol>
+<p>云计算</p>
+<p>转自：<a href="http://blog.csdn.net/shatty/article/details/6629896" target="_blank" rel="external">http://blog.csdn.net/shatty/article/details/6629896</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/09/permission/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          权限流程图
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/08/concurrent-nio/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">高吞吐高并发Java NIO服务的架构</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="high-concurrent-system-design" data-title="高并发系统设计" data-url="http://krisjin.github.io/2015/04/08/high-concurrent-system-design/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>netty序列化实现 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Java序列化jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,ja">
+<meta property="og:type" content="article">
+<meta property="og:title" content="netty序列化实现">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/13/netty-serializable-sample/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="Java序列化jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,ja">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="netty序列化实现">
+<meta name="twitter:description" content="Java序列化jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,ja">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-netty-serializable-sample" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/13/netty-serializable-sample/" class="article-date">
+  	<time datetime="2015-02-13T05:35:46.000Z" itemprop="datePublished">2月 13 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      netty序列化实现
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Java序列化">Java序列化</h3><p>jdk本身提供了序列化的实现，需要序列化的类要实现Serializable接口。<br>序列化的目的主要有网络传输和对象持久化，网络传输应用到远程系统之间的调用。持久化在ORM<br>中使用的较多。java序列化不支持多种语言的实现，假如A系统是用java 序列化请求到B系统，而B系统是用C++实现，在这种情况下Java序列化并不是很适用，很多成熟的远程调用框架也没有采用java 自带的序列化,java的序列化性能也很低<br><a id="more"></a></p>
+<h3 id="netty序列化">netty序列化</h3><p>使用netty提供的序列化，序列化类也同样要实现Serializable接口，提高了两个序列化类是ObjectDecoder，ObjectEncoder，下面通过具体实例来了解下：</p>
+<p><strong>服务器端</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderServer</span> </span>{
+
+<span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> port)</span> <span class="keyword">throws</span> InterruptedException </span>{
+    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();
+    EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();
+
+    <span class="keyword">try</span> {
+        ServerBootstrap boot = <span class="keyword">new</span> ServerBootstrap();
+        boot.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .option(ChannelOption.SO_BACKLOG, <span class="number">100</span>).<span class="keyword">handler</span>(<span class="keyword">new</span> LoggingHandler(LogLevel.INFO))
+            .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    <span class="annotation">@Override</span>
+                    <span class="keyword">protected</span> <span class="function"><span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>{
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectDecoder(<span class="number">1024</span> * <span class="number">1024</span>, ClassResolvers.weakCachingConcurrentResolver(<span class="keyword">this</span>.getClass().getClassLoader())));
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectEncoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> OrderServerHandler());
+
+                    }
+                });
+
+
+        <span class="comment">//绑定端口，同步等待</span>
+        ChannelFuture cf =boot.bind(port).sync();
+        <span class="comment">//等待服务端监听端口关闭</span>
+        cf.channel().closeFuture().sync();
+
+    }  <span class="keyword">finally</span> {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>{
+    <span class="keyword">new</span> OrderServer().bind(<span class="number">8080</span>);
+}
+
+}
+</code></pre><p><strong>服务器端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>{
+    OrderRequest request = (OrderRequest) msg;
+
+    <span class="keyword">if</span> (<span class="string">"krisjin"</span>.equals(request.getUserName())) {
+
+        System.out.println(<span class="string">"Service accept client order request: ["</span> + request.toString() + <span class="string">"]"</span>);
+        ctx.writeAndFlush(getResponse(request.getOrderId()));
+    }
+
+}
+
+<span class="function"><span class="keyword">private</span> OrderResponse <span class="title">getResponse</span><span class="params">(<span class="keyword">long</span> orderId)</span> </span>{
+    OrderResponse resp = <span class="keyword">new</span> OrderResponse();
+
+    resp.setOrderId(orderId);
+    resp.setRespCode(<span class="number">0</span>);
+    resp.setDesc(<span class="string">"Receive order success,we are as quickly as possible send..."</span>);
+    <span class="keyword">return</span> resp;
+}
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>{
+    cause.printStackTrace();
+    ctx.close();
+}
+}    
+</code></pre><p><strong>客户端</strong></p>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">OrderClient</span> {
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> port, String host)</span> </span>{
+    EventLoopGroup <span class="keyword">group</span> = <span class="keyword">new</span> NioEventLoopGroup();
+
+    <span class="keyword">try</span> {
+        Bootstrap boot = <span class="keyword">new</span> Bootstrap();
+        boot.<span class="keyword">group</span>(<span class="keyword">group</span>).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)
+                .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() {
+
+                    @<span class="function">Override
+                    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> throws Exception </span>{
+
+                        ch.pipeline().addLast(
+                                <span class="keyword">new</span> ObjectDecoder(<span class="number">1024</span>, ClassResolvers.cacheDisabled(<span class="keyword">this</span>.getClass()
+                                        .getClassLoader())));
+                        ch.pipeline().addLast(<span class="keyword">new</span> ObjectEncoder());
+                        ch.pipeline().addLast(<span class="keyword">new</span> OrderClientHandler());
+                    }
+                });
+
+        <span class="comment">// 发起异步连接操作</span>
+        ChannelFuture cf = boot.connect(host, port).sync();
+        cf.channel().closeFuture().sync();
+
+    } <span class="keyword">catch</span> (InterruptedException e) {
+        e.printStackTrace();
+    } <span class="keyword">finally</span> {
+        <span class="keyword">group</span>.shutdownGracefully();
+    }
+
+}
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>{
+    <span class="keyword">new</span> OrderClient().connect(<span class="number">8080</span>, <span class="string">"127.0.0.1"</span>);
+}
+}
+</code></pre><p><strong>客户端handler</strong></p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>{
+
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>{
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) {
+        ctx.write(buildRequest(i));
+    }
+    ctx.flush();
+}
+
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>{
+
+    System.out.println(<span class="string">"Receive server response :"</span> + msg);
+
+}
+
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>{
+    cause.printStackTrace();
+    ctx.close();
+}
+
+<span class="function"><span class="keyword">private</span> OrderRequest <span class="title">buildRequest</span><span class="params">(<span class="keyword">long</span> orderId)</span> </span>{
+    OrderRequest request = <span class="keyword">new</span> OrderRequest();
+    request.setOrderId(orderId);
+    request.setUserName(<span class="string">"krisjin"</span>);
+    request.setAddress(<span class="string">"朝阳门外大街泛利大厦"</span>);
+    request.setMobilePhone(<span class="string">"10000000"</span>);
+    request.setProductName(<span class="string">"黑客与画家"</span>);
+    <span class="keyword">return</span> request;
+}
+
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>{
+    ctx.flush();
+}
+
+}
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/14/netty-file-server/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          netty实现http文件服务器
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/12/netty-fixed-length-decoder/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">netty定长消息解码</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="netty-serializable-sample" data-title="netty序列化实现" data-url="http://krisjin.github.io/2015/02/13/netty-serializable-sample/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

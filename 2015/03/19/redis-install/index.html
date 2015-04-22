@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Ubuntu安装redis | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu安装redis">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/19/redis-install/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ubuntu安装redis">
+<meta name="twitter:description" content="Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-redis-install" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/19/redis-install/" class="article-date">
+  	<time datetime="2015-03-19T01:20:44.000Z" itemprop="datePublished">3月 19 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Ubuntu安装redis
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nosql/">nosql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/NoSQL/">NoSQL</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，交和补集(difference)等，还支持多种排序功能。<a id="more"></a></p>
+<h2 id="安装">安装</h2><pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># wget http://download.redis.io/releases/redis-2.8.19.tar.gz</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># tar xvfz redis-2.8.19.tar.gz</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cd redis-2.8.19#</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># make</span>
+</code></pre><p>编译完成后就会生成相关的二进制可执行文件，为了便于管理。创建3个目录分别用来存放可执行二进制文件、配置文件、数据持久化文件。将src目录下的二进制文件redis-benchmark、redis-check-aof、redis-check-dump、redis-cli、redis-sentinel（非必需）、redis-server拷贝到bin目录，配置文件redis.conf、sentinel.conf（非必需）拷贝到etc目录。</p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># mkdir -p /usr/local/redis/{bin,db,etc}</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-server /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-benchmark /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-check-aof /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-check-dump /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-cli /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp src/redis-sentinel /usr/local/redis/bin</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp redis.conf /usr/local/redis/etc/</span>
+root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># cp sentinel.conf /usr/local/redis/etc</span>
+</code></pre><p>redis-server：Redis服务器的daemon启动程序，对应的默认配置文件redis.conf。<br>redis-benchmark：Redis性能测试工具。<br>redis-cli：Redis命令行操作工具，类似于mysql的控制台。<br>redis-check-aof/redis-check-dump：修复损坏的数据文件file.aof/dump.rdb。<br>redis-sentinel：用于管理多个Redis服务器（instance），为集群提供监控、提醒、自动故障迁移服务，对应的配置文件sentinel.conf。   </p>
+<h6 id="调整默认的相关参数">调整默认的相关参数</h6><pre><code><span class="preprocessor">#以守护进程的模式运行实例</span>
+daemonize yes
+<span class="preprocessor">#指定日志文件的位置。默认为空，以守护进程运行时日志默认会发送到/dev/null设备，不以守护进程运行时日志输出到标准输出设备。</span>
+logfile <span class="string">"/var/log/redis.log"</span>
+<span class="preprocessor">#指定存放数据库文件的文件夹</span>
+dir <span class="string">"/usr/local/redis/db"</span>
+</code></pre><p>启动redis，可以看到redis默认监听TCP的6379端口</p>
+<p><strong>./redis-server ./etc/redis.conf</strong></p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/opt/redis-</span><span class="number">2.8</span>.<span class="number">19</span><span class="comment"># netstat -tpln</span>
+<span class="constant">Active Internet </span>connections (only servers)
+<span class="constant">Proto Recv-Q Send-Q Local Address </span>          <span class="constant">Foreign Address </span>        <span class="constant">State </span>      <span class="constant">PID/Program </span>name
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span><span class="symbol">:</span><span class="number">3306</span>          <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN </span>     <span class="number">1277</span>/mysqld     
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:</span><span class="number">6379</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN </span>     <span class="number">9308</span>/redis-server *
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">1.1</span><span class="symbol">:</span><span class="number">53</span>            <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN </span>     <span class="number">1444</span>/dnsmasq    
+tcp        <span class="number">0</span>      <span class="number">0</span> <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span><span class="symbol">:</span><span class="number">631</span>           <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span><span class="symbol">:*</span>               <span class="constant">LISTEN </span>     <span class="number">3231</span>/cupsd      
+tcp6       <span class="number">0</span>      <span class="number">0</span> <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:</span><span class="number">6379</span>                 <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:*</span>                    <span class="constant">LISTEN </span>     <span class="number">9308</span>/redis-server *
+tcp6       <span class="number">0</span>      <span class="number">0</span> <span class="symbol">:</span><span class="symbol">:</span><span class="number">1</span><span class="symbol">:</span><span class="number">631</span>                 <span class="symbol">:</span><span class="symbol">:</span><span class="symbol">:*</span>                    <span class="constant">LISTEN </span>     <span class="number">3231</span>/cupsd      
+</code></pre><p>查看redis的日志时发现在启动的时候抛出了几条条警告：</p>
+<pre><code>[9390] 18 Mar 19:11:47.121 # WARNING overcommit_memory is <span class="operator"><span class="keyword">set</span> <span class="keyword">to</span> <span class="number">0</span>! Background save may fail under low memory condition. <span class="keyword">To</span> fix this issue <span class="keyword">add</span> <span class="string">'vm.overcommit_memory = 1'</span> <span class="keyword">to</span> /etc/sysctl.conf <span class="keyword">and</span> <span class="keyword">then</span> reboot <span class="keyword">or</span> run the command <span class="string">'sysctl vm.overcommit_memory=1'</span> <span class="keyword">for</span> this <span class="keyword">to</span> take effect.
+[<span class="number">9390</span>] <span class="number">18</span> Mar <span class="number">19</span>:<span class="number">11</span>:<span class="number">47.141</span> # WARNING you have Transparent Huge Pages (THP) support enabled <span class="keyword">in</span> your kernel. This will <span class="keyword">create</span> latency <span class="keyword">and</span> memory <span class="keyword">usage</span> issues <span class="keyword">with</span> Redis. <span class="keyword">To</span> fix this issue run the command <span class="string">'echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled'</span> <span class="keyword">as</span> root, <span class="keyword">and</span> <span class="keyword">add</span> it <span class="keyword">to</span> your /etc/rc.<span class="keyword">local</span> <span class="keyword">in</span> <span class="keyword">order</span> <span class="keyword">to</span> retain the setting <span class="keyword">after</span> a reboot. Redis must be restarted <span class="keyword">after</span> THP <span class="keyword">is</span> disabled.
+[<span class="number">9390</span>] <span class="number">18</span> Mar <span class="number">19</span>:<span class="number">11</span>:<span class="number">47.141</span> # WARNING: The TCP backlog setting <span class="keyword">of</span> <span class="number">511</span> cannot be enforced because /proc/sys/net/core/somaxconn <span class="keyword">is</span> <span class="keyword">set</span> <span class="keyword">to</span> the <span class="keyword">lower</span> <span class="keyword">value</span> <span class="keyword">of</span> <span class="number">128.</span></span>
+</code></pre><p>根据警告提示我们需要将内核参数vm.overcommit_memory设置为1，net.core.somaxconn设置成更大的数值，默认是128。编辑文件/etc/sysctl.conf，追加2行</p>
+<pre><code>#sysctl文件追加的参数
+vm<span class="class">.overcommit_memory</span> = <span class="number">1</span>
+net<span class="class">.core</span><span class="class">.somaxconn</span> = <span class="number">1024</span>
+</code></pre><p>保存退出后，刷新系统内核参数，运行命令：sysctl -p</p>
+<p>关于这两个内核参数的解释：<br>vm.overcommit_memory<br>指定了内核针对内存分配的策略，其值可以是0、1、2。</p>
+<p>0， 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程。  </p>
+<p>1， 表示内核允许分配所有的物理内存，而不管当前的内存状态如何。</p>
+<p>2， 表示内核允许分配超过所有物理内存和交换空间总和的内存。<br>net.core.somaxconn<br>定义了系统中每一个端口最大的监听队列的长度,这是个全局的参数,默认值为128，在某些应用下可能会限制接收新TCP连接侦听队列的大小。</p>
+<p>4、用redis提供的命令行工具进行一些简单的操作</p>
+<p><strong>用redis提供的命令行工具进行一些简单的操作</strong></p>
+<pre><code>root<span class="variable">@zookeeper03</span><span class="symbol">:/usr/local/redis/bin</span><span class="comment"># ./redis-cli</span>
+<span class="prompt">127.0.0.1:6379&gt;</span>
+<span class="comment">#查看redis的各种信息参数，内存、连接数、键值数等</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> info
+<span class="comment">#查看所有的key值</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> keys *
+(empty list or set)
+<span class="comment">#插入并查看一个key值</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> set i <span class="number">123</span>
+<span class="constant">OK</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> get i
+<span class="string">"123"</span>
+<span class="comment">#list操作</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> sadd listTest <span class="number">1</span>
+(integer) <span class="number">1</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> sadd listTest <span class="number">2</span>
+(integer) <span class="number">1</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> sadd listTest <span class="number">3</span>
+(integer) <span class="number">1</span>
+<span class="prompt">127.0.0.1:6379&gt;</span> smembers listTest
+<span class="number">1</span>) <span class="string">"1"</span>
+<span class="number">2</span>) <span class="string">"2"</span>
+<span class="number">3</span>) <span class="string">"3"</span>
+</code></pre><h3 id="停止redis">停止redis</h3><pre><code>./redis-<span class="keyword">cli</span> shutdown
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/19/nio-selector/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          NIO多路复用器理解
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/17/ubuntu14-install-mysql/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ubuntu14安装mysql</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="redis-install" data-title="Ubuntu安装redis" data-url="http://krisjin.github.io/2015/03/19/redis-install/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

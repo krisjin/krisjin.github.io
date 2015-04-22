@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Netty ChannelPipeline 详解 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty ChannelPipeline 详解">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/16/Netty-ChannelPipeline/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。">
+<meta property="og:image" content="/img/channelpipeline-sort.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Netty ChannelPipeline 详解">
+<meta name="twitter:description" content="ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Netty-ChannelPipeline" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/16/Netty-ChannelPipeline/" class="article-date">
+  	<time datetime="2015-03-16T13:29:29.000Z" itemprop="datePublished">3月 16 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Netty ChannelPipeline 详解
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/channelpipeline/">channelpipeline</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。<a id="more"></a></p>
+<h2 id="ChannelPipeline的事件处理">ChannelPipeline的事件处理</h2><hr>
+<p>下图展示了一个消息被ChannelPipeline的ChannelHandler链拦截和处理的全过程。</p>
+<pre><code><span class="code">                                                      I/O Request</span>
+<span class="bullet">*                                            </span>via {@link Channel} or
+<span class="bullet">*                                        </span>{@link ChannelHandlerContext}
+<span class="bullet">*                                                      </span>|
+<span class="bullet">*  </span><span class="code">+---------------------------------------------------+</span>---------------+
+<span class="bullet">*  </span>|                           ChannelPipeline         |               |
+<span class="bullet">*  </span>|                                                  \|/              |
+<span class="bullet">*  </span>|    <span class="code">+----------------------------------------------+</span>----------+    |
+<span class="bullet">*  </span>|    |                   ChannelHandler  N                     |    |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|              /|\                                  |               |
+<span class="bullet">*  </span>|               |                                  \|/              |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|    |                   ChannelHandler N-1                    |    |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|              /|\                                  .               |
+<span class="bullet">*  </span>|               .                                   .               |
+<span class="bullet">*  </span>| ChannelHandlerContext.fireIN<span class="emphasis">_EVT() ChannelHandlerContext.OUT_</span>EVT()|
+<span class="bullet">*  </span>|          [method call]                      [method call]         |
+<span class="bullet">*  </span>|               .                                   .               |
+<span class="bullet">*  </span>|               .                                  \|/              |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|    |                   ChannelHandler  2                     |    |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|              /|\                                  |               |
+<span class="bullet">*  </span>|               |                                  \|/              |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|    |                   ChannelHandler  1                     |    |
+<span class="bullet">*  </span>|    <span class="code">+----------+</span>-----------------------------------<span class="code">+----------+</span>    |
+<span class="bullet">*  </span>|              /|\                                  |               |
+<span class="bullet">*  </span><span class="code">+---------------+</span>-----------------------------------<span class="code">+---------------+</span>
+<span class="bullet">*                  </span>|                                  \|/
+<span class="bullet">*  </span><span class="code">+---------------+</span>-----------------------------------<span class="code">+---------------+</span>
+<span class="bullet">*  </span>|               |                                   |               |
+<span class="bullet">*  </span>|       [ Socket.read() ]                    [ Socket.write() ]     |
+<span class="bullet">*  </span>|                                                                   |
+<span class="bullet">*  </span>|  Netty Internal I/O Threads (Transport Implementation)            |
+<span class="bullet">*  </span><span class="code">+-------------------------------------------------------------------+</span>
+</code></pre><p>消息的读取和发送处理全流程描述如下：</p>
+<ol>
+<li>底层的SocketChannel read()方法读取ByteBuf,触发ChannelRead事件，由I/O线程NioEventLoop调用ChannelPipeline的fireChannelRead(Object msg)方法，将消息（Bytebuf）传输到ChannelPipeline中；</li>
+<li>消息依次被HeadHandler、ChannelHandler1、ChannelHandler2…..TailHandler拦截和处理，在这个过程中，任何ChannelHandler都可以中断当前的流程，结束消息的传递。</li>
+<li>调用ChannelHandlerContext的write方法发送消息，消息从TailHandler开始，途径ChannelHandlerN….ChannelHandler1、HeadHandler，最终被添加到消息发送缓冲区中等待刷新和发送，在此过程中也可以中断消息的传递，例如编码失败时，就需要中断流程，构造异常的Future返回。</li>
+</ol>
+<p>Netty中的事件分为inbound事件和outbound事件，inbound事件通常由I/O线程触发，例如TCP链路建立事件，链路关闭事件，读事件，异常通知事件等，它对应上图的左半部分。</p>
+<p><strong>触发inbound事件</strong>的方法如下：  </p>
+<ol>
+<li>public ChannelPipeline fireChannelRegistered()：Channel注册事件</li>
+<li>public ChannelHandlerContext fireChannelActive()：TCP链路建立成功，Channel激活事件</li>
+<li>public ChannelHandlerContext fireChannelRead(Object msg)：读事件</li>
+<li>public ChannelHandlerContext fireChannelReadComplete() ：读操作完成通知事件</li>
+<li>public ChannelHandlerContext fireExceptionCaught(Throwable cause)：异常通知事件</li>
+<li>public ChannelHandlerContext fireUserEventTriggered(Object event)：用户自定义事件</li>
+<li>public ChannelHandlerContext fireChannelWritabilityChanged()：Channel的可写状态变化通知事件</li>
+<li>public ChannelHandlerContext fireChannelInactive() ：TCP连接关闭，链路不可用通知事件</li>
+</ol>
+<p>outbound事件通常是由用户主动发起的网络I/O操作，例如用户发起的连接操作、绑定操作、消息发送等操作，它对应上图的右半部分。</p>
+<p><strong>触发outbound事件</strong>的方法如下：</p>
+<ol>
+<li>public ChannelFuture bind(final SocketAddress localAddress, final ChannelPromise promise)：绑定本地地址事件</li>
+<li><strong>public ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise)</strong>：连接服务端事件</li>
+<li><strong>public ChannelFuture write(Object msg, ChannelPromise promise)</strong>：发送事件</li>
+<li><strong>public ChannelHandlerContext flush()</strong>：刷新事件</li>
+<li><strong>public ChannelHandlerContext read()</strong>：读事件</li>
+<li><strong>public ChannelFuture disconnect(ChannelPromise promise)</strong>：断开连接事件</li>
+<li><strong>public ChannelFuture close(ChannelPromise promise)</strong>：关闭当前Channel事件</li>
+</ol>
+<h2 id="自定义拦截器">自定义拦截器</h2><hr>
+<p>ChannelPipeline通过ChannelHandler接口来实现事件的拦截和处理，由于ChannelHandler中的事件种类繁多，不同的ChannelHandler可能只需要关心其中的某一个或者几个事件，所以，通常ChannelHandler只需要继承ChannelHandlerAdapter类覆盖自己关心的方法即可。<br>例如下面的例子展示拦截Channel Active事件，打印TCP链路建立成功日志，代码如下：</p>
+<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">ChannelActiveInbound</span> <span class="keyword"><span class="keyword">extends</span></span> <span class="title">ChannelHandlerAdapter</span> {</span>
+
+<span class="annotation">@Override</span>
+public void channelActive(<span class="type">ChannelHandlerContext</span> ctx) <span class="keyword">throws</span> <span class="type">Exception</span> {
+
+    <span class="type">System</span>.out.println(<span class="string">"TCP Connected!"</span>);
+
+    ctx.fireChannelActive();
+}
+
+}
+</code></pre><p>下面的例子展示了如何在链路关闭的时候释放资源，示例代码如下：</p>
+<pre><code>public <span class="class"><span class="keyword">class</span> <span class="title">ChannelCloseOutbound</span> <span class="keyword"><span class="keyword">extends</span></span> <span class="title">ChannelHandlerAdapter</span> {</span>
+
+<span class="annotation">@Override</span>
+public void close(<span class="type">ChannelHandlerContext</span> ctx, <span class="type">ChannelPromise</span> promise)
+        <span class="keyword">throws</span> <span class="type">Exception</span> {
+
+    <span class="type">System</span>.out.println(<span class="string">"TCP Closing!"</span>);
+    ctx.close(promise);
+}
+
+}
+</code></pre><h2 id="构建pipeline">构建pipeline</h2><p>事实上用户不需要创建pipeline，因为使用ServerBootstrap或Bootstrap启动服务端或客户端时，Netty会为每个Channel创建一个独立的pipeline,对于使用者而言，只需要将自定义的拦截器加入到pipeline即可，相关代码入下：</p>
+<pre><code>pipeline=ch.pipeline<span class="literal">()</span>;
+pipeline.addLast(<span class="string">"decoder"</span>,<span class="keyword">new</span> <span class="type">MyProtocolDecoder</span><span class="literal">()</span>);
+pipeline.addLast(<span class="string">"encoder"</span>,<span class="keyword">new</span> <span class="type">MyProtocolEncoder</span><span class="literal">()</span>);
+</code></pre><p>对于编写这样的ChannelHandler，它存在先后顺序，例如 MessageToMessageDecoder,在它之前往往需要有ByteToMessageDecoder将ByteBuf编码为对象，然后对对象做二次编码得到最终的POJO对象。Pipeline支持指定位置添加或者删除拦截器，相关接口定义如下：</p>
+<p><img src="/img/channelpipeline-sort.png" alt=""></p>
+<h2 id="ChannelPipeline的主要特性">ChannelPipeline的主要特性</h2><p>ChannelPipeline支持运行态动态的添加或者删除ChannelHandler，在某些场景下这个特性非常实用。例如当业务高峰期需要对系统做拥塞保护时，就可以根据当前的系统时间进行判断，如果处于业务高峰期，则动态地将系统拥塞保护添加到当前的ChannelPipeline中，当高峰期过去之后，就可以动态的删除拥塞保护ChannelHandler了。</p>
+<p>ChannelPipeline是线程安全的，这意味着N个业务线程可以并发地操作ChannelPipeline而不存在多线程并发问题。但是，ChannelHandler却不是线程安全的，这意味着尽管ChannelPipeline是线程安全的，但是用户仍然需要自己保证ChannelHandler的线程安全。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/17/ubuntu14-install-mysql/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          ubuntu14安装mysql
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/13/netty-thread-model/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">netty thread model</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Netty-ChannelPipeline" data-title="Netty ChannelPipeline 详解" data-url="http://krisjin.github.io/2015/03/16/Netty-ChannelPipeline/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

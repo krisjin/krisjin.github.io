@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Windows上安装nexus私有仓库 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1. Nexus简介
+Nexus是一个Maven仓库管理器，用来搭建私有仓库服务器。建立公司/组织的私有仓库的的好处是便于管理，节省公网带宽，利用内网下载依赖项速度快，还有一个非常有用的功能就是能有效管理内部项目的SNAPSHOT版本，实现各个模块间的共享。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows上安装nexus私有仓库">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/09/Windows-install-nexus/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="1. Nexus简介
+Nexus是一个Maven仓库管理器，用来搭建私有仓库服务器。建立公司/组织的私有仓库的的好处是便于管理，节省公网带宽，利用内网下载依赖项速度快，还有一个非常有用的功能就是能有效管理内部项目的SNAPSHOT版本，实现各个模块间的共享。">
+<meta property="og:image" content="/img/nexus.png">
+<meta property="og:image" content="/img/nexus-index.png">
+<meta property="og:image" content="/img/nexus-index-config.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows上安装nexus私有仓库">
+<meta name="twitter:description" content="1. Nexus简介
+Nexus是一个Maven仓库管理器，用来搭建私有仓库服务器。建立公司/组织的私有仓库的的好处是便于管理，节省公网带宽，利用内网下载依赖项速度快，还有一个非常有用的功能就是能有效管理内部项目的SNAPSHOT版本，实现各个模块间的共享。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Windows-install-nexus" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/09/Windows-install-nexus/" class="article-date">
+  	<time datetime="2015-04-09T08:33:34.000Z" itemprop="datePublished">4月 9 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Windows上安装nexus私有仓库
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/nexus/">nexus</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1-_Nexus简介">1. Nexus简介</h2><hr>
+<p>Nexus是一个Maven仓库管理器，用来搭建私有仓库服务器。建立公司/组织的私有仓库的的好处是便于管理，节省公网带宽，利用内网下载依赖项速度快，还有一个非常有用的功能就是能有效管理内部项目的SNAPSHOT版本，实现各个模块间的共享。 <a id="more"></a></p>
+<h2 id="2-_下载Nexus">2. 下载Nexus</h2><hr>
+<p>从<a href="http://www.sonatype.org/nexus/archived/#step2top" target="_blank" rel="external">http://www.sonatype.org/nexus/archived/#step2top</a> 中选择指定的版本下载到本地。、</p>
+<h2 id="3-_安装Nexus">3. 安装Nexus</h2><hr>
+<p>解压nexus-2.8.0-bundle.zip，解压后的有两个目录：</p>
+<ol>
+<li>nexus-2.8.0-05（该目录包含了Nexus运行所需要的文件，如启动脚本、依赖jar包等）</li>
+<li>sonatype-work（该目录包含Nenus生成的配置文件、日志文件、仓库文件等。）</li>
+</ol>
+<p>配置Path环境变量：<br>将E:\nexus-2.8\nexus-2.8.0-05\bin 添加到Path中</p>
+<p>启动Nexus:</p>
+<p>因为我用的是win7 64位OS，所以到E:\nexus-2.8\nexus-2.8.0-05\bin\jsw\windows-x86-64 下运行start-nexus.bat（以管理员身份运行）。</p>
+<p>启动成功后我们访问下管理界面：<br>在浏览器输入：<a href="http://localhost:8081/nexus/" target="_blank" rel="external">http://localhost:8081/nexus/</a> 显示界面如下：</p>
+<p><img src="/img/nexus.png" alt=""></p>
+<p>这时你可以单击界面右上角的Login进行登录，Nexus默认管理用户名和密码为admin/admin123</p>
+<h2 id="4-_Nexus索引">4. Nexus索引</h2><p>这时你使用Nexus搜索插件得不到任何结果，为了能够搜索Maven中央库，首先需要设置Nexus中的Maven Central仓库下载远程索引。如下图：<br><img src="/img/nexus-index.png" alt=""></p>
+<p>单击左边导航栏的Repositories，可以link到这个页面，选择Central，点击Configuration，里面有一个Download Remote Indexes配置，默认状态是false，将其改为true，‘Save’后，单击Administration==&gt; Scheduled Tasks, 就有一条更新Index的任务，这个是Nexus在后天运行了一个任务来下载中央仓库的索引。由于中央仓库的内容比较多，因此其索引文件比较大，Nexus下载该文件也需要比较长的时间。请读者耐心等待把。如果网速不好的话，可以使用其他人搭建好的的Nexus私服。后面会介绍。下图为Nexus后台运行的task图：</p>
+<p><img src="/img/nexus-index-config.png" alt=""></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/10/adver-arch/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          广告平台架构
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/09/permission/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">权限流程图</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Windows-install-nexus" data-title="Windows上安装nexus私有仓库" data-url="http://krisjin.github.io/2015/04/09/Windows-install-nexus/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

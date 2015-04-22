@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>netty channel详解 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.Channel简述&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;提起Channel大家并不会陌生，它是JDK的NIO类库的重要组成部分，就是提供了java.nio.SocketChannel 和java.nio.ServerSocketChannel,用于非阻塞的IO操作。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;类似NIO的channe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="netty channel详解">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/16/channel-detail/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="1.Channel简述&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;提起Channel大家并不会陌生，它是JDK的NIO类库的重要组成部分，就是提供了java.nio.SocketChannel 和java.nio.ServerSocketChannel,用于非阻塞的IO操作。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;类似NIO的channe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="netty channel详解">
+<meta name="twitter:description" content="1.Channel简述&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;提起Channel大家并不会陌生，它是JDK的NIO类库的重要组成部分，就是提供了java.nio.SocketChannel 和java.nio.ServerSocketChannel,用于非阻塞的IO操作。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;类似NIO的channe">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-channel-detail" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/16/channel-detail/" class="article-date">
+  	<time datetime="2015-02-16T00:00:35.000Z" itemprop="datePublished">2月 16 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      netty channel详解
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="1-Channel简述">1.Channel简述</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提起Channel大家并不会陌生，它是JDK的NIO类库的重要组成部分，就是提供了java.nio.SocketChannel 和java.nio.ServerSocketChannel,用于非阻塞的IO操作。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类似NIO的channel，Netty提供了自己的Channel及子类的实现，用于异步IO操作和其他相关的操作。<br><a id="more"></a></p>
+<h3 id="2-Channel功能说明">2.Channel功能说明</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io.netty.channel.channel是Netty网络操作抽象类，它聚合了一组功能，包括但不限于网络的读、写，客户端发起连接、主动关闭连接，链路关闭，获得通信双方的网络地址等。它也包含了Netty框架相关的一些功能，包括获取该Channel的EventLoop,获取缓冲分配器ByteBufAllocator和pipeline等。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;下面先从channel的接口分析，讲解它的主要API和功能，然后在了解下它的子类相关功能实现</p>
+<h3 id="3-Channel工作原理">3.Channel工作原理</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Channel是Netty抽象出来的网络IO读写相关的接口，为什么不使用JDK NIO原生的Channel而要另起炉灶呢，主要原因如下：</p>
+<ol>
+<li>JDK的SocketChannel和ServerSocketChannel没有提供统一的Channel接口供业务开发者使用，对于用户而言，没有统一的操作视图，使用起来并方便。</li>
+<li>JDK的SocketChannel和ServerSocketChannel的主要职责就是网络操作，由于它们是SPI类接口，由具体的虚拟机厂家来提供，所以通过继承SPI功能类来扩展其功能的难度很大。直接实现ServerSocketChannle和SocketChannel抽象类，其工作量和重新开发一个新的Channeld的功能类差不多的。</li>
+<li>Netty的channel需要能跟Netty整体框架融合在一起，例如IO模型、基于ChannelPipie的定制模型，以及基于元数据描述配置化的TCP参数等，这些JDK的SocketChannel和ServerSocketChannel都没有提供，需要重新封装。</li>
+<li>自定义的Channel，功能实现更加灵活。  </li>
+</ol>
+<p>基于以上的4个原因，Netty重新设计了Channel接口，并且给予了很多不同的实现，它的设计原理很简单，但是功能却比较复杂，主要的设计理念如下：</p>
+<ol>
+<li>在Channel接口层，采用Facade模式进行统一封装，将网络IO操作，及相关联的的其它操作封装起来，统一对外提供。</li>
+<li>Channel接口的定义尽量大而全，为SocketChannel和ServerSocketChannel提供统一的视图，由不同的子类实现不同的功能，公共功能在抽象父类实现，最大限度上实现功能和接口的重用。</li>
+<li>具体实现采用聚合而非包含的方式，将相关的功能类聚合在Channel中，由Channel统一负责分配和调度，功能实现更加灵活。</li>
+</ol>
+<h3 id="4-Channel功能介绍">4.Channel功能介绍</h3><p>Channel的功能比较繁杂，通过分类的方式对它主要的功能进行介绍。</p>
+<h5 id="1、网络IO操作">1、网络IO操作</h5><p>Channel网络IO相关的方法定义如下：</p>
+<p>下面对这些API的功能进行分类说明，读写相关的API列表。  </p>
+<ol>
+<li><strong>Channel read():</strong> 从当前的Channel读取数据到第一个inbound缓冲区中，如果数据被成功读取，触发ChannelHandler.channelRead(ChannelHandlerContext,Object)事件，读取操作调用完之后，紧接着会触发ChannelHandler.channelReadComplete(ChannelHandlerContext)事件，这样业务的ChannelHandler可以决定是否需要继续读取数据。如果已经有读操作请求被挂起，则后续的读操作会被忽略。  </li>
+<li><strong>ChannelFuture write(Object msg):</strong>请求将当前的msg通过ChannePipe写入到目标Channel中。注意，write操作只是将消息存入到消息发送环形数组中，并没有真正被发送，只有调用flush操作才会被写入到Channel中，发送给对方。  </li>
+<li><strong>ChannelFuture write(Object msg,ChannelPromise promise):</strong>功能与write（Object msg）相同，但是携带了ChannelPromise 参数负责设置写入操作的结果。  </li>
+<li><strong>ChannelFuture writeAndFlush(Object msg,ChannelPromise promiese):</strong>与方法3功能类似，不同之处在于它会将消息写入Channel中发送，等价于单独调用write和flush操作的组合。  </li>
+<li><strong>ChannelFuture writeAndFlush(Object msg):</strong>功能等于方法4，但是没有ChannelPromise promiese 参数  </li>
+<li><strong>Channel flush():</strong> 将之前写入到发送环形数组中的消息全部写入到目标Channel中，发送给通信对方  </li>
+<li><strong>ChannelFuture close(ChannelPromise promise):</strong>主动关闭当前连接，通过ChannelPromise设置操作结果并进行结果通知，无论操作是否成功，都可以通过ChannelPromise获取操作结果。改操作会级联触发ChannelPipe中所有ChannelHandler的ChannelHandler.close(ChannelHandlerContext,ChannelPromise)事件。  </li>
+<li><strong>ChannelFuture disconnect(ChannelPromise promise):</strong>请求断开与远程通信对端的连接并使用ChannelPromise获取操作结果的通知信息。该方法会级联触发ChannelHandler.disconnect(ChannelHandlerContext,ChannelPromise)事件。  </li>
+<li><strong>ChannelFuture connect(SocketAddress remoteAddress):</strong>客户端使用指定的服务端地址发起连接请求，如果连接因为应答超时而失败，ChannelFuture中的操作结果ConnectTimeoutException异常，如果连接被拒绝，操作结果为ConnectException。该方法会级联触发ChannelHandler.connect(ChannelHandlerContext,SocketAddress,SocketAddress,ChannelPromise)事件。   </li>
+<li><strong>ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress)：</strong>功能与方法9类似，唯一不同的是先绑定本地地址localAddress，然后在连接服务端  </li>
+<li><strong>ChannelFuture connect(SocketAddress remoteAddress, ChannelPromise promise):</strong>与方式9功能类似，唯一不同的是多了一个ChannelPromise参数用于写入操作结果。  </li>
+<li><strong>ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise)：</strong>与方法11功能类似，唯一不同的就是绑定了本地地址。  </li>
+<li><strong>ChannelFuture bind(SocketAddress localAddress)：</strong>绑定指定的本地Socket地址，该方法会级联触发ChannelHandler.bind(ChannelHandlerContext,SocketAddress,ChannelPromise)事件。  </li>
+<li><strong>ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise)：</strong>与13方法功能类似，多了一个ChannelPromise参数用于写入操作结果。  </li>
+<li><strong> ChannelConfig config()：</strong>获取当前Channel的配置信息，例如CONNECT_TIMEOUT_MILLIS  </li>
+<li><strong>blooean is opoen():</strong>判断当前Channel是否已经打开  </li>
+<li><strong>boolean isRegistered()：</strong>判断当前Channel是否已经注册到EventLoop上。  </li>
+<li><strong>boolean isActive()：</strong>判断当前Channel是否已经处于激活状态  </li>
+<li><strong>ChannelMetadata metadata()：</strong>获取当前Channel的元数据描述信息，包括TCP参数配等。  </li>
+<li><strong>SocketAddress localAddress()：</strong>获取当前Channel的本地绑定地址  </li>
+<li><strong>SocketAddress remoteAddress()</strong>获取当前Channel通信的远程Socket地址。</li>
+</ol>
+<h5 id="2、其它常用API功能说明">2、其它常用API功能说明</h5><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第一个比较重要的方法是eventLoop，Channel需要注册到EventLoop的多路复用器上，用于处理IO事件，通过eventLoop方法可以获取到Channel注册的EventLoop。EventLoop本质上就是处理网络读写事件的Reactor线程。在Netty中，它不仅仅用来处理网络事件，也可以用来执行定时任务和用户自定义NioTask等任务。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第二个比较常用的方法是metadata方法，熟悉TCP协议的同学可能知道，当创建Socket的时候需要指定TCP参数，例如接收和发送的TCP缓冲区大小，TCP的超时时间，是否重用地址等等。在Netty中，每个Channel对应一个物理连接，每个连接都有自己的ＴＣＰ参数配置。所以，Ｃｈａｎｎｅｌ会聚合一个ChannelMetadata用来对TCP参数提供元数据描述信息，通过metadata方法就可以获取当前Channel的TCP参数配置。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第三个方法是parent,对于服务端Channel而言，它的父Channel为空，对于客户端Channel，它的父Channel就是创建它的ServerSocketChannel。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第四个方法是用户获取Channel标识的id,它返回ChannelId对象，ChannelId是Channel的唯一标识，<strong>它的可能生成策略如下：</strong><br>(1) 机器的MAC地址（EUI-48或者EUI-64）等可以代表全局唯一的信息。<br>(2) 当前进程的ID。<br>(3) 当前系统时间的毫秒——System.currentTimeMillis<br>(4) 当前系统时间的纳秒——System.nanoTime<br>(5) 32位的随机整型数<br>(6) 32位自增的序列数</p>
+<h3 id="5-Channel源码分析">5.Channel源码分析</h3><p>Channel的实现类非常多，继承关系复杂，从学习的角度我们抽取最重要的两个NioServerSocketChannel和NioSocketChannel。<br>服务端NioServerSocketChannel的继承关系类图如下：</p>
+<h4 id="AbstractChannel源码分析">AbstractChannel源码分析</h4><p>1、<strong>成员变量定义</strong><br>在分析Abstract源码之前先了解下它的成员变量定义，首先定义了两个静态全局异常  </p>
+<ul>
+<li>CLOSED_CHANNEL_EXCEPTION 链路已经关闭已经异常  </li>
+<li>NOT_YET_CONNECTED_EXCEPTION 物理链路尚未建立异常  </li>
+</ul>
+<p>声明完上述两个异常之后，通过静态块将它们的堆栈设置为空的EMPTY_STACK_TRACE。    estimatorHandle用于预测下一个报文的大小，它基于之前数据的采样进行分析预测。<br>根据之前的Channel原理分析，我们知道AbstractChannel采用聚合的方式封装各种功能，从成员变量的定义可以看出，它聚合了一下内容。</p>
+<ul>
+<li>parent:代表了父类的Channel</li>
+<li>id：采用默认方式生成全局唯一的ID</li>
+<li>unsafe:Unsafe实例</li>
+<li>pipeline:当前Channel对应的DefaultChannelPipeline</li>
+<li>eventLoop:当前Channel注册的EventLoop</li>
+</ul>
+<p><strong>代码清单</strong><br>     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractChannel.class);</p>
+<pre><code><span class="keyword">static</span> <span class="keyword">final</span> ClosedChannelException CLOSED_CHANNEL_EXCEPTION = <span class="keyword">new</span> ClosedChannelException();
+<span class="keyword">static</span> <span class="keyword">final</span> NotYetConnectedException NOT_YET_CONNECTED_EXCEPTION = <span class="keyword">new</span> NotYetConnectedException();
+
+<span class="keyword">static</span> {
+    CLOSED_CHANNEL_EXCEPTION.setStackTrace(EmptyArrays.EMPTY_STACK_TRACE);
+    NOT_YET_CONNECTED_EXCEPTION.setStackTrace(EmptyArrays.EMPTY_STACK_TRACE);
+}
+
+<span class="keyword">private</span> MessageSizeEstimator.Handle estimatorHandle;
+
+<span class="keyword">private</span> <span class="keyword">final</span> Channel parent;
+<span class="keyword">private</span> <span class="keyword">final</span> ChannelId id = DefaultChannelId.newInstance();
+<span class="keyword">private</span> <span class="keyword">final</span> Unsafe unsafe;
+<span class="keyword">private</span> <span class="keyword">final</span> DefaultChannelPipeline pipeline;
+<span class="keyword">private</span> <span class="keyword">final</span> ChannelFuture succeededFuture = <span class="keyword">new</span> SucceededChannelFuture(<span class="keyword">this</span>, <span class="keyword">null</span>);
+<span class="keyword">private</span> <span class="keyword">final</span> VoidChannelPromise voidPromise = <span class="keyword">new</span> VoidChannelPromise(<span class="keyword">this</span>, <span class="keyword">true</span>);
+<span class="keyword">private</span> <span class="keyword">final</span> VoidChannelPromise unsafeVoidPromise = <span class="keyword">new</span> VoidChannelPromise(<span class="keyword">this</span>, <span class="keyword">false</span>);
+<span class="keyword">private</span> <span class="keyword">final</span> CloseFuture closeFuture = <span class="keyword">new</span> CloseFuture(<span class="keyword">this</span>);
+
+<span class="keyword">private</span> <span class="keyword">volatile</span> SocketAddress localAddress;
+<span class="keyword">private</span> <span class="keyword">volatile</span> SocketAddress remoteAddress;
+<span class="keyword">private</span> <span class="keyword">final</span> EventLoop eventLoop;
+<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="built_in">boolean</span> registered;
+
+<span class="comment">/** Cache for the string representation of this channel */</span>
+<span class="keyword">private</span> <span class="built_in">boolean</span> strValActive;
+<span class="keyword">private</span> <span class="keyword">String</span> strVal;
+</code></pre><p>在此不一一列举，通过变量定义可以看出AbstractChannel聚合了所有Channel使用到的功能对象，由AbstractChannel提供初始化和统一封装，如果功能和子类强相关，则定义成抽象方法由子类具体实现。</p>
+<p>2、<strong>核心API源码分析</strong></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首先看下网络读写操作，前面有提到网络IO操作时讲到它会触发Channelpipeline中对应的事件方法，Netty基于事件驱动，我们也可以理解为当Channel进行IO操作时会产生对应的IO事件，然后驱动事件在ChannelPipe中传播，由相对应的ChannelHandler对事件进行拦截和处理，不关心的事件可以直接忽略。采用事件驱动的方式可以非常轻松的通过事件定义来划分事件拦截切面，方便业务的定制和功能扩展，相比AOP，其性能更高，但是功能却基本等价。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网络IO操作直接调用DefaultPipelinec的相关方法，由DefaultChannelPipeline中对应的ChannelHandler进行具体的逻辑处理。<br><strong>代码清单</strong>（AbstractChannel网络IO操作实现）</p>
+<pre><code><span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">ChannelFuture <span class="title">bind</span><span class="params">(SocketAddress localAddress)</span> </span>{
+    <span class="function"><span class="keyword">return</span> pipeline.<span class="title">bind</span><span class="params">(localAddress)</span></span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">ChannelFuture <span class="title">connect</span><span class="params">(SocketAddress remoteAddress)</span> </span>{
+    <span class="function"><span class="keyword">return</span> pipeline.<span class="title">connect</span><span class="params">(remoteAddress)</span></span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">ChannelFuture <span class="title">connect</span><span class="params">(SocketAddress remoteAddress, SocketAddress localAddress)</span> </span>{
+    <span class="function"><span class="keyword">return</span> pipeline.<span class="title">connect</span><span class="params">(remoteAddress, localAddress)</span></span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">ChannelFuture <span class="title">disconnect</span><span class="params">()</span> </span>{
+    <span class="function"><span class="keyword">return</span> pipeline.<span class="title">disconnect</span><span class="params">()</span></span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">ChannelFuture <span class="title">close</span><span class="params">()</span> </span>{
+    <span class="function"><span class="keyword">return</span> pipeline.<span class="title">close</span><span class="params">()</span></span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">Channel <span class="title">flush</span><span class="params">()</span> </span>{
+    pipeline.flush();
+    <span class="keyword">return</span> <span class="keyword">this</span>;
+}
+</code></pre><p>AbstractChannel也提供了一些公共API的具体实现，例如localAddress和remoteAddress方法，源码如下</p>
+<p><strong>代码清单</strong></p>
+<pre><code>    <span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">SocketAddress <span class="title">localAddress</span><span class="params">()</span> </span>{
+    SocketAddress localAddress = <span class="keyword">this</span>.localAddress;
+    <span class="keyword">if</span> (localAddress == <span class="keyword">null</span>) {
+        <span class="keyword">try</span> {
+            <span class="keyword">this</span>.localAddress = localAddress = unsafe().localAddress();
+        } <span class="keyword">catch</span> (Throwable t) {
+            <span class="comment">// Sometimes fails on a closed socket in Windows.</span>
+            <span class="keyword">return</span> <span class="keyword">null</span>;
+        }
+    }
+    <span class="keyword">return</span> localAddress;
+}
+
+<span class="keyword">protected</span> <span class="function"><span class="keyword">void</span> <span class="title">invalidateLocalAddress</span><span class="params">()</span> </span>{
+    localAddress = <span class="keyword">null</span>;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="function">SocketAddress <span class="title">remoteAddress</span><span class="params">()</span> </span>{
+    SocketAddress remoteAddress = <span class="keyword">this</span>.remoteAddress;
+    <span class="keyword">if</span> (remoteAddress == <span class="keyword">null</span>) {
+        <span class="keyword">try</span> {
+            <span class="keyword">this</span>.remoteAddress = remoteAddress = unsafe().remoteAddress();
+        } <span class="keyword">catch</span> (Throwable t) {
+            <span class="comment">// Sometimes fails on a closed socket in Windows.</span>
+            <span class="keyword">return</span> <span class="keyword">null</span>;
+        }
+    }
+    <span class="keyword">return</span> remoteAddress;
+}
+</code></pre><p>首先从缓存的成员变量中获取，如果第一次调用为空，需要通过unsafe的remoteAddress获取，它是个抽象方法，具体由对应的channel子类实现。</p>
+<h4 id="AbstractNioChannel源码分析">AbstractNioChannel源码分析</h4><p>1、<strong>成员变量定义</strong><br>首先还是先从成员变量定义入手，来了解下它的功能实现，成员变量如下：<br><strong>代码清单</strong></p>
+<pre><code><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> InternalLogger logger =
+        InternalLoggerFactory.getInstance(AbstractNioChannel.<span class="keyword">class</span>);
+
+<span class="keyword">private</span> <span class="keyword">final</span> SelectableChannel ch;
+<span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">int</span> readInterestOp;
+<span class="keyword">private</span> <span class="keyword">volatile</span> SelectionKey selectionKey;
+<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> inputShutdown;
+
+<span class="comment">/**
+ * The future of the current connection attempt.  If not null, subsequent
+ * connection attempts will fail.
+ */</span>
+<span class="keyword">private</span> ChannelPromise connectPromise;
+<span class="keyword">private</span> ScheduledFuture&lt;?&gt; connectTimeoutFuture;
+<span class="keyword">private</span> SocketAddress requestedRemoteAddress;
+</code></pre><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;由于NIO Channel 、NioSocketChannel 和 NioServerSocketChannel需要共用，所以定义了一个java.nio.SocketChannel和java.nio.ServerSocketChannel的公共父类SelectableChannel,用于设置SelectableChannel参数和进行IO操作。  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;readInterestOp代表了Jdk SelectionKey的OP_READ。  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;volatile修饰的selectionKey，该SelectionKey是Channel注册到EventLoop后返回的选择键。由于Channel会面临多个业务线程的并发写操作，当SelectionKey由SelectionKey修改之后，为了能让其它线程感知到变比，所以需要使用volatile保证修改的可见性。  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最后定义了代表连接操作结果的ChannelPromise以及连接超时定时器ScheduledFuture和请求通信的地址信息。 </p>
+<p>1、<strong>核心API源码解析</strong> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;先看下在AbstractNioChannel实现的主要API首先是Channel的注册。<br><strong>代码清单</strong></p>
+<pre><code> <span class="annotation">@Override</span>
+<span class="keyword">protected</span> <span class="function"><span class="keyword">void</span> <span class="title">doRegister</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>{
+    <span class="keyword">boolean</span> selected = <span class="keyword">false</span>;
+    <span class="keyword">for</span> (;;) {
+        <span class="keyword">try</span> {
+            selectionKey = javaChannel().register(eventLoop().selector, <span class="number">0</span>, <span class="keyword">this</span>);
+            <span class="keyword">return</span>;
+        } <span class="keyword">catch</span> (CancelledKeyException e) {
+            <span class="keyword">if</span> (!selected) {
+                <span class="comment">// Force the Selector to select now as the "canceled" SelectionKey may still be</span>
+                <span class="comment">// cached and not removed because no Select.select(..) operation was called yet.</span>
+                eventLoop().selectNow();
+                selected = <span class="keyword">true</span>;
+            } <span class="keyword">else</span> {
+                <span class="comment">// We forced a select operation on the selector before but the SelectionKey is still cached</span>
+                <span class="comment">// for whatever reason. JDK bug ?</span>
+                <span class="keyword">throw</span> e;
+            }
+        }
+    }
+}
+</code></pre><p>定义一个布尔类型的局部变量selected 来表示注册操作是否成功，调用SelectableChannel的register方法，将当前的Channel注册到EventLoop的多路复用器上，SelectableChannel的注册方法定义如下：</p>
+<p><strong>代码清单</strong>（JDK SelectableChannel的注册方法定义）</p>
+<pre><code><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="function">SelectionKey <span class="title">register</span><span class="params">(Selector sel, <span class="keyword">int</span> ops, Object att)</span>
+   <span class="keyword">throws</span> ClosedChannelException</span>;
+</code></pre><p>注册Channel的时候需要指定监听的网络操作位来表示Channel对哪几类网络事件感兴趣，具体定义如下：</p>
+<ul>
+<li>public static final int OP_READ = 1 &lt;&lt; 0  读操作位</li>
+<li>public static final int OP_WRITE = 1 &lt;&lt; 2 写操作位</li>
+<li>public static final int OP_CONNECT = 1 &lt;&lt; 3 客户端连接服务端操作位</li>
+<li>public static final int OP_ACCEPT = 1 &lt;&lt; 4 服务端接收客户端连接操作位</li>
+</ul>
+<p>AbstractNioChannel注册的是0，说明对任何事件都不敢兴趣，仅仅完成注册操作。注册的时候可以指定附件，后续Channel接收到网络事件通知时可以从SelectionKey中重新获取之前的附件进行处理，此处将AbstractNioChannel的实现子类自身当作附件注册。如果注册Channel成功，则返回selectionkey,通过selectionkey可以从多路复用器中获取Channel对象。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/16/cold-in-new-year/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          新年感冒了
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/14/netty-file-server/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">netty实现http文件服务器</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="channel-detail" data-title="netty channel详解" data-url="http://krisjin.github.io/2015/02/16/channel-detail/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

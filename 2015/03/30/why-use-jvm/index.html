@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>为什么需要JVM? | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Java程序可以跨平台，这是你在许多书或文件早就看过的描述，但是跨平台是怎麽一回事？在这之前，你得先了解不能跨平台是怎麽一回事。
+其 实对于电脑而言，它只认识一种语言，也就是0101序列所组合而成的指令。当你使用的是C/C++等之类的高阶语言撰写程式时，其实这些语言，都是比较贴 近人类可阅读的文法，精确点来说，大部份就是比较接近英文文法的语言。这是为了方便人类阅读及撰写。电脑其实看不懂C/C++这">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么需要JVM?">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/30/why-use-jvm/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="Java程序可以跨平台，这是你在许多书或文件早就看过的描述，但是跨平台是怎麽一回事？在这之前，你得先了解不能跨平台是怎麽一回事。
+其 实对于电脑而言，它只认识一种语言，也就是0101序列所组合而成的指令。当你使用的是C/C++等之类的高阶语言撰写程式时，其实这些语言，都是比较贴 近人类可阅读的文法，精确点来说，大部份就是比较接近英文文法的语言。这是为了方便人类阅读及撰写。电脑其实看不懂C/C++这">
+<meta property="og:image" content="/img/compiler.png">
+<meta property="og:image" content="/img/c-compiler.png">
+<meta property="og:image" content="/img/java-compiler.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为什么需要JVM?">
+<meta name="twitter:description" content="Java程序可以跨平台，这是你在许多书或文件早就看过的描述，但是跨平台是怎麽一回事？在这之前，你得先了解不能跨平台是怎麽一回事。
+其 实对于电脑而言，它只认识一种语言，也就是0101序列所组合而成的指令。当你使用的是C/C++等之类的高阶语言撰写程式时，其实这些语言，都是比较贴 近人类可阅读的文法，精确点来说，大部份就是比较接近英文文法的语言。这是为了方便人类阅读及撰写。电脑其实看不懂C/C++这">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-why-use-jvm" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/30/why-use-jvm/" class="article-date">
+  	<time datetime="2015-03-30T15:07:47.000Z" itemprop="datePublished">3月 30 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      为什么需要JVM?
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Java/">Java</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Java程序可以跨平台，这是你在许多书或文件早就看过的描述，但是跨平台是怎麽一回事？在这之前，你得先了解不能跨平台是怎麽一回事。</p>
+<p>其 实对于电脑而言，它只认识一种语言，也就是0101序列所组合而成的指令。当你使用的是C/C++等之类的高阶语言撰写程式时，其实这些语言，都是比较贴 近人类可阅读的文法，精确点来说，大部份就是比较接近英文文法的语言。这是为了方便人类阅读及撰写。电脑其实看不懂C/C++这类语言。<a id="more"></a></p>
+<p>你要有个「翻译员」将你写的C/C++程式，翻译为电脑看得懂的0101序列指令，这个翻译员就是所谓的编译器。</p>
+<p><img src="/img/compiler.png" alt=""></p>
+<p>问题在于，每个平台所认识的0101序列并不一样。在Windows上也许某个指令是0101，在Linux下也许是1010，因此不同的平台必须使用不同 的编译器来翻你的程式，而在Windows平台上编译好的程式，也不能直接拿到Linux等其它平台上执行，而必须经过重新编译的动作，让编译器将你的程 式翻译为该平台可以执行的指令。</p>
+<p><img src="/img/c-compiler.png" alt=""></p>
+<p>由于每个平台的特性不同，可引用的程式库（Library）不同，也许你的程式还得作修改，才可以在另一个平台上编译执行。这很不方便，这表示如果你在Windows设计了一款游戏，想要卖给Linux的使用者，就得再花费一些功夫。</p>
+<p>Java 也是个高阶语言，要让电脑执行你撰写的程式，也是得透过编译器的翻译。不过，Java编译时，并不直接翻译为相依于某平台的0101指令，而是翻译为中介 格式的位元码（byte code）。Java 的原始码副档名为<em>.java，经过编译器翻译过后，会变成</em>.class的位元码。如果想要执行这个位元码档桉，目标平台上必须安装有JVM（Java Virtual Machine）。JVM会将位元码翻译为平台相依的语言。</p>
+<p><img src="/img/java-compiler.png" alt=""></p>
+<p>不同的平台必须安装该平台相依的JVM。这就好比你讲中文（<em>.java），Java编译器帮你翻译为英文（</em>.class）。之后该英文文件，到当地之后，再由当地看得懂英文的人翻译为当地的语言。</p>
+<p>所以JVM所担任的职责之一，就是当地的翻译员，将位元码档桉翻译为当时作业系统看得懂的0101序列。不过这不是最重要的，基本上如果只是要翻译员的话，直译器（Interpreter ）就办得到了。</p>
+<p>JVM有个很重要的观念就是：「对于Java程式而言，其实它只认识一种作业系统（或说是一种机器），这个系统叫作JVM，而对于JVM而言，位元码档桉就是它的可执行档桉！也就是副档名为.class的档桉。Java程式理想上，并不用理会真正执行于哪个平台之上，它只要知道如何执行于JVM之上就可以了，至于JVM实际上如何与底层平台作沟通，则是JVM自己的事！」这个观念非常的重要，对于往后釐清所谓PATH变数与CLASSPATH变数，有非常大的帮助。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/31/guice-module/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Guice module研究
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/24/idea-quick-key/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">idea快捷键整理(持续更新)</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="why-use-jvm" data-title="为什么需要JVM?" data-url="http://krisjin.github.io/2015/03/30/why-use-jvm/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

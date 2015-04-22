@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Netty包功能描述 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在学习Netty的过程中为了从整体的角度去了解整个框架的功能实现，一种可以去官网看用户指南，另一种是查看API，当然我相信还有很多种，还有哪些学习方式，可以留言哦。  
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;为了了解net">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty包功能描述">
+<meta property="og:url" content="http://krisjin.github.io/2015/02/16/netty-api-reference/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在学习Netty的过程中为了从整体的角度去了解整个框架的功能实现，一种可以去官网看用户指南，另一种是查看API，当然我相信还有很多种，还有哪些学习方式，可以留言哦。  
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;为了了解net">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Netty包功能描述">
+<meta name="twitter:description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在学习Netty的过程中为了从整体的角度去了解整个框架的功能实现，一种可以去官网看用户指南，另一种是查看API，当然我相信还有很多种，还有哪些学习方式，可以留言哦。  
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;为了了解net">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-netty-api-reference" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/16/netty-api-reference/" class="article-date">
+  	<time datetime="2015-02-16T04:24:42.000Z" itemprop="datePublished">2月 16 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Netty包功能描述
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在学习Netty的过程中为了从整体的角度去了解整个框架的功能实现，一种可以去官网看用户指南，另一种是查看API，当然我相信还有很多种，还有哪些学习方式，可以留言哦。  </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为了了解netty的子项目都用于那些功能实现，下面是对API中包的功能描述翻译，针对的版本是5.0，有不当之处，请多多提意见留言。</p>
+<a id="more"></a>
+<h4 id="底层数据表示"><span style="color:blue;">底层数据表示</span></h4><ol>
+<li><strong>io.netty.buffer</strong><br>抽象的字节缓冲区：使用基本的数据结构来表示一个二进制信息和文本信息</li>
+</ol>
+<h4 id="所有IO操作的重要接口"><span style="color:blue;"><strong>所有IO操作的重要接口</strong></span></h4><ol>
+<li><p><strong>io.netty.channel</strong><br>核心Channel API:它是异步的、基于事件驱动的抽象的各种传送接口</p>
+</li>
+<li><p><strong>io.netty.channel.embedded</strong><br>虚拟通道是帮助包装了一系列的处理程序进行单元测试的处理程序，或使用他们在非I/ O方面</p>
+</li>
+<li><p><strong>io.netty.channel.group</strong><br>一个通道注册，帮助用户保持Channel列表打开和并对它们进行执行多个操作 </p>
+</li>
+<li><p><strong>io.netty.channel.local</strong><br>一种虚拟传送方式，允许同一个虚拟机上的两个部分可以相互通信</p>
+</li>
+<li><p><strong>io.netty.channel.nio</strong><br>基于NIO的Channel实现，推荐用于大量连接的（&gt;=1000）</p>
+</li>
+<li><p><strong>io.netty.channel.oio</strong><br>基于老IO的Channel实现，推荐用于小数量的连接（&lt;1000）</p>
+</li>
+<li><p><strong>io.netty.channel.rxtx</strong><br>基于RXTX串行和并行端口通信传输</p>
+</li>
+<li><p><strong>io.netty.channel.sctp</strong><br>继承核心渠道API的抽象SCTP套接字接口</p>
+</li>
+<li><p><strong>io.netty.channel.sctp.nio</strong><br>基于NIO的SCTP Channel 实现 ，推荐了大量的连接（&gt;=1000）</p>
+</li>
+<li><p><strong>io.netty.channel.sctp.oio</strong><br>基于SCTP Channel实现，使用旧的阻塞式IO，推荐一个小数量的连接（&lt;1000）</p>
+</li>
+<li><p><strong>io.netty.channel.socket</strong><br>继承了核心Channel接口的抽象TCP和UDP套接字接口 </p>
+</li>
+<li><p><strong>io.netty.channel.socket.nio</strong><br>基于NIO的Socket Channel实现，推荐了大量的连接（&gt;=1000）</p>
+</li>
+<li><p><strong>io.netty.channel.socket.oio</strong><br>基于旧IO的Socket Channel实现，推荐一个小数量的连接（&lt;1000）</p>
+</li>
+<li><p><strong>io.netty.channel.udt</strong><br>udt传输协议</p>
+</li>
+<li><p><strong>io.netty.channel.udt.nio</strong><br>基于UDT协议传输方式实现的NIOChannel</p>
+</li>
+</ol>
+<h4 id="客户端和服务器引导操作"><span style="color:blue;">客户端和服务器引导操作</span></h4><ol>
+<li><strong>io.netty.bootstrap</strong><br>使用流畅的帮助类很容易的实现客户端与服务端的channel初始化操作</li>
+</ol>
+<h4 id="可重复使用的I_/_O事件拦截器"><span style="color:blue;">可重复使用的I / O事件拦截器</span></h4><ol>
+<li><p><strong>io.netty.handler.codec</strong><br>通用的可扩展的解码器实现，如如TCP/ IP中的数据包分段和重组问题</p>
+</li>
+<li><p><strong>io.netty.handler.codec.base64</strong><br>编码器和解码器：转换Base64编码成String或者ByteBuf解码成ByteBuf,反之亦然</p>
+</li>
+<li><p><strong>io.netty.handler.codec.bytes</strong><br>编码器和解码器转换字节数组到ByteBuf，反之亦然  </p>
+</li>
+<li><p><strong>io.netty.handler.codec.compression</strong><br>编码器和解码器，压缩和解压缩ByteBufs的压缩格式如zlib，gzip和Snappy</p>
+</li>
+<li><p><strong>io.netty.handler.codec.http</strong><br>编码器，解码器和HTTP及其相关消息类型</p>
+</li>
+<li><p><strong>io.netty.handler.codec.http.cors</strong><br>该软件包包含跨起源资源共享（CORS）相关的类</p>
+</li>
+<li><p><strong>io.netty.handler.codec.http.multipart</strong><br>HTTP多部分支持 </p>
+</li>
+<li><p><strong>io.netty.handler.codec.http.websocketx</strong><br>编码器，解码器，handshakers 和它们websocket数据帧的相关数据类型</p>
+</li>
+<li><p><strong>io.netty.handler.codec.marshalling</strong><br>使用JBoss的Marshalling实现编码器、解码器</p>
+</li>
+</ol>
+<ol>
+<li><p><strong>io.netty.handler.codec.memcache</strong><br>ASCII和二进制类常见的超集</p>
+</li>
+<li><p><strong>io.netty.handler.codec.memcache.binary</strong><br>Memcache二进制协议的接口和实现</p>
+</li>
+<li><p><strong>io.netty.handler.codec.protobuf</strong><br>编码器、解码器，使用Google的 protobuf 转换成ByteBuf，反之亦然。  </p>
+</li>
+</ol>
+<ol>
+<li><p><strong>io.netty.handler.codec.rtsp</strong><br>基于HTTP的编解码器的RTSP扩展</p>
+</li>
+<li><p><strong>io.netty.handler.codec.sctp</strong><br>解码器和编码器来管理信息，并完成多流编解码器在SCTP/ IP</p>
+</li>
+<li><p><strong>io.netty.handler.codec.serialization</strong><br>编码器，解码器和其兼容性流实现它把一个序列化对象转成字节缓冲区，反之亦然</p>
+</li>
+<li><p><strong>io.netty.handler.codec.socks</strong><br>socks相关消息类型的编码器、解码器</p>
+</li>
+<li><p><strong>io.netty.handler.codec.spdy</strong><br>SPDY协议的编码器、解码器、会话处理和它们的相关消息类型</p>
+</li>
+<li><p><strong>io.netty.handler.codec.string</strong><br>编码器和解码器，把一个字符串变成ByteBuf，反之亦然</p>
+</li>
+<li><p><strong>io.netty.handler.codec.xml</strong><br>XML特定的编解码器</p>
+</li>
+<li><p><strong>io.netty.handler.logging</strong><br>记录用于调试目的I / O事件</p>
+</li>
+<li><p><strong>io.netty.handler.ssl</strong><br>SSL·基于TLS SSLEngine的实施</p>
+</li>
+<li><p><strong>io.netty.handler.stream</strong><br>写非常大的数据流异步既不花费了大量的内存，也没有得到OutOfMemoryError</p>
+</li>
+<li><p><strong>io.netty.handler.timeout</strong><br>增加了对读取和写入超时并使用定时器空闲连接通知的支持</p>
+</li>
+<li><p><strong>io.netty.handler.traffic</strong><br>传输成型处理和动态统计的实现</p>
+</li>
+</ol>
+<h4 id="其它"><span style="color:blue;">其它</span></h4><ol>
+<li><p><strong>io.netty.util</strong><br>使用工具类</p>
+</li>
+<li><p><strong>io.netty.util.concurrent</strong><br>并发/异步任务工具类</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/16/overview-spring/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          初识Spring
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/16/cold-in-new-year/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">新年感冒了</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="netty-api-reference" data-title="Netty包功能描述" data-url="http://krisjin.github.io/2015/02/16/netty-api-reference/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

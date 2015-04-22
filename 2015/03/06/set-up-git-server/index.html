@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>CentOS上搭建Git Server | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="经过了一年，公司的项目终于采用了Git作为代码的版本管理，利用了一上午的时间终于弄完了，在这里做个记录供以后使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS上搭建Git Server">
+<meta property="og:url" content="http://krisjin.github.io/2015/03/06/set-up-git-server/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="经过了一年，公司的项目终于采用了Git作为代码的版本管理，利用了一上午的时间终于弄完了，在这里做个记录供以后使用。">
+<meta property="og:image" content="/img/gitosis.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CentOS上搭建Git Server">
+<meta name="twitter:description" content="经过了一年，公司的项目终于采用了Git作为代码的版本管理，利用了一上午的时间终于弄完了，在这里做个记录供以后使用。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-set-up-git-server" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/06/set-up-git-server/" class="article-date">
+  	<time datetime="2015-03-06T05:50:06.000Z" itemprop="datePublished">3月 6 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CentOS上搭建Git Server
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git-server/">git server</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/git/">git</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>经过了一年，公司的项目终于采用了Git作为代码的版本管理，利用了一上午的时间终于弄完了，在这里做个记录供以后使用。<a id="more"></a></p>
+<h3 id="1-Git服务器安装准备">1.Git服务器安装准备</h3><p>使用的Centos5的操作系统，git server 使用的git-1.9.0.tar.gz，。下面列出安装依赖的软件，需要提前安装。</p>
+<ul>
+<li>curl-devel</li>
+<li>expat-devel</li>
+<li>gettext-devel</li>
+<li>openssl-devel</li>
+<li>zlib-devel</li>
+<li>perl-devel(perl)</li>
+</ul>
+<h3 id="2-安装Git">2.安装Git</h3><p>基于上面的依赖软件都安装完后，下面开始安装git服务器，</p>
+<p><em>wget <a href="http://git-core.googlecode.com/files/git-1.9.0.tar.gz" target="_blank" rel="external">http://git-core.googlecode.com/files/git-1.9.0.tar.gz</a></em> 下载</p>
+<p>将下载后git 解压并进入，使用下面命令进行安装。  </p>
+<pre><code><span class="variable">#make</span> prefix<span class="subst">=</span>/usr/<span class="built_in">local</span> <span class="literal">all</span>
+<span class="variable">#make</span> prefix<span class="subst">=</span>/usr/<span class="built_in">local</span> install
+</code></pre><p>使用<strong>git —version</strong>查看是否安装成功。</p>
+<h3 id="3-安装gitosis">3.安装gitosis</h3><p>gitosis为Git用户权限管理系统,通过管理服务端的/home/git/.ssh/authorized_key文件来执行对用户权限的管理，是一个python模块包。  </p>
+<p>使用下面命令执行安装</p>
+<pre><code><span class="id">#yum</span> install python python-setuptools
+<span class="id">#git</span> clone git:<span class="comment">//github.com/res0nat0r/gitosis.git</span>
+<span class="id">#cd</span> gitosis/
+<span class="id">#python</span> setup<span class="class">.py</span> install
+</code></pre><p><em>显示Finished processing dependencies for gitosis==0.2即表示成功</em></p>
+<h3 id="4-Git客户端安装">4.Git客户端安装</h3><p>git客户端使用的基于Window上的mygit,下载<strong><a href="https://msysgit.github.io/" title="mygit" target="_blank" rel="external">mygit</a></strong>并安装。</p>
+<p><strong>客户端密钥生成</strong>  </p>
+<pre><code>ssh-keygen -t rsa
+</code></pre><p>在安装好的mygit操作窗口中输入上面的命令生成密钥，生成的是一个id_rsa.pub文件，将生成的密钥上传到服务器中，上传存放目录可以随便定义。</p>
+<p><strong>Git服务端设置</strong></p>
+<p><em>创建Git用户</em>  </p>
+<pre><code>useradd -r <span class="operator">-s</span> /bin/sh -c <span class="string">'git version control'</span> <span class="operator">-d</span> /home/git git
+</code></pre><p><em>创建Git仓库目录</em>  </p>
+<pre><code>mkdir -p <span class="regexp">/home/</span>git
+chown <span class="string">git:</span>git <span class="regexp">/home/</span>git
+</code></pre><p><em>在服务器端生成管理库</em></p>
+<p>上面已经创建了用户及对应的home目录，下面我们切换到git用户。</p>
+<pre><code><span class="title">su</span> - git
+gitosis-init &lt; ～/id_rsa.pub
+</code></pre><p>创建成功提示信息：  </p>
+<p>Initialized empty Git repository in /home/git//repositories/gitosis-admin.git/ Reinitialized existing Git repository in /home/git/repositories/gitosis-admin.git/ </p>
+<p>执行完后会在/home/git下创建两个目录：</p>
+<p><img src="/img/gitosis.png" alt=""></p>
+<p>注：  </p>
+<ol>
+<li>生成的gitosis-admin为Git的用户访问权限管理库，gitosis通过这个git库来管理所有git库的访问权限。</li>
+<li>通过执行初始化，该公钥的拥有者就能修改用于配置gitosis的那个特殊Git仓库了</li>
+</ol>
+<h3 id="5-Gitosis管理">5.Gitosis管理</h3><p>上面完成了gitosis及仓库的初始化，下面我们来看看如果使用gitosis进行git的用户权限管理。</p>
+<p>在mygit中使用如下命令：</p>
+<pre><code>git clone git<span class="variable">@192</span>.<span class="number">168.56</span>.<span class="number">1</span><span class="symbol">:gitosis-admin</span>.git
+</code></pre><p>将gitosis-admin 下载到本地，在gitosis-admin主要有<em>keydir</em>目录和<em>gitosis.conf</em>配置文件。</p>
+<p>注：</p>
+<ol>
+<li><p>gitosis.conf文件用来设置用户、仓库和权限的控制文件，</p>
+</li>
+<li><p>keydir目录则是保存所有具有访问权限用户公钥的地方./keydir/root@vm1.pub:如前所述，该用户具有访问权限，如果新增的开发人员，只需要把生成的密钥放到该目录中就行了。</p>
+</li>
+</ol>
+<p><strong>权限控制配置文件讲解</strong></p>
+<pre><code>[gitosis]
+
+[group gitosis-admin]
+<span class="variable">writable =</span> gitosis-admin
+<span class="variable">members =</span> kris@KRIS-PC
+
+[group test-git] <span class="comment">##组名称</span>
+<span class="variable">writable =</span> test-git <span class="comment">##项目名称</span>
+<span class="variable">members =</span> kris@KRIS-PC hexun@HEXUN-PC <span class="comment">##项目成员名称</span>
+
+[group testq]
+<span class="variable">writable =</span> testq
+<span class="variable">members =</span> kris@KRIS-PC hexun@HEXUN-PC
+</code></pre><p><strong>初始、增加及使用项目git-test</strong> </p>
+<pre><code><span class="keyword">cd</span> /git-repo
+<span class="keyword">mkdir</span> git-<span class="keyword">test</span>
+<span class="keyword">cd</span> git-<span class="keyword">test</span>
+git init
+touch README
+git add .
+git commit -a -<span class="keyword">m</span> <span class="string">"init git-test"</span>
+git remote add origin git@192.168.56.1:git-<span class="keyword">test</span>.git
+git push origin master
+</code></pre><p>注：在新项目git-test里首次推送数据到服务器前，需先设定该服务器地址为远程仓库，但你不用事先到服务器上手工创建该项目的裸仓库— Gitosis 会在第一次遇到推送时自动创建</p>
+<p>注意：<br>1.<strong>keydir 目录下的pub文件名与gitsois.conf中的用户一致</strong></p>
+<p>2.<strong>gitosis.conf文件清单：</strong></p>
+<pre><code>[gitosis]
+
+[<span class="keyword">group</span> gitosis-admin]
+writable = gitosis-admin
+members = kris<span class="variable">@KRIS</span>-PC hexun<span class="variable">@HEXUN</span>-PC shenmiao1314<span class="variable">@SHENMIAO</span>
+
+
+[<span class="keyword">group</span> test-git]
+writable = test-git
+members = kris<span class="variable">@KRIS</span>-PC hexun<span class="variable">@HEXUN</span>-PC
+
+[<span class="keyword">group</span> testq]
+writable = testq
+members = kris<span class="variable">@KRIS</span>-PC hexun<span class="variable">@HEXUN</span>-PC
+
+[<span class="keyword">group</span> hx-nlp]
+writable = hx-nlp
+members = kris<span class="variable">@KRIS</span>-PC hexun<span class="variable">@HEXUN</span>-PC shenmiao1314<span class="variable">@SHENMIAO</span>
+</code></pre><p>3.~/.ssh/authorized_keys 文件清单</p>
+<pre><code>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2wFjIZCRESZri1B9GOLJJvOvidB6KykHqQFJSCLQbattGBtD1paFmOaH2l51O2TdEkFVSdqtU5hfdF+QoqxaitcL3uFnAdIsOdYcfi51l5OhnyoZTSfol6SQnZHphv5VV+iMJU9G0UoBjOOdliBZ/oK3T/kPhOcBIM748hDI0GQUJjYuV658WsYUfG+ZgRWA6MgDjbviMYKUtaaZagFhlVRroS/za/NuqNiyoydTneYGastJkMko2AO3dTs4eKrrrf3wPxSNJ6Z6ZDmZavmrepYDOZMTDAfFx/MoaxQ+jf9hhHDkTArCYuybhx+bZM3/<span class="number">9</span>yydZT29ian0uucpTdVfrQ== hexun<span class="variable">@HEXUN</span>-PC
+<span class="comment">### autogenerated by gitosis, DO NOT EDIT</span>
+command=<span class="string">"gitosis-serve kris<span class="variable">@KRIS</span>-PC"</span>,<span class="keyword">no</span>-port-forwarding,<span class="keyword">no</span>-X11-forwarding,<span class="keyword">no</span>-agent-forwarding,<span class="keyword">no</span>-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDB8RJWPD3P5Dd1f6QonOxSJ3EEvqrJvdKtSyx2xMNnIn1tTk6oYOw4dphJFCLzuYe0GffqSHIJRlP7IxfXTZ+FS0ebLD0bljD7Ir9ywjFscd3paLPofrASwBW7TxJlq8etcdEb4nn8z3+0d4YpgFhOfCkqcnTOxPPwQxYmJCWWfAs/Wo8v0A70LXhO90FoyYWzzo8NAHG10WIXyyAGj9yBlheTZQf3vb8VKhcAFoWpKOoz8NvLOSll5s6RzVKyzU387EA+vG5t6DUMsuB1ZHZrkd/<span class="number">9</span>ZmOYCPZ9i9o1OkZ4vr7mlSa9WPpejTMAZMvA5PPhEvpiyAn+QPE95W+Otxvn kris<span class="variable">@KRIS</span>-PC
+command=<span class="string">"gitosis-serve hexun<span class="variable">@HEXUN</span>-PC"</span>,<span class="keyword">no</span>-port-forwarding,<span class="keyword">no</span>-X11-forwarding,<span class="keyword">no</span>-agent-forwarding,<span class="keyword">no</span>-pty ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA81Afc+I0WIeFXlf/ZN04gtQKDT++SCcoX/<span class="number">9</span>uukCuMFPqaGvH+<span class="number">27</span>xi9HwXDgfGl2xQ/sIE1vfaTVsrMaZDFN9BiqUQ5TWKppaNZomvflGUTiIvDZsC5Is/UGpsaQuCOPyUT8ygzOAX2E0zHi2iKo8dWN9e0JE5rVH5zd+B87W0x5Spe14BbdoWt9prNTR96ZtHRMTZQBK7pakKhmZ1mmuB/vd9sh6Lo1QmRvLrEQRfb3glETDUMzu4mrH88qoM+MgHDo4kc+wFnjztnxFmsxv8Vt+<span class="number">5</span>Lo4JTpk4ANALU+MoCG2ifpUbPxhjS6eT34hC/<span class="number">17</span>jB+HkJZTcVBlbY8nLWcgQQ== hexun<span class="variable">@HEXUN</span>-PC
+command=<span class="string">"gitosis-serve shenmiao1314<span class="variable">@SHENMIAO</span>"</span>,<span class="keyword">no</span>-port-forwarding,<span class="keyword">no</span>-X11-forwarding,<span class="keyword">no</span>-agent-forwarding,<span class="keyword">no</span>-pty ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwbld5Mo/va+R/vQE2ITdo/QMa1zpLWPJKSoMhShizIwopgW3UQgSi05YoaJvM1tEgT+iFpOTyu+ckvlDOmqwStk42HJh/b8zBKKvsfSqY5HNeV0VJLdsmZ3Wh00M+CNvZ0n91pp4bvgLGuED+sFm9OiKR5bvpdN2ui7KL2t3jYyk8jTdlgoj5IoQGt1E23nu0EBPuhFBzIp1wlrfdth3KlZa0wlM1+BxA3NtTNH2hJZtZdFBb6+Z33aDC4eo9yQSyIeBmVGDSUKcnHfa6N5Qwly8sapZnETAN4fUpSsc8wKpYackDGbHsWupPx5s5vFYz8/hpqzPbJm9pDIQD7ky5w== shenmiao1314<span class="variable">@SHENMIAO</span>
+</code></pre>
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/09/it-idf-keyword/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          TF-IDF关键字提取
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/02/nio-buffer-explore/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">NIO Buffer理解</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="set-up-git-server" data-title="CentOS上搭建Git Server" data-url="http://krisjin.github.io/2015/03/06/set-up-git-server/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

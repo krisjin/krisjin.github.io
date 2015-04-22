@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>基于微服务架构，改造企业核心系统之实践 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1. 背景与挑战随着公司国际化战略的推行以及本土业务的高速发展，后台支撑系统已经不堪重负。在吞吐量、稳定性以及可扩展性上都无法满足日益增长的业务需求。对于每10万元额度的合同，从销售团队准备材料、与客户签单、递交给合同部门，再到合同生效大概需要3.5人天。随着业务量的快速增长，签订合同的成本急剧增加。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于微服务架构，改造企业核心系统之实践">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/10/micor-services-practice/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="1. 背景与挑战随着公司国际化战略的推行以及本土业务的高速发展，后台支撑系统已经不堪重负。在吞吐量、稳定性以及可扩展性上都无法满足日益增长的业务需求。对于每10万元额度的合同，从销售团队准备材料、与客户签单、递交给合同部门，再到合同生效大概需要3.5人天。随着业务量的快速增长，签订合同的成本急剧增加。">
+<meta property="og:image" content="/img/old-app.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于微服务架构，改造企业核心系统之实践">
+<meta name="twitter:description" content="1. 背景与挑战随着公司国际化战略的推行以及本土业务的高速发展，后台支撑系统已经不堪重负。在吞吐量、稳定性以及可扩展性上都无法满足日益增长的业务需求。对于每10万元额度的合同，从销售团队准备材料、与客户签单、递交给合同部门，再到合同生效大概需要3.5人天。随着业务量的快速增长，签订合同的成本急剧增加。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-micor-services-practice" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/10/micor-services-practice/" class="article-date">
+  	<time datetime="2015-04-10T11:07:42.000Z" itemprop="datePublished">4月 10 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      基于微服务架构，改造企业核心系统之实践
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/MicroServices/">MicroServices</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1-_背景与挑战">1. 背景与挑战</h2><p>随着公司国际化战略的推行以及本土业务的高速发展，后台支撑系统已经不堪重负。在吞吐量、稳定性以及可扩展性上都无法满足日益增长的业务需求。对于每10万元额度的合同，从销售团队准备材料、与客户签单、递交给合同部门，再到合同生效大概需要3.5人天。随着业务量的快速增长，签订合同的成本急剧增加。<a id="more"></a></p>
+<p>合同管理系统是后台支撑系统中重要的一部分。当前的合同系统是5年前使用.NET基于SAGE CRM二次开发的产品。 一方面，系统架构过于陈旧，性能、可靠性无法满足现有的需求。另一方面，功能繁杂，结构混乱，定制的代码与SAGE CRM系统耦合度极高。由于是遗留系统，熟悉该代码的人早已离职多时，新团队对其望而却步，只能做些周边的修补工作。同时，还要承担着边补测试，边整理逻辑的工作。</p>
+<p><img src="/img/old-app.png" alt=""></p>
+<p>在无法中断业务处理的情况下，为了解决当前面临的问题，团队制定了如下的策略：</p>
+<blockquote>
+<p>1). 在现有合同管理系统的外围，构建功能服务接口，将系统核心的功能分离出来。</p>
+<p>2). 利用这些功能服务接口作为代理，解耦原合同系统与其调用者之间的依赖；</p>
+<p>3). 通过不断构建功能服务接口，逐渐将原有系统分解成多个独立的服务。</p>
+<p>4). 摒弃原有的合同管理系统，使用全新构建的(微)服务接口替代。</p>
+</blockquote>
+<h2 id="2-_什么是微服务">2. 什么是微服务</h2><p>多年来，我们一直在技术的浪潮中不断乘风破浪，扬帆奋进，寻找更好的方式构建IT系统。微服务架构(Micro Service Architect)是近一段时间在软件体系架构领域里出现的一个新名词。它通过将功能分解到多个独立的服务，以实现对解决方案或者复杂系统的解耦。</p>
+<p>微服务的诞生并非偶然: 领域驱动设计指导我们如何分析并模型化复杂的业务；敏捷方法论帮助我们消除浪费，快速反馈；持续交付促使我们构建更快、更可靠、更频繁的软件部署和交付能力；虚拟化和基础设施自动化( Infrastructure As Code)则帮助我们简化环境的创建、安装；DevOps文化的流行以及特性团队的出现，使得小团队更加全功能化。这些都是推动微服务诞生的重要因素。</p>
+<p>实际上，微服务本身并没有一个严格的定义。不过从业界的讨论来看，微服务通常有如下几个特征:</p>
+<p>小，且专注于做一件事情</p>
+<p>每个服务都是很小的应用，至于有多小，是一个非常有趣的话题。有人喜欢100行以内，有人赞成1000行以内。数字并不是最重要的。仁者见仁，智者见智，只要团队觉得合适就好。只关注一个业务功能，这一点和我们平常谈论的面向对象原则中的”单一职责原则”类似，每个服务只做一件事情，并且把它做好。</p>
+<p>运行在独立的进程中</p>
+<p>每个服务都运行在一个独立的操作系统进程中，这意味着不同的服务能被部署到不同的主机上。</p>
+<p>轻量级的通信机制</p>
+<p>服务和服务之间通过轻量级的机制实现彼此间的通信。所谓轻量级通信机制，通常指基于语言无关、平台无关的这类协议，例如XML、JSON，而不是传统我们熟知的Java RMI或者.Net Remoting等。</p>
+<p>松耦合</p>
+<p>不需要改变依赖，只更改当前服务本身，就可以独立部署。这意味着该服务和其他服务之间在部署和运行上呈现相互独立的状态。</p>
+<p>综上所述，微服务架构采用多个服务间互相协作的方式构建传统应用。每个服务独立运行在不同的进程中，服务与服务之间通过轻量的通讯机制交互，并且每个服务可以通过自动化部署方式独立部署。</p>
+<p>3.微服务的优势</p>
+<p>相比传统的单块架构系统(monolithic)，微服务在如下诸多方面有着显著的优势：</p>
+<p>异构性</p>
+<p>问题有其具体性，解决方案也应有其针对性。用最适合的技术方案去解决具体的问题，往往会事半功倍。传统的单块架构系统倾向采用统一的技术平台或方案来解决所有问题。而微服务的异构性，可以针对不同的业务特征选择不同的技术方案，有针对性的解决具体的业务问题。</p>
+<p>对于单块架构的系统，初始的技术选型严重限制将来采用不同语言或框架的能力。如果想尝试新的编程语言或者框架，没有完备的功能测试集，很难平滑的完成替换，而且系统规模越大，风险越高。基于微服务架构，使我们更容易在遗留系统上尝试新的技术或解决方案。譬如说，可以先挑选风险最小的服务作为尝试，快速得到反馈后再决定是否试用于其他服务。这也意味着，即便对一项新技术的尝试失败，也可以抛弃这个方案，并不会对整个产品带来风险。</p>
+<p>该图引用自Martin Fowler的Microservices一文</p>
+<p>独立测试与部署</p>
+<p>单块架构系统运行在一个进程中，因此系统中任何程序的改变，都需要对整个系统重新测试并部署。 而对于微服务架构而言，不同服务之间的打包、测试或者部署等，与其它服务都是完全独立的。对某个服务所做的改动，只需要关注该服务本身。从这个角度来说，使用微服务后，代码修改、测试、打包以及部署的成本和风险都比单块架构系统降低很多。</p>
+<p>按需伸缩</p>
+<p>单块架构系统由于单进程的局限性，水平扩展时只能基于整个系统进行扩展，无法针对某一个功能模块按需扩展。 而服务架构则可以完美地解决伸缩性的扩展问题。系统可以根据需要，实施细粒度的自由扩展。</p>
+<p>错误隔离性</p>
+<p>微服务架构同时也能提升故障的隔离性。例如，如果某个服务的内存泄露，只会影响自己，其他服务能够继续正常地工作。与之形成对比的是，单块架构中如果有一个不合格的组件发生异常，有可能会拖垮整个系统。</p>
+<p>团队全功能化</p>
+<p>康威定律（Conway’s law）指出：一个组织的设计成果，其结构往往对应于这个组织中的沟通结构（organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations）。传统的开发模式在分工时往往以技术为单位，比如UI团队、服务端团队和数据库团队，这样的分工可能会导致任何功能上的改变都需要跨团队沟通和协调。而微服务则倡导围绕服务来分工，团队需要具备服务设计、开发、测试到部署所需的所有技能。</p>
+<ol>
+<li>微服务快速开发实践</li>
+</ol>
+<p>随着团队对业务的理解加深和对微服务实践的尝试，数个微服务程序已经成功构建出来。不过，问题同时也出现了：对于这些不同的微服务程序而言，虽然具体实现的代码细节不同，但其结构、开发方式、持续集成环境、测试策略、部署机制以及监控和告警等，都有着类似的实现方式。那么如何满足DRY原则并消除浪费呢？带着这个问题，经过团队的努力，Stencil诞生了。 Stencil是一个帮助快速构建Ruby微服务应用的开发框架，主要包括四部分：Stencil模板、代码生成工具，持续集成模板以及一键部署工具。</p>
+<p>Stencil模板</p>
+<p>Stencil模板是一个独立的Ruby代码工程库，主要包括代码模板以及一组配置文件模板。</p>
+<p>代码模板使用Webmachine作为Web框架，RESTful和JSON构建服务之间的通信方式，RSpec作为测试框架。同时，代码模板还定义了一组Rake任务，譬如运行测试，查看测试报告，将当前的微服务生成RPM包，使用Koji给RPM包打标签等。</p>
+<p>除此之外，该模板也提供了一组通用的URL，帮助使用者查看微服务的当前版本、配置信息以及检测该微服务程序是否健康运行等。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/14/single-responsibility-principle/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          单一职责原则的系统设计
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/10/wanglei-microservice/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">从单块架构到微服务架构</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="micor-services-practice" data-title="基于微服务架构，改造企业核心系统之实践" data-url="http://krisjin.github.io/2015/04/10/micor-services-practice/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>持续可用与CAP理论 – 一个系统开发者的观点 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="持续可用本文主要针对金融数据库，认为金融数据库的持续可用包含两点：一个是强一致性；另外一个是高可用性。
+数据库系统必须是强一致性的系统，这是因为数据库系统有事务ACID的基本要求，而弱一致系统无法做到。业内也有一些流行的NOSQL系统，例如各种类Dynamo系统，如开源的Cassandra，对同一个最小数据单位（同一行数据）允许多台服务器同时写入，虽然采用NWR机制处理冲突，但是由于不可能解决多台">
+<meta property="og:type" content="article">
+<meta property="og:title" content="持续可用与CAP理论 – 一个系统开发者的观点">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/22/cap/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="持续可用本文主要针对金融数据库，认为金融数据库的持续可用包含两点：一个是强一致性；另外一个是高可用性。
+数据库系统必须是强一致性的系统，这是因为数据库系统有事务ACID的基本要求，而弱一致系统无法做到。业内也有一些流行的NOSQL系统，例如各种类Dynamo系统，如开源的Cassandra，对同一个最小数据单位（同一行数据）允许多台服务器同时写入，虽然采用NWR机制处理冲突，但是由于不可能解决多台">
+<meta property="og:image" content="/img/cap-instance.png">
+<meta property="og:image" content="/img/Paxos-global.png">
+<meta property="og:image" content="/img/Paxos-global2.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="持续可用与CAP理论 – 一个系统开发者的观点">
+<meta name="twitter:description" content="持续可用本文主要针对金融数据库，认为金融数据库的持续可用包含两点：一个是强一致性；另外一个是高可用性。
+数据库系统必须是强一致性的系统，这是因为数据库系统有事务ACID的基本要求，而弱一致系统无法做到。业内也有一些流行的NOSQL系统，例如各种类Dynamo系统，如开源的Cassandra，对同一个最小数据单位（同一行数据）允许多台服务器同时写入，虽然采用NWR机制处理冲突，但是由于不可能解决多台">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-cap" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/22/cap/" class="article-date">
+  	<time datetime="2015-04-22T05:30:24.000Z" itemprop="datePublished">4月 22 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      持续可用与CAP理论 – 一个系统开发者的观点
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cap/">cap</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Architecture/">Architecture</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="持续可用">持续可用</h2><p>本文主要针对金融数据库，认为金融数据库的持续可用包含两点：一个是强一致性；另外一个是高可用性。</p>
+<p>数据库系统必须是强一致性的系统，这是因为数据库系统有事务ACID的基本要求，而弱一致系统无法做到。业内也有一些流行的NOSQL系统，例如各种类Dynamo系统，如开源的Cassandra，对同一个最小数据单位（同一行数据）允许多台服务器同时写入，虽然采用NWR机制处理冲突，但是由于不可能解决多台服务器之间的时序问题，而只能支持弱一致语义。弱一致语义的问题很多，例如无法支持复杂功能，无法构建严谨的测试体系，无法应用到核心场景。虽然弱一致性系统也有一定的应用场景，但本文认为其不符合核心业务持续可用的要求，不予讨论。</p>
+<p>高可用性可以有很多种解释，实践中最常见的解释为：在一台服务器，一个交换机，一个机房，或者一个地区整体故障后，系统能够在多长时间内恢复服务。当然，这里的恢复服务是以保证强一致性作为前提条件的。如果能够在秒级（10秒左右）恢复服务，本文认为这个系统是高可用的，绝大部分应用系统都能够容忍硬件故障导致的秒级不可用。<a id="more"></a></p>
+<h2 id="CAP理论">CAP理论</h2><p>CAP理论网上传了很多版本，大致的意思是：一致性，可用性和分区可容忍性三者只能取其二，不可兼得。由于分区可容忍性是不可选择的，因此，系统设计时只能在一致性和可用性之间权衡。这就带来了一个很悲观的结论：持续可用无法实现。然而，事实是这样吗？</p>
+<p>首先，我们回到CAP理论的原始定义：</p>
+<p>C（Consistency）：A read is guaranteed to return the most recent write for a given client<br>A（Availability）：A non-failing node will return a reasonable response within a reasonable amount of time (no error or timeout)<br>P（Partition Tolerance）：The system will continue to function when network partitions occur.<br>CAP理论的证明也比较直观，如下：</p>
+<p><img src="/img/cap-instance.png" alt=""></p>
+<p>左图中，假设有两个节点N1和N2，N1和N2之间发生了网络分区（P），N1写入新值y，N2一直是老值x，为了保证一致性（C），读取N2总是返回失败，违反了可用性（A）要求：任何一个没有发生故障的节点必须在有限时间内返回结果，不允许为Error或者Timeout，系统只能保证CP。</p>
+<p>右图中，从另外一个角度看，假设总是要保证可用性（A），那么，读到N2中的老值x，由于x和最新写入的y不同，违反了一致性（C）的要求，系统只能保证AP。</p>
+<p>CAP理论本身毋庸置疑，证明可以参考Gilbert和Lynch合著的论文。</p>
+<h2 id="CAP中的A与高可用的HA">CAP中的A与高可用的HA</h2><p>请读者会到CAP理论中关于A的定义：CAP中的A要求任何一个没有发生故障的节点必须在有限的时间内返回结果。然而，如果系统能够做到当某个节点发生网络分区后，将它从系统中剔除，由其它节点继续提供服务。虽然没有满足CAP中A的要求，但是，只要恢复时间足够快，也符合高可用的要求。而高可用才是系统设计的本质需求，CAP中的A只是个理论上的需求。</p>
+<p>CAP理论的作者Eric Brewer后来确实也写过一篇文章来说明这个问题：<strong>&lt;&lt; CAP twelve years later &gt;&gt;</strong>：当发生网络分区时，系统可以进入分区模式，将网络不通的节点从系统中剔除后分区恢复，系统继续运行。</p>
+<h2 id="Paxos与持续可用">Paxos与持续可用</h2><p>Paxos是图灵奖获得者Lamport的经典之作，第一个版本的论文叫做：<strong>&lt;&lt; The Part-time Parliament &gt;&gt;</strong>  。Lamport奠定了很多分布式系统的理论基础，比如：<strong>&lt;&lt; Time, Clocks and the Ordering of Events in a Distributed System &gt;&gt;</strong>。据传（八卦，不确信）Lamport通过讲故事的方法讲”拜占庭将军”问题，尝到了甜头，于是在最初的Paxos论文中也讲了一个考古的故事，不过论文提交上去没人能看懂，后来不知道从哪个犄角旮旯里面被人翻了出来。Lamport后来也意识到讲的故事太难懂，于是又整理了第二个版本叫做：<strong>&lt;&lt; Paxos Made Simple &gt;&gt;</strong>。这个版本的初始协议很容易理解，不过如果想深入理解，例如协议中最难理解的Multi-Paxos，难度相比第一个版本一点都没有降低。与Lamport同时期还有一篇类似的论文，叫做<strong>&lt;&lt; Viewstamped Replication &gt;&gt;</strong>，最近还有一篇<strong>&lt;&lt; Raft &gt;&gt;</strong>。建议理解Paxos遇到困难的看后面这两篇论文，尤其是Raft，在牺牲很少可用性的情况下，对Paxos做了极大的简化，称得上业界良心。</p>
+<p>八卦完了Paxos，下面进入正题。Lamport和Jim Gray分别是分布式系统和数据库领域的代表任务，同属微软研究院，不过也是共事多年才坐在一起聊两个领域的问题。高可用是分布式系统的长项，为了实现高可用，首先必须至少写三份数据（一主两备）。这是因为，如果只写两份数据，当一份数据出现故障的时候，另外一份数据永远无法证明自己是对，也无法证明自己是错。这就是选举的价值，类Paxos选举协议允许在超过半数（Majority）节点正常的情况下提供服务。因此，当某台服务器，某个交换机，某个IDC甚至某个地区整体故障的时候，只要不超过整个系统的半数，系统都能够很快从错误中恢复过来，而且完全自动，无需人工干预。</p>
+<p>强一致性是数据库的长项，做法就是强同步，Oracle，MySQL 5.7，国内的MySQL定制版本，例如阿里、网易的MySQL版本都支持强一致性。强同步的问题在于性能损耗，例如传统数据库的执行模型（非线程池模型）一般为一个连接对应一个工作线程/进程，采用强同步模式后事务的延时必然延长，从而导致工作线程/进程数增多，高并发情况下日志线程唤醒工作线程导致的上下文切换开销也非常大。另外，为了实现高可用，必须同步至少两个备库，使得情况进一步恶化。</p>
+<p>采用Paxos协议的持续可用系统有两种常见的部署方式：</p>
+<p><img src="/img/Paxos-global.png" alt=""></p>
+<p>第一种部署方式比较简单，也最为常见。有一个全局Paxos服务，例如Zookeeper，它和其它机器之间保持租约。Master和两个Slave之间保持强同步，事务至少要写入到Master和其中一个Slave才可以返回成功。同一时刻对于同一份数据只有一个Master，全局Paxos服务负责选举，当Master出现故障时，选举日志号最大的Slave接替原来的Master继续提供服务。</p>
+<p><img src="/img/Paxos-global2.png" alt=""></p>
+<p>第二种部署方式比较纯粹，只出现在少量的分布式数据库中，例如Google Spanner，OceanBase 1.0。Leader（相当于Master）和Follower（相当于Slave）之间直接采用Paxos协议进行数据同步和选举，相比第一种方案，这种方式实现复杂度要高很多，换来的好处是宕机恢复时间更短，系统更优雅。</p>
+<h2 id="共享存储与硬件解决方案">共享存储与硬件解决方案</h2><p>数据库领域经常采用共享存储来解决强一致性问题，主库将redo日志持久化到共享存储，如果主库故障，假设共享存储是持续可用的，备库可以从共享存储中读取日志恢复系统。共享存储与share-nothing架构的强同步有何区别呢？共享存储模式下只需要部署一个主库和一个备库，而share-nothing架构下强同步至少需要一个主库加两个备库。为什么呢？假设share-nothing架构只部署了一个主库和一个备库，只要任何一台机器，即使是备库宕机，为了保证强一致性，整个系统都无法提供服务。显然，这样的系统在互联网业务中几乎没有应用场景。</p>
+<p>共享存储本质上是硬件解决方案，相比Paxos解决方案，优势是简单成熟，在商用数据库中广泛使用。问题在于成本高，且依赖硬件本身高可靠和高性能，也无法跨IDC部署，只能容忍单台服务器故障，无法容忍单个IDC故障。</p>
+<h2 id="强同步性能">强同步性能</h2><p>数据库的性能分为两个方面：</p>
+<p>单个事务的延时：由于多了一次同步操作，单个事务提交的延时加长了。设计系统时能够做的事情是将同步两个备库和主库写磁盘这三个操作完全并行起来，使得增加的额外延时只是三个操作的最大值，而不是三个操作之和。<br>系统的吞吐量：本质上看，强同步是否影响吞吐量取决于主备之间的网络带宽是否成为瓶颈。在采用万兆网卡或者两块千兆网卡的情况下，吞吐量基本没有影响。<br>理想的系统应该是一个全异步的系统，避免强同步占用线程/进程等执行资源，且不应该带来额外的上下文切换。日志同步的优化有一些关键点，例如：组提交（Group Commit），减少日志缓冲区的锁冲突，异步化，避免不必要的上下文切换，数据库提前解行锁避免热点。具体可以参考论文：&lt;<aether：a scalable="" approach="" to="" logging="">&gt;。我参与实现的OceanBase系统强同步对单个事务带来的额外延时只是一次网络同步，同一个机房内在0.5ms左右，同城的多个机房之间只有1ms左右，对系统吞吐量的影响也只有5% ~ 10%左右。也就是说，如果实现做到极致，强同步的性能不会是问题。当然，这就要求将持续可用看成数据库架构的核心目标，针对这个需求重构数据库的执行引擎。</aether：a></p>
+<p>与性能相关联的一个问题是成本。前面已经提到，基于Paxos的持续可用方案至少需要一主两备，如果数据总是有三份，确实比较浪费。一个做到极致的系统应该能够只需要两个副本，第三个副本只存储redo日志即可。</p>
+<h2 id="引入选举的难点">引入选举的难点</h2><p>假设在关系数据库的基础上引入全局Paxos服务，是否能够解决高可用问题呢？理论上确实是可以的，不过实施起来难度也不小。这是因为，即使是Zookeeper这样成熟的选举服务，使用过程中总是会遇到各种各样的问题，如果期望应用到核心业务，需要对Zookeeper系统完全的掌控力。也就是说，假设Zookeeper这样的服务出现问题，需要能够Fix Bug，而不是简单重启解决。另外，也需要做一套模拟各种异常的测试系统，确保不会在异常的情况下出现一些严重的问题，例如Zookeeper选出双主导致数据不一致。总而言之，做一个持续可用的选举服务并不是简单地使用开源软件，这是一个全局服务，要么不做，要么就深入下去做到完全掌控。</p>
+<h2 id="跨机房问题">跨机房问题</h2><p>跨机房问题分为两类：同城以及异地。前面已经提到，无论如何实现，强同步方案中单个事务至少增加一次网络同步延时。对于同城场景，如果网络环境比较好，例如公司的数据库服务有专用的光纤或者带宽比较高，那么，增加的延时在1~2ms（光折射传播的时间 + 交换机处理时间），业务是完全可以接受的。因此，可以做到同城持续可用，单个IDC故障时，能够在保证强一致的前提下很快恢复服务。</p>
+<p>对于异地场景，由于网络延时较大，例如100ms左右，业务往往不可接受。因此，无法做到跨地域持续可用，整个地区故障时，要么牺牲一致性，要么牺牲可用性，如果选择可用性时可能会丢失最后几秒内的数据。当然，实际上业务上往往会组合使用各种柔性解决方案，例如涉及到钱的业务停服务，其它业务容忍极端情况下的数据丢失；或者在外部系统中记录一些信息，例如记录哪些用户的数据不一致，出现问题是禁止这些用户的写服务，其它用户正常提供服务；或者DBA采用各种办法补数据，等等。</p>
+<h2 id="小结">小结</h2><p>总而言之，在金融数据库中，由于强一致性是必选项，因此，要做到持续可用比较困难，但也并不是不可能，CAP和持续可用并不矛盾。成熟的商业数据库都是基于共享存储的，不过基于Paxos的持续可用方案开始越来越多地应用到核心场景，例如Google Spanner，Microsoft SQL Server云版本，Amazon DynamoDB，而Aliababa OceanBase也在金融核心场景得到了验证。同时，笔者认为，采用Paxos协议，虽然工程难度很高，但是，只要在实现上做到极致，在同城的情况下，可以容忍单个IDC故障，且性能损耗非常小；而在异地的场景，考虑到光速不可突破，往往由业务在一致性和可用性之间权衡。越来越多的云数据库将会采用Paxos来实现持续可用。</p>
+<p>转载自：<a href="http://www.nosqlnotes.net/archives/333" target="_blank" rel="external">NOSQL Notes</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/04/21/mysql-optimization/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">性能优化之MySQL优化</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="cap" data-title="持续可用与CAP理论 – 一个系统开发者的观点" data-url="http://krisjin.github.io/2015/04/22/cap/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>
