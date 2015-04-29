@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>项目成长总结 | krisjin博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在“app后端”qq群中，经常被问到的一个问题：“怎么设计一个应付高并发的架构”。诚然，设计一个能应付百万流量的高并发架构，是很令人兴奋的技术挑战，但在创业公司中的成长，难道就只有设计架构吗？在这篇文章中，谈谈我对这方面的看法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目成长总结">
+<meta property="og:url" content="http://krisjin.github.io/2015/04/23/website-summary/index.html">
+<meta property="og:site_name" content="krisjin博客">
+<meta property="og:description" content="在“app后端”qq群中，经常被问到的一个问题：“怎么设计一个应付高并发的架构”。诚然，设计一个能应付百万流量的高并发架构，是很令人兴奋的技术挑战，但在创业公司中的成长，难道就只有设计架构吗？在这篇文章中，谈谈我对这方面的看法。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="项目成长总结">
+<meta name="twitter:description" content="在“app后端”qq群中，经常被问到的一个问题：“怎么设计一个应付高并发的架构”。诚然，设计一个能应付百万流量的高并发架构，是很令人兴奋的技术挑战，但在创业公司中的成长，难道就只有设计架构吗？在这篇文章中，谈谈我对这方面的看法。">
+  
+    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img lazy-src="" class="js-avatar">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">krisjin</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">一步一脚印</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">归档</a></li>
+				        
+							<li><a href="/readbook">读书</a></li>
+				        
+							<li><a href="/categories">分类</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a><a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a><a href="/tags/马云/" style="font-size: 10px;">马云</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">技术博客</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">krisjin</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">一步一脚印</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">归档</a></li>
+		        
+					<li><a href="/readbook">读书</a></li>
+		        
+					<li><a href="/categories">分类</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-website-summary" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/23/website-summary/" class="article-date">
+  	<time datetime="2015-04-23T01:19:46.000Z" itemprop="datePublished">4月 23 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      项目成长总结
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/创业，经验/">创业，经验</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Architecture/">Architecture</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p> 在“app后端”qq群中，经常被问到的一个问题：“怎么设计一个应付高并发的架构”。诚然，设计一个能应付百万流量的高并发架构，是很令人兴奋的技术挑战，但在创业公司中的成长，难道就只有设计架构吗？在这篇文章中，谈谈我对这方面的看法。<a id="more"></a>
+　　</p>
+<h2 id="1-_在大多数的公司中，很难遇到真正的高并发问题">1. 在大多数的公司中，很难遇到真正的高并发问题</h2><p>曾经听不止一位网友说过，自己想去某某互联网巨头工作，希望能锻炼自己的技术，学习高并发，高可用，可伸缩的架构技术。  </p>
+<p>但亲，你知道吗？在大型公司中，一个典型的工作模式是螺丝钉，一个人只负责固定的一部分。很多时间，这些高并发，高可用，可伸缩的架构问题，都给以前有这方面经验的人去解决。<br>　　<br>想想，一个靠谱，以前有成功解决相关高并发经验的人，和一个只掌握了基本理论，没真正实践过这方面的新手，出于成本和风险的考虑，假设你是一个公司的领导者，会选择哪一个呢？<br>　　<br>　　而在创业型公司里，由于都是新生的产品，需要一点点积累用户，在初期没啥机会遇到相关的大规模的并发问题。<br>　　<br>　　至于以后有没有机会遇到，很难说。在聚光灯下，看到的都是成功者，失败者早已湮没在历史的长河里。极大可能当没遇到过相关的大规模的并发问题，项目就已经倒下了。
+　　</p>
+<h2 id="2-_不为了技术而技术">2. 不为了技术而技术</h2><p>　　<br>　　对于创业公司来说，我一直推崇的架构原则是“尽量使用成熟的第三方服务和软件，自己只负责业务逻辑”。<br>　　<br>　　为啥要尽量使用成熟的第三方？我的理由是，自己去做，不见得比第三方的专业团队做得更好，大多数情况是更糟的，既浪费了精力，又拖慢了产品的进度，为啥还要自己弄呢？<br>　　<br>　　有的小伙伴把后台的架构弄得无比复杂，例如，就一个普通的应用，不是游戏，不是聊天服务器，app和后端的通讯专门开发一个私有的socket协议，而不采用简单容易实现的http。理由是私有协议安全，省流量。<br>　　<br>　　在创业公司里，我一直认为最大的成本是时间成本。初期融资有限，面对产品的压力，投资人的压力，还有，团队的压力，我觉得，3个月的时间，怎么也要出产品。<br>　　<br>　　私有协议比起http协议是更安全，省流量，但私有协议需要自己去做相关的封包，解包的处理，这都需要耗费时间。而且，对于大多数程序员来说，非常熟悉http，但socket编程，很多程序员都只在学校中学过，没有真正的实践经验。这些方面都会拖慢了产品的开发进度。<br>　　<br>　　时间，对于初创团队来说是最宝贵，过于复杂的架构，在创业初期，根本不适用。
+　　</p>
+<h2 id="3-_在创业公司中的额外成长">3. 在创业公司中的额外成长</h2><p>　　<br>（1） 独立做技术决策的机会<br>　　<br>　　虽然在创业公司里，初期没法面对高并发的挑战，但会有全局了解app后端的机会。后台每个模块应该有哪些方案去解决，每个方案有哪些具体的技术，每种技术的优缺点，这些都需要后台去调研，决策。<br>　　<br>　　创业公司里，很少有全面了解后端技术，android, ios 这三方面的通才，技术负责人的角色，更多的是保证产品的顺利研发，而不是解决具体每个技术问题。所以，你要评估这个技术的学习成本，运维成本，对产品的影响，这个过程没有同事能帮助你，都要靠自己去调研，解决，每次都是难得的成长机会。<br>　　<br>（2） 全面去了解app的诞生，成长过程<br>　　<br>　　从基础的需求分析开始，到分拆模块，到数据库设计，技术的选型，甚至是运维，部署，陪伴着app的成长。<br>　　<br>　　这个过程中，我们会不断地思考为什么要这样做，这样做的优缺点是什么，有什么影响。<br>　　<br>　　没有完整经过过这个过程的人，怎么会了解这这里面的风光呢？<br>　　<br>（3） 另类的成长<br>　　<br>　　虽然，高并发的问题不是每个初创app都有机会经历，但一些成长，只要你有心，就能实现：<br>　　<br>　　 你有重构过自己的代码，使它的执行效率更好吗?<br>　　<br>　　面对痛苦的调试api的经历，你有研究过其他工具，使调试api更加方便吗？<br>　　<br>　　 你有写过自动化的运维脚本，进行一些常见的运维工作吗？<br>　　<br>　　你有定期和同事分享自己在工作中遇到的问题和解决方案，使大家一起成长吗？（当然了，这个需要领导批准。如果领导不同意这样的技术分享会，就写博客分享憋）<br>　　<br>　　你有研究过自己的产品，给相关的同事提过意见吗？你是否想过产品为啥要这样设计，迎合了用户的哪些需求呢？</p>
+<p>项目挂掉了，你有总结出在这个过程，团队和自己犯过哪些错误吗？</p>
+<p>转自：<a href="http://blog.csdn.net/newjueqi/article/details/44926137" target="_blank" rel="external">CSDN</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/23/java-extends/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          java extends
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/22/cap/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">持续可用与CAP理论 – 一个系统开发者的观点</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="website-summary" data-title="项目成长总结" data-url="http://krisjin.github.io/2015/04/23/website-summary/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"krisjin"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 krisjin
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/mobile.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+</body>
+</html>

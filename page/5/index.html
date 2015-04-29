@@ -110,7 +110,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a>
+						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a><a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a><a href="/tags/马云/" style="font-size: 10px;">马云</a>
 					</div>
 				</section>
 				
@@ -177,6 +177,174 @@
 	</div>
 </nav>
       <div class="body-wrap">
+  
+    <article id="post-netty-file-transport" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/23/netty-file-transport/" class="article-date">
+  	<time datetime="2015-02-23T10:37:03.000Z" itemprop="datePublished">2月 23 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/02/23/netty-file-transport/">netty文件传输</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>文件传输通常采用FTP或者HTTP附件的方式，事实上通过TCP Socket+File的方式进行传输也有一定的应用场景，尽管不是主流，但是掌握文件传输的方式还是很重要的，特别是针对两个跨主机的JVM进程之间进行持久化数据的相互交换。
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/netty/">netty</a>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a  href="/2015/02/23/netty-file-transport/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+  
+    <article id="post-protobuf-start" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/23/protobuf-start/" class="article-date">
+  	<time datetime="2015-02-23T03:12:36.000Z" itemprop="datePublished">2月 23 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/02/23/protobuf-start/">protobuf入门</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="protobuf简介">protobuf简介</h3><p>protobuf是google提供的一个开源序列化框架，类似于XML，JSON这样的数据表示语言，其最大的特点是基于二进制，因此比传统的XML表示高效短小得多。虽然是二进制数据格式，但并没有因此变得复杂，开发人员通过按照一定的语法定义结构化的消息格式，然后送给命令行工具，工具将自动生成相关的类，可以支持java、c++、python等语言环境。通过将这些类包含在项目中，可以很轻松的调用相关方法来完成业务消息的序列化与反序列化工作。
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/protobuf/">protobuf</a>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a  href="/2015/02/23/protobuf-start/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+  
+    <article id="post-spring-beanpostprocessor" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/02/23/spring-beanpostprocessor/" class="article-date">
+  	<time datetime="2015-02-22T23:38:24.000Z" itemprop="datePublished">2月 23 2015</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/02/23/spring-beanpostprocessor/">Spring bean实例化后处理器</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spring Bean 实例化阶段后处理器主要是BeanPostProcessor接口，它与BeanFactoryPostProcessor容易产生混淆。只要记住BeanPostProcessor是存在于对象实例化阶段，而BeanFactoryPostProcessor则存在于容器启动阶段。这两个概念就比较容易区分了。
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/spring/">spring</a>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a  href="/2015/02/23/spring-beanpostprocessor/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
   
     <article id="post-spring-startup-process" class="article article-type-post" itemscope itemprop="blogPost">
   
@@ -561,173 +729,6 @@
         <p class="article-more-link">
           <a  href="/2015/02/17/ioc-pattern/#more">more >></a>
         </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-  
-    <article id="post-overview-spring" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/02/16/overview-spring/" class="article-date">
-  	<time datetime="2015-02-16T08:29:32.000Z" itemprop="datePublished">2月 16 2015</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/02/16/overview-spring/">初识Spring</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="概述">概述</h3><hr>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spring开源框架是一个轻量级的解决方案和一站式的构建企业级应用程序，Spring框架是模块化的，允许你使用需要的功能模块。你可以用IOC容器、strust、hibernate等，也可以选择不用，它支持声明式事务管理，使用RMI远程调用或Web Services,提供了优雅的MVC框架,也可以集成AOP到你的应用中。<br>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-category tagcloud">
-	<a class="article-category-link" href="/categories/spring/">spring</a>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/02/16/overview-spring/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-  
-    <article id="post-netty-api-reference" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/02/16/netty-api-reference/" class="article-date">
-  	<time datetime="2015-02-16T04:24:42.000Z" itemprop="datePublished">2月 16 2015</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/02/16/netty-api-reference/">Netty包功能描述</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在学习Netty的过程中为了从整体的角度去了解整个框架的功能实现，一种可以去官网看用户指南，另一种是查看API，当然我相信还有很多种，还有哪些学习方式，可以留言哦。  </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为了了解netty的子项目都用于那些功能实现，下面是对API中包的功能描述翻译，针对的版本是5.0，有不当之处，请多多提意见留言。</p>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-category tagcloud">
-	<a class="article-category-link" href="/categories/netty/">netty</a>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/02/16/netty-api-reference/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-  
-    <article id="post-cold-in-new-year" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/02/16/cold-in-new-year/" class="article-date">
-  	<time datetime="2015-02-16T00:24:14.000Z" itemprop="datePublished">2月 16 2015</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/02/16/cold-in-new-year/">新年感冒了</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;还有两天就过年了，不知怎么的就突然的感冒了。没有任何的征兆，这是习惯性的，还是就是这样的呢。感冒了，也引发了一点争执，结果是我出去住旅馆了。如果感冒不好，就得一个人过年了。</p>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-category tagcloud">
-	<a class="article-category-link" href="/categories/life/">life</a>
-	</div>
-
-
       
       <div class="clearfix"></div>
     </div>
