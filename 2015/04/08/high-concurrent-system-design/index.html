@@ -1,222 +1,105 @@
-<!DOCTYPE html>
-<html>
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="baidu_union_verify" content="d1952c66cf48912e21c18c7c581f382a">
+  <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
+<meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-  <title>高并发系统设计 | krisjin博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
+    <title>高并发系统设计 | krisjin博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="krisjin">
+    
+    <meta name="description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
 一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="高并发系统设计">
-<meta property="og:url" content="http://krisjin.github.io/2015/04/08/high-concurrent-system-design/index.html">
-<meta property="og:site_name" content="krisjin博客">
-<meta property="og:description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
-一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="高并发系统设计">
-<meta name="twitter:description" content="注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。
-一、引子最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。">
-  
-    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  <link rel="stylesheet" href="/css/style.css" type="text/css">
-  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    
+    
+    
+    
+    <link rel="alternate" href="atom.xml" title="krisjin博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            var _bdId ='391982416296a0d54221f59fe35250d4';
+             hm.src = "//hm.baidu.com/hm.js?" + _bdId;
+             var s = document.getElementsByTagName("script")[0]; 
+             s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+     
 </head>
-<body>
-  <div id="container">
-    <div class="left-col">
-    <div class="overlay"></div>
-<div class="intrude-less">
-	<header id="header" class="inner">
-		<a href="/" class="profilepic">
-			<img lazy-src="" class="js-avatar">
-		</a>
 
-		<hgroup>
-		  <h1 class="header-author"><a href="/">krisjin</a></h1>
-		</hgroup>
-
+  <body>
+    <header>
+      <div>
 		
-		<p class="header-subtitle">一步一脚印</p>
-		
-
-		
-			<div class="switch-btn">
-				<div class="icon">
-					<div class="icon-ctn">
-						<div class="icon-wrap icon-house" data-idx="0">
-							<div class="birdhouse"></div>
-							<div class="birdhouse_holes"></div>
-						</div>
-						<div class="icon-wrap icon-ribbon hide" data-idx="1">
-							<div class="ribbon"></div>
-						</div>
-						
-						
-						<div class="icon-wrap icon-me hide" data-idx="3">
-							<div class="user"></div>
-							<div class="shoulder"></div>
-						</div>
-						
-					</div>
-					
-				</div>
-				<div class="tips-box hide">
-					<div class="tips-arrow"></div>
-					<ul class="tips-inner">
-						<li>菜单</li>
-						<li>标签</li>
-						
-						
-						<li>关于我</li>
-						
-					</ul>
-				</div>
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="krisjin博客">krisjin博客</a></h1>
+				<a class="blog-motto">一步一脚印</a>
 			</div>
-		
-
-		<div class="switch-area">
-			<div class="switch-wrap">
-				<section class="switch-part switch-part1">
-					<nav class="header-menu">
-						<ul>
-						
-							<li><a href="/">主页</a></li>
-				        
-							<li><a href="/archives">归档</a></li>
-				        
-							<li><a href="/readbook">读书</a></li>
-				        
-							<li><a href="/categories">分类</a></li>
-				        
-							<li><a href="/about">关于</a></li>
-				        
-						</ul>
-					</nav>
-					<nav class="header-nav">
-						<div class="social">
-							
-								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
-					        
-								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
-					        
-								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
-					        
-						</div>
-					</nav>
-				</section>
-				
-				
-				<section class="switch-part switch-part2">
-					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a><a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a><a href="/tags/马云/" style="font-size: 10px;">马云</a>
-					</div>
-				</section>
-				
-				
-				
-
-				
-				
-				<section class="switch-part switch-part3">
-				
-					<div id="js-aboutme">技术博客</div>
-				</section>
-				
-			</div>
-		</div>
-	</header>				
-</div>
-    </div>
-    <div class="mid-col">
-      <nav id="mobile-nav">
-  	<div class="overlay">
-  		<div class="slider-trigger"></div>
-  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
-  	</div>
-	<div class="intrude-less">
-		<header id="header" class="inner">
-			<div class="profilepic">
-				<img lazy-src="" class="js-avatar">
-			</div>
-			<hgroup>
-			  <h1 class="header-author">krisjin</h1>
-			</hgroup>
-			
-			<p class="header-subtitle">一步一脚印</p>
-			
-			<nav class="header-menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
 				<ul>
-				
-					<li><a href="/">主页</a></li>
-		        
-					<li><a href="/archives">归档</a></li>
-		        
-					<li><a href="/readbook">读书</a></li>
-		        
-					<li><a href="/categories">分类</a></li>
-		        
-					<li><a href="/about">关于</a></li>
-		        
-		        <div class="clearfix"></div>
-				</ul>
-			</nav>
-			<nav class="header-nav">
-				<div class="social">
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
 					
-						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
-			        
-						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
-			        
-						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
-			        
-				</div>
-			</nav>
-		</header>				
-	</div>
-</nav>
-      <div class="body-wrap"><article id="post-high-concurrent-system-design" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/04/08/high-concurrent-system-design/" class="article-date">
-  	<time datetime="2015-04-08T14:51:57.000Z" itemprop="datePublished">4月 8 2015</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      高并发系统设计
-    </h1>
-  
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/readbook">读书</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+					
+                                            <form class="search" action=http://zhannei.baidu.com/cse/search target="_blank">
+                                            <label>Search</label>
+                                        <input name="s" type="hidden" value= null ><input type="text" name="q" size="30" placeholder="搜索"><br>
+					
+					</li>
+				</ul>
+                            </nav>			
+</div>
 
-      </header>
-      
-      <div class="article-info article-info-post">
-        
-        
-	<div class="article-category tagcloud">
-	<a class="article-category-link" href="/categories/concurrent/">concurrent</a>
-	</div>
-
-
-        <div class="clearfix"></div>
-      </div>
-      
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。</p>
+      <a href="/2015/04/08/high-concurrent-system-design/" title="高并发系统设计" itemprop="url">高并发系统设计</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-08T14:51:57.000Z" itemprop="datePublished">Apr 8 2015</time>
+    更新日期:<time datetime="2015-04-21T10:51:13.000Z" itemprop="dateModified">Apr 21 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、引子"><span class="toc-number">1.</span> <span class="toc-text">一、引子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、服务器内部设计"><span class="toc-number">2.</span> <span class="toc-text">二、服务器内部设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Java高并发服务器"><span class="toc-number">2.1.</span> <span class="toc-text">1. Java高并发服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_C高并发服务器设计"><span class="toc-number">2.2.</span> <span class="toc-text">2. C高并发服务器设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1)_基本概念"><span class="toc-number">2.2.1.</span> <span class="toc-text">1) 基本概念</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-_分布式系统设计"><span class="toc-number">3.</span> <span class="toc-text">三. 分布式系统设计</span></a></li></ol>
+		</div>
+		
+		<p>注：本文大多数观点和代码都是从网上或者开源代码中抄来的，为了疏理和组织这片文章，作者也费了不少心血，为了表示对我劳动的尊重，请转载时注明作者和出处。</p>
 <h2 id="一、引子">一、引子</h2><p>最近失业在家，闲来无事。通过网上查找资料和查看开源代码，研究了一下互联网高并发系统的一些设计。这里主要从服务器内部设计和整个系统设计两个方面讨论，更多的是从互联网大型网站设计方面考虑，高性能计算之类系统没有研究过。<a id="more"></a></p>
 <h2 id="二、服务器内部设计">二、服务器内部设计</h2><p>服务器设计涉及Socket的阻塞/非阻塞，操作系统IO的同步和异步（之前被人问到过两次。第一次让我说说知道的网络模型，我说ISO模型和TCP/IP模型，结果被鄙视了。最后人说了解linux epoll吗？不了解呀！汉，回去查资料才知道是这回事。第二次让我说说知道线程模型，汉！这个名词感觉没有听说过,线程？模型？半同步/半异步，领导者/跟随者知道吗。再汉，我知道同步/异步，还有半同步/半异步？啥呀？领导者/跟随者，我现在没有领导。回去一顿恶补，原来是ACE框架里边经常有这样的提法，Reactor属于同步/半同步，PREACTOR属于领导者/跟随者模式。瀑布汗。小插曲一段，这些不懂没关系，下边我慢慢分解），事件分离器，线程池等。内部设计希望通过各个模块的给出一个简单设计，经过您的进一步的组合和打磨，就可以实现一个基本的高并发服务器。</p>
 <h3 id="1-_Java高并发服务器">1. Java高并发服务器</h3><p>Java设计高并发服务器相对比较简单。直接是用ServerSocket或者Channel+selector实现。前者属于同步IO设计，后者采用了模拟的异步IO。为什么说模拟的异步IO呢？记得网上看到一篇文章分析了java的selector。在windows上通过建立一个127.0.0.1到127.0.0.1的连接实现IO的异步通知。在linux上通过建立一个管道实现IO的异步通知。考虑到高并并发系统的要求和java上边的异步IO的限制（通常操作系统同时打开的文件数是有限制的）和效率问题，java的高并发服务器设计不做展开深入的分析，可以参考C高并发服务器的分析做同样的设计。</p>
@@ -230,16 +113,16 @@
  * 
  */</span>  
 <span class="keyword">typedef</span> <span class="keyword">struct</span> fdevents {  
-         fdevent_handler_t type;  
+         <span class="keyword">fdevent_handler_t</span> type;  
 
          fdnode **fdarray;  
-         size_t maxfds;  
+         <span class="keyword">size_t</span> maxfds;  
 
 <span class="preprocessor">#ifdef USE_LINUX_SIGIO  </span>
          <span class="keyword">int</span> in_sigio;  
          <span class="keyword">int</span> signum;  
-         sigset_t sigset;  
-         siginfo_t siginfo;  
+         <span class="keyword">sigset_t</span> sigset;  
+         <span class="keyword">siginfo_t</span> siginfo;  
          <span class="built_in">bitset</span> *sigbset;  
 <span class="preprocessor">#<span class="keyword">endif</span>  </span>
 <span class="preprocessor">#ifdef USE_LINUX_EPOLL  </span>
@@ -249,8 +132,8 @@
 <span class="preprocessor">#ifdef USE_POLL  </span>
          <span class="keyword">struct</span> pollfd *pollfds;  
 
-         size_t size;  
-         size_t used;  
+         <span class="keyword">size_t</span> size;  
+         <span class="keyword">size_t</span> used;  
 
          buffer_int unused;  
 <span class="preprocessor">#<span class="keyword">endif</span>  </span>
@@ -282,8 +165,8 @@
 
          <span class="keyword">int</span> (*event_add)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fde_ndx, <span class="keyword">int</span> fd,<span class="keyword">int</span> events);  
          <span class="keyword">int</span> (*event_del)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fde_ndx, <span class="keyword">int</span> fd);  
-         <span class="keyword">int</span> (*event_get_revent)(<span class="keyword">struct</span> fdevents *ev, size_t ndx);  
-         <span class="keyword">int</span> (*event_get_fd)(<span class="keyword">struct</span> fdevents *ev, size_t ndx);  
+         <span class="keyword">int</span> (*event_get_revent)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">size_t</span> ndx);  
+         <span class="keyword">int</span> (*event_get_fd)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">size_t</span> ndx);  
 
          <span class="keyword">int</span> (*event_next_fdndx)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> ndx);  
 
@@ -292,14 +175,14 @@
          <span class="keyword">int</span> (*fcntl_set)(<span class="keyword">struct</span> fdevents *ev, <span class="keyword">int</span> fd);  
 } fdevents;  
 
-fdevents *fdevent_init(size_tmaxfds, fdevent_handler_t type);  
+fdevents *fdevent_init(<span class="keyword">size_t</span>maxfds, <span class="keyword">fdevent_handler_t</span> type);  
 <span class="function"><span class="keyword">int</span> <span class="title">fdevent_reset</span><span class="params">(fdevents*ev)</span></span>;  
 <span class="function"><span class="keyword">void</span> <span class="title">fdevent_free</span><span class="params">(fdevents*ev)</span></span>;  
 
 <span class="function"><span class="keyword">int</span> <span class="title">fdevent_event_add</span><span class="params">(fdevents*ev, <span class="keyword">int</span> *fde_ndx, <span class="keyword">int</span> fd, <span class="keyword">int</span> events)</span></span>;  
 <span class="function"><span class="keyword">int</span> <span class="title">fdevent_event_del</span><span class="params">(fdevents*ev, <span class="keyword">int</span> *fde_ndx, <span class="keyword">int</span> fd)</span></span>;  
-intfdevent_event_get_revent(fdevents *ev, size_t ndx);  
-intfdevent_event_get_fd(fdevents *ev, size_t ndx);  
+intfdevent_event_get_revent(fdevents *ev, <span class="keyword">size_t</span> ndx);  
+intfdevent_event_get_fd(fdevents *ev, <span class="keyword">size_t</span> ndx);  
 fdevent_handlerfdevent_get_handler(fdevents *ev, <span class="keyword">int</span> fd);  
 <span class="keyword">void</span> *fdevent_get_context(fdevents *ev, <span class="keyword">int</span> fd);  
 
@@ -331,11 +214,11 @@ intfdevent_freebsd_kqueue_init(fdevents *ev);
 <span class="preprocessor">#<span class="keyword">include</span> &lt;pthread.h&gt;  </span>
 <span class="preprocessor">#<span class="keyword">include</span> &lt;unistd.h&gt;  </span>
 
-<span class="keyword">typedef</span> <span class="keyword">void</span> *sp_thread_result_t;  
-<span class="keyword">typedef</span> pthread_mutex_tsp_thread_mutex_t;  
-<span class="keyword">typedef</span> pthread_cond_t  sp_thread_cond_t;  
-<span class="keyword">typedef</span> pthread_t       sp_thread_t;  
-<span class="keyword">typedef</span> pthread_attr_t  sp_thread_attr_t;  
+<span class="keyword">typedef</span> <span class="keyword">void</span> *<span class="keyword">sp_thread_result_t</span>;  
+<span class="keyword">typedef</span> <span class="keyword">pthread_mutex_tsp_thread_mutex_t</span>;  
+<span class="keyword">typedef</span> <span class="keyword">pthread_cond_t</span>  <span class="keyword">sp_thread_cond_t</span>;  
+<span class="keyword">typedef</span> <span class="keyword">pthread_t</span>       <span class="keyword">sp_thread_t</span>;  
+<span class="keyword">typedef</span> <span class="keyword">pthread_attr_t</span>  <span class="keyword">sp_thread_attr_t</span>;  
 
 <span class="preprocessor">#definesp_thread_mutex_init(m,a)  pthread_mutex_init(m,a)  </span>
 <span class="preprocessor">#definesp_thread_mutex_destroy(m) pthread_mutex_destroy(m)  </span>
@@ -366,15 +249,15 @@ intfdevent_freebsd_kqueue_init(fdevents *ev);
 <span class="preprocessor">#<span class="keyword">include</span> &lt;winsock2.h&gt;  </span>
 <span class="preprocessor">#<span class="keyword">include</span> &lt;process.h&gt;  </span>
 
-<span class="keyword">typedef</span> <span class="keyword">unsigned</span> sp_thread_t;  
+<span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">sp_thread_t</span>;  
 
-<span class="keyword">typedef</span> unsignedsp_thread_result_t;  
+<span class="keyword">typedef</span> <span class="keyword">unsignedsp_thread_result_t</span>;  
 <span class="preprocessor">#<span class="keyword">define</span> SP_THREAD_CALL__stdcall  </span>
 <span class="function"><span class="keyword">typedef</span> <span class="title">sp_thread_result_t</span> <span class="params">(__stdcall * sp_thread_func_t )</span><span class="params">( <span class="keyword">void</span> * args )</span></span>;  
 
-<span class="keyword">typedef</span> HANDLE  sp_thread_mutex_t;  
-<span class="keyword">typedef</span> HANDLE  sp_thread_cond_t;  
-<span class="keyword">typedef</span> DWORD   sp_thread_attr_t;  
+<span class="keyword">typedef</span> HANDLE  <span class="keyword">sp_thread_mutex_t</span>;  
+<span class="keyword">typedef</span> HANDLE  <span class="keyword">sp_thread_cond_t</span>;  
+<span class="keyword">typedef</span> DWORD   <span class="keyword">sp_thread_attr_t</span>;  
 
 <span class="preprocessor">#defineSP_THREAD_CREATE_DETACHED 1  </span>
 <span class="preprocessor">#<span class="keyword">define</span> sp_sleep(x)Sleep(1000*x)  </span>
@@ -426,11 +309,11 @@ is re-acquired before returningto the caller.
 </span>{  
          <span class="keyword">int</span> ret = <span class="number">0</span>;  
 
-         sp_thread_mutex_unlock( mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_unlock( mutex );  
 
          ret = WaitForSingleObject( *cond, INFINITE );  
 
-         sp_thread_mutex_lock( mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_lock( mutex );  
 
          <span class="keyword">return</span> WAIT_OBJECT_0 == ret ? <span class="number">0</span> : GetLastError();  
 }  
@@ -441,8 +324,8 @@ is re-acquired before returningto the caller.
          <span class="keyword">return</span> <span class="number">0</span> == ret ? GetLastError() : <span class="number">0</span>;  
 }  
 
-<span class="function">sp_thread_t <span class="title">sp_thread_self</span><span class="params">()</span>  
-</span>{  
+<span class="keyword">sp_thread_t</span> <span class="keyword">sp_t</span>hread_self()  
+{  
          <span class="keyword">return</span> GetCurrentThreadId();  
 }  
 
@@ -452,7 +335,7 @@ is re-acquired before returningto the caller.
          <span class="keyword">return</span> <span class="number">0</span>;  
 }  
 
-intsp_thread_attr_setdetachstate( sp_thread_attr_t * attr, <span class="keyword">int</span> detachstate )  
+<span class="keyword">intsp_t</span>hread_attr_setdetachstate( <span class="keyword">sp_thread_attr_t</span> * attr, <span class="keyword">int</span> detachstate )  
 {  
          *attr |= detachstate;  
          <span class="keyword">return</span> <span class="number">0</span>;  
@@ -508,7 +391,7 @@ threadpool.h
  * pool. If the function succeeds, it returns a (non-NULL) 
  * "threadpool", else it returnsNULL. 
  */</span>  
-threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool);  
+<span class="keyword">threadpoolcreate_t</span>hreadpool(<span class="keyword">int</span> <span class="keyword">num_t</span>hreads_in_pool);  
 
 
 <span class="comment">/** 
@@ -522,7 +405,7 @@ threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool
  * The dispatched thread calls into thefunction 
  * "dispatch_to_here" with argument"arg". 
  */</span>  
-intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here,  
+<span class="keyword">intdispatch_t</span>hreadpool(threadpool from_me, dispatch_fn <span class="keyword">dispatch_t</span>o_here,  
                <span class="keyword">void</span> *arg);  
 
 <span class="comment">/** 
@@ -530,7 +413,7 @@ intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here,
  * all threads in it to commit suicide, andthen 
  * frees all the memory associated with thethreadpool. 
  */</span>  
-voiddestroy_threadpool(threadpool destroyme);  
+<span class="keyword">voiddestroy_t</span>hreadpool(threadpool destroyme);  
 
 <span class="preprocessor">#ifdef __cplusplus  </span>
 }  
@@ -553,55 +436,55 @@ threadpool.c
 <span class="preprocessor">#<span class="keyword">include</span>"threadpool.h"  </span>
 <span class="preprocessor">#<span class="keyword">include</span> "spthread.h"  </span>
 
-<span class="keyword">typedef</span> <span class="keyword">struct</span> _thread_st {  
-         sp_thread_t id;  
-         sp_thread_mutex_t mutex;  
-         sp_thread_cond_t cond;  
+<span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="keyword">_t</span>hread_st {  
+         <span class="keyword">sp_thread_t</span> id;  
+         <span class="keyword">sp_thread_mutex_t</span> mutex;  
+         <span class="keyword">sp_thread_cond_t</span> cond;  
          dispatch_fn fn;  
          <span class="keyword">void</span> *arg;  
          threadpool parent;  
-} _thread;  
+} <span class="keyword">_t</span>hread;  
 
 <span class="comment">// _threadpool is the internalthreadpool structure that is  </span>
 <span class="comment">// cast to type"threadpool" before it given out to callers  </span>
-<span class="keyword">typedef</span> <span class="keyword">struct</span> _threadpool_st {  
+<span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="keyword">_t</span>hreadpool_st {  
          <span class="comment">// you should fill in this structure with whatever you need  </span>
-         sp_thread_mutex_t tp_mutex;  
-         sp_thread_cond_t tp_idle;  
-         sp_thread_cond_t tp_full;  
-         sp_thread_cond_t tp_empty;  
-         _thread ** tp_list;  
+         <span class="keyword">sp_thread_mutex_t</span> tp_mutex;  
+         <span class="keyword">sp_thread_cond_t</span> tp_idle;  
+         <span class="keyword">sp_thread_cond_t</span> tp_full;  
+         <span class="keyword">sp_thread_cond_t</span> tp_empty;  
+         <span class="keyword">_t</span>hread ** tp_list;  
          <span class="keyword">int</span> tp_index;  
          <span class="keyword">int</span> tp_max_index;  
          <span class="keyword">int</span> tp_stop;  
 
-         <span class="keyword">int</span> tp_total;  
-} _threadpool;  
+         <span class="keyword">int</span> <span class="keyword">tp_t</span>otal;  
+} <span class="keyword">_t</span>hreadpool;  
 
-threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool)  
+<span class="keyword">threadpoolcreate_t</span>hreadpool(<span class="keyword">int</span> <span class="keyword">num_t</span>hreads_in_pool)  
 {  
-         _threadpool *pool;  
+         <span class="keyword">_t</span>hreadpool *pool;  
 
          <span class="comment">// sanity check the argument  </span>
-         <span class="keyword">if</span> ((num_threads_in_pool &lt;= <span class="number">0</span>) || (num_threads_in_pool&gt; MAXT_IN_POOL))  
+         <span class="keyword">if</span> ((<span class="keyword">num_t</span>hreads_in_pool &lt;= <span class="number">0</span>) || (<span class="keyword">num_t</span>hreads_in_pool&gt; MAXT_IN_POOL))  
                    <span class="keyword">return</span> NULL;  
 
-         pool = (_threadpool *) <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(_threadpool));  
+         pool = (<span class="keyword">_t</span>hreadpool *) <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">_t</span>hreadpool));  
          <span class="keyword">if</span> (pool == NULL) {  
                    <span class="built_in">fprintf</span>(stderr, <span class="string">"Out of memory creating a newthreadpool!\n"</span>);  
                    <span class="keyword">return</span> NULL;  
          }  
 
          <span class="comment">// add your code here to initialize the newly createdthreadpool  </span>
-         sp_thread_mutex_init( &amp;pool-&gt;tp_mutex, NULL );  
-         sp_thread_cond_init( &amp;pool-&gt;tp_idle, NULL );  
-         sp_thread_cond_init( &amp;pool-&gt;tp_full, NULL );  
-         sp_thread_cond_init( &amp;pool-&gt;tp_empty, NULL );  
-         pool-&gt;tp_max_index = num_threads_in_pool;  
+         <span class="keyword">sp_t</span>hread_mutex_init( &amp;pool-&gt;tp_mutex, NULL );  
+         <span class="keyword">sp_t</span>hread_cond_init( &amp;pool-&gt;tp_idle, NULL );  
+         <span class="keyword">sp_t</span>hread_cond_init( &amp;pool-&gt;tp_full, NULL );  
+         <span class="keyword">sp_t</span>hread_cond_init( &amp;pool-&gt;tp_empty, NULL );  
+         pool-&gt;tp_max_index = <span class="keyword">num_t</span>hreads_in_pool;  
          pool-&gt;tp_index = <span class="number">0</span>;  
          pool-&gt;tp_stop = <span class="number">0</span>;  
-         pool-&gt;tp_total = <span class="number">0</span>;  
-         pool-&gt;tp_list = ( _thread ** )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>( <span class="keyword">void</span> * ) *MAXT_IN_POOL );  
+         pool-&gt;<span class="keyword">tp_t</span>otal = <span class="number">0</span>;  
+         pool-&gt;tp_list = ( <span class="keyword">_t</span>hread ** )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>( <span class="keyword">void</span> * ) *MAXT_IN_POOL );  
          <span class="built_in">memset</span>( pool-&gt;tp_list, <span class="number">0</span>, <span class="keyword">sizeof</span>( <span class="keyword">void</span> * ) * MAXT_IN_POOL);  
 
          <span class="keyword">return</span> (threadpool) pool;  
@@ -611,92 +494,92 @@ threadpoolcreate_threadpool(<span class="keyword">int</span> num_threads_in_pool
 </span>{  
          <span class="keyword">int</span> ret = -<span class="number">1</span>;  
 
-         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_lock( &amp;pool-&gt;tp_mutex );  
 
          <span class="keyword">if</span>( pool-&gt;tp_index &lt; pool-&gt;tp_max_index ) {  
                    pool-&gt;tp_list[ pool-&gt;tp_index ] = thread;  
                    pool-&gt;tp_index++;  
                    ret = <span class="number">0</span>;  
 
-                   sp_thread_cond_signal( &amp;pool-&gt;tp_idle );  
+                   <span class="keyword">sp_t</span>hread_cond_signal( &amp;pool-&gt;tp_idle );  
 
-                   <span class="keyword">if</span>( pool-&gt;tp_index &gt;= pool-&gt;tp_total ) {  
-                            sp_thread_cond_signal(&amp;pool-&gt;tp_full );  
+                   <span class="keyword">if</span>( pool-&gt;tp_index &gt;= pool-&gt;<span class="keyword">tp_t</span>otal ) {  
+                            <span class="keyword">sp_t</span>hread_cond_signal(&amp;pool-&gt;tp_full );  
                    }  
          }  
 
-         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
 
          <span class="keyword">return</span> ret;  
 }  
 
-<span class="function">sp_thread_result_tSP_THREAD_CALL <span class="title">wrapper_fn</span><span class="params">( <span class="keyword">void</span> * arg )</span>  
+<span class="keyword">sp_thread_result_t</span><span class="function">SP_THREAD_CALL <span class="title">wrapper_fn</span><span class="params">( <span class="keyword">void</span> * arg )</span>  
 </span>{  
-         _thread * thread = (_thread*)arg;  
-         _threadpool * pool = (_threadpool*)thread-&gt;parent;  
+         <span class="keyword">_t</span>hread * thread = (<span class="keyword">_t</span>hread*)arg;  
+         <span class="keyword">_t</span>hreadpool * pool = (<span class="keyword">_t</span>hreadpool*)thread-&gt;parent;  
 
-         <span class="keyword">for</span>( ; <span class="number">0</span> == ((_threadpool*)thread-&gt;parent)-&gt;tp_stop; ){  
+         <span class="keyword">for</span>( ; <span class="number">0</span> == ((<span class="keyword">_t</span>hreadpool*)thread-&gt;parent)-&gt;tp_stop; ){  
                    thread-&gt;fn( thread-&gt;arg );  
 
-                   <span class="keyword">if</span>( <span class="number">0</span> !=((_threadpool*)thread-&gt;parent)-&gt;tp_stop ) <span class="keyword">break</span>;  
+                   <span class="keyword">if</span>( <span class="number">0</span> !=((<span class="keyword">_t</span>hreadpool*)thread-&gt;parent)-&gt;tp_stop ) <span class="keyword">break</span>;  
 
-                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
-                   <span class="keyword">if</span>( <span class="number">0</span> == save_thread( thread-&gt;parent, thread )) {  
-                            sp_thread_cond_wait(&amp;thread-&gt;cond, &amp;thread-&gt;mutex );  
-                            sp_thread_mutex_unlock(&amp;thread-&gt;mutex );  
+                   <span class="keyword">sp_t</span>hread_mutex_lock( &amp;thread-&gt;mutex );  
+                   <span class="keyword">if</span>( <span class="number">0</span> == <span class="keyword">save_t</span>hread( thread-&gt;parent, thread )) {  
+                            <span class="keyword">sp_t</span>hread_cond_wait(&amp;thread-&gt;cond, &amp;thread-&gt;mutex );  
+                            <span class="keyword">sp_t</span>hread_mutex_unlock(&amp;thread-&gt;mutex );  
                    } <span class="keyword">else</span> {  
-                            sp_thread_mutex_unlock(&amp;thread-&gt;mutex );  
-                            sp_thread_cond_destroy(&amp;thread-&gt;cond );  
-                            sp_thread_mutex_destroy(&amp;thread-&gt;mutex );  
+                            <span class="keyword">sp_t</span>hread_mutex_unlock(&amp;thread-&gt;mutex );  
+                            <span class="keyword">sp_t</span>hread_cond_destroy(&amp;thread-&gt;cond );  
+                            <span class="keyword">sp_t</span>hread_mutex_destroy(&amp;thread-&gt;mutex );  
 
                             <span class="built_in">free</span>( thread );  
                             <span class="keyword">break</span>;  
                    }  
          }  
 
-         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
-         pool-&gt;tp_total--;  
-         <span class="keyword">if</span>( pool-&gt;tp_total &lt;= <span class="number">0</span> ) sp_thread_cond_signal(&amp;pool-&gt;tp_empty );  
-         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+         pool-&gt;<span class="keyword">tp_t</span>otal--;  
+         <span class="keyword">if</span>( pool-&gt;<span class="keyword">tp_t</span>otal &lt;= <span class="number">0</span> ) <span class="keyword">sp_t</span>hread_cond_signal(&amp;pool-&gt;tp_empty );  
+         <span class="keyword">sp_t</span>hread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
 
          <span class="keyword">return</span> <span class="number">0</span>;  
 }  
 
-intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here, <span class="keyword">void</span>*arg)  
+<span class="keyword">intdispatch_t</span>hreadpool(threadpool from_me, dispatch_fn <span class="keyword">dispatch_t</span>o_here, <span class="keyword">void</span>*arg)  
 {  
          <span class="keyword">int</span> ret = <span class="number">0</span>;  
 
-         _threadpool *pool = (_threadpool *) from_me;  
-         sp_thread_attr_t attr;  
-         _thread * thread = NULL;  
+         <span class="keyword">_t</span>hreadpool *pool = (<span class="keyword">_t</span>hreadpool *) from_me;  
+         <span class="keyword">sp_thread_attr_t</span> attr;  
+         <span class="keyword">_t</span>hread * thread = NULL;  
 
          <span class="comment">// add your code here to dispatch a thread  </span>
-         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_lock( &amp;pool-&gt;tp_mutex );  
 
-         <span class="keyword">if</span>( pool-&gt;tp_index &lt;= <span class="number">0</span> &amp;&amp; pool-&gt;tp_total&gt;= pool-&gt;tp_max_index ) {  
-                   sp_thread_cond_wait( &amp;pool-&gt;tp_idle,&amp;pool-&gt;tp_mutex );  
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt;= <span class="number">0</span> &amp;&amp; pool-&gt;<span class="keyword">tp_t</span>otal&gt;= pool-&gt;tp_max_index ) {  
+                   <span class="keyword">sp_t</span>hread_cond_wait( &amp;pool-&gt;tp_idle,&amp;pool-&gt;tp_mutex );  
          }  
 
          <span class="keyword">if</span>( pool-&gt;tp_index &lt;= <span class="number">0</span> ) {  
-                   _thread * thread = ( _thread * )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>(_thread ) );  
+                   <span class="keyword">_t</span>hread * thread = ( <span class="keyword">_t</span>hread * )<span class="built_in">malloc</span>( <span class="keyword">sizeof</span>(<span class="keyword">_t</span>hread ) );  
                    <span class="built_in">memset</span>( &amp;( thread-&gt;id ), <span class="number">0</span>, <span class="keyword">sizeof</span>(thread-&gt;id ) );  
-                   sp_thread_mutex_init( &amp;thread-&gt;mutex, NULL);  
-                   sp_thread_cond_init( &amp;thread-&gt;cond, NULL );  
-                   thread-&gt;fn = dispatch_to_here;  
+                   <span class="keyword">sp_t</span>hread_mutex_init( &amp;thread-&gt;mutex, NULL);  
+                   <span class="keyword">sp_t</span>hread_cond_init( &amp;thread-&gt;cond, NULL );  
+                   thread-&gt;fn = <span class="keyword">dispatch_t</span>o_here;  
                    thread-&gt;arg = arg;  
                    thread-&gt;parent = pool;  
 
-                   sp_thread_attr_init( &amp;attr );  
-                   sp_thread_attr_setdetachstate( &amp;attr,SP_THREAD_CREATE_DETACHED );  
+                   <span class="keyword">sp_t</span>hread_attr_init( &amp;attr );  
+                   <span class="keyword">sp_t</span>hread_attr_setdetachstate( &amp;attr,SP_THREAD_CREATE_DETACHED );  
 
-                   <span class="keyword">if</span>( <span class="number">0</span> == sp_thread_create( &amp;thread-&gt;id,&amp;attr, wrapper_fn, thread ) ) {  
-                            pool-&gt;tp_total++;  
+                   <span class="keyword">if</span>( <span class="number">0</span> == <span class="keyword">sp_t</span>hread_create( &amp;thread-&gt;id,&amp;attr, wrapper_fn, thread ) ) {  
+                            pool-&gt;<span class="keyword">tp_t</span>otal++;  
                             <span class="built_in">printf</span>( <span class="string">"create thread#%ld\n"</span>,thread-&gt;id );  
                    } <span class="keyword">else</span> {  
                             ret = -<span class="number">1</span>;  
                             <span class="built_in">printf</span>( <span class="string">"cannot createthread\n"</span> );  
-                            sp_thread_mutex_destroy(&amp;thread-&gt;mutex );  
-                            sp_thread_cond_destroy(&amp;thread-&gt;cond );  
+                            <span class="keyword">sp_t</span>hread_mutex_destroy(&amp;thread-&gt;mutex );  
+                            <span class="keyword">sp_t</span>hread_cond_destroy(&amp;thread-&gt;cond );  
                             <span class="built_in">free</span>( thread );  
                    }  
          } <span class="keyword">else</span> {  
@@ -704,47 +587,47 @@ intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here, <span c
                    thread = pool-&gt;tp_list[ pool-&gt;tp_index ];  
                    pool-&gt;tp_list[ pool-&gt;tp_index ] = NULL;  
 
-                   thread-&gt;fn = dispatch_to_here;  
+                   thread-&gt;fn = <span class="keyword">dispatch_t</span>o_here;  
                    thread-&gt;arg = arg;  
                    thread-&gt;parent = pool;  
 
-                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
-                   sp_thread_cond_signal( &amp;thread-&gt;cond ) ;  
-                   sp_thread_mutex_unlock ( &amp;thread-&gt;mutex );  
+                   <span class="keyword">sp_t</span>hread_mutex_lock( &amp;thread-&gt;mutex );  
+                   <span class="keyword">sp_t</span>hread_cond_signal( &amp;thread-&gt;cond ) ;  
+                   <span class="keyword">sp_t</span>hread_mutex_unlock ( &amp;thread-&gt;mutex );  
          }  
 
-         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
 
          <span class="keyword">return</span> ret;  
 }  
 
 <span class="function"><span class="keyword">void</span> <span class="title">destroy_threadpool</span><span class="params">(threadpooldestroyme)</span>  
 </span>{  
-         _threadpool *pool = (_threadpool *) destroyme;  
+         <span class="keyword">_t</span>hreadpool *pool = (<span class="keyword">_t</span>hreadpool *) destroyme;  
 
          <span class="comment">// add your code here to kill a threadpool  </span>
          <span class="keyword">int</span> i = <span class="number">0</span>;  
 
-         sp_thread_mutex_lock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_lock( &amp;pool-&gt;tp_mutex );  
 
-         <span class="keyword">if</span>( pool-&gt;tp_index &lt; pool-&gt;tp_total ) {  
-                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) tofinish\n"</span>, pool-&gt;tp_total - pool-&gt;tp_index );  
-                   sp_thread_cond_wait( &amp;pool-&gt;tp_full,&amp;pool-&gt;tp_mutex );  
+         <span class="keyword">if</span>( pool-&gt;tp_index &lt; pool-&gt;<span class="keyword">tp_t</span>otal ) {  
+                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) tofinish\n"</span>, pool-&gt;<span class="keyword">tp_t</span>otal - pool-&gt;tp_index );  
+                   <span class="keyword">sp_t</span>hread_cond_wait( &amp;pool-&gt;tp_full,&amp;pool-&gt;tp_mutex );  
          }  
 
          pool-&gt;tp_stop = <span class="number">1</span>;  
 
          <span class="keyword">for</span>( i = <span class="number">0</span>; i &lt; pool-&gt;tp_index; i++ ) {  
-                   _thread * thread = pool-&gt;tp_list[ i ];  
+                   <span class="keyword">_t</span>hread * thread = pool-&gt;tp_list[ i ];  
 
-                   sp_thread_mutex_lock( &amp;thread-&gt;mutex );  
-                   sp_thread_cond_signal( &amp;thread-&gt;cond ) ;  
-                   sp_thread_mutex_unlock ( &amp;thread-&gt;mutex );  
+                   <span class="keyword">sp_t</span>hread_mutex_lock( &amp;thread-&gt;mutex );  
+                   <span class="keyword">sp_t</span>hread_cond_signal( &amp;thread-&gt;cond ) ;  
+                   <span class="keyword">sp_t</span>hread_mutex_unlock ( &amp;thread-&gt;mutex );  
          }  
 
-         <span class="keyword">if</span>( pool-&gt;tp_total &gt; <span class="number">0</span> ) {  
-                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) toexit\n"</span>, pool-&gt;tp_total );  
-                   sp_thread_cond_wait( &amp;pool-&gt;tp_empty,&amp;pool-&gt;tp_mutex );  
+         <span class="keyword">if</span>( pool-&gt;<span class="keyword">tp_t</span>otal &gt; <span class="number">0</span> ) {  
+                   <span class="built_in">printf</span>( <span class="string">"waiting for %d thread(s) toexit\n"</span>, pool-&gt;<span class="keyword">tp_t</span>otal );  
+                   <span class="keyword">sp_t</span>hread_cond_wait( &amp;pool-&gt;tp_empty,&amp;pool-&gt;tp_mutex );  
          }  
 
          <span class="keyword">for</span>( i = <span class="number">0</span>; i &lt; pool-&gt;tp_index; i++ ) {  
@@ -752,14 +635,14 @@ intdispatch_threadpool(threadpool from_me, dispatch_fn dispatch_to_here, <span c
                    pool-&gt;tp_list[ i ] = NULL;  
          }  
 
-         sp_thread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_mutex_unlock( &amp;pool-&gt;tp_mutex );  
 
          pool-&gt;tp_index = <span class="number">0</span>;  
 
-         sp_thread_mutex_destroy( &amp;pool-&gt;tp_mutex );  
-         sp_thread_cond_destroy( &amp;pool-&gt;tp_idle );  
-         sp_thread_cond_destroy( &amp;pool-&gt;tp_full );  
-         sp_thread_cond_destroy( &amp;pool-&gt;tp_empty );  
+         <span class="keyword">sp_t</span>hread_mutex_destroy( &amp;pool-&gt;tp_mutex );  
+         <span class="keyword">sp_t</span>hread_cond_destroy( &amp;pool-&gt;tp_idle );  
+         <span class="keyword">sp_t</span>hread_cond_destroy( &amp;pool-&gt;tp_full );  
+         <span class="keyword">sp_t</span>hread_cond_destroy( &amp;pool-&gt;tp_empty );  
 
          <span class="built_in">free</span>( pool-&gt;tp_list );  
          <span class="built_in">free</span>( pool );  
@@ -774,39 +657,39 @@ recv<span class="list">( <span class="keyword">accept_fd</span> ,<span class="ke
 close<span class="list">(<span class="keyword">accept_fd</span>)</span> 
 </code></pre><p>阻塞异步方式有所改进，但是Socket的阻塞方式，前一个连接没有处理完成，下一个连接不能接入，是高并发服务器所不可接收的方式。只不过在上边阻塞同步方式的基础上使用select（严格来说select是一种IO多路服用技术。因为linux尚没有完整的实现异步IO，而winsock实在理解socket没有linux上面那么直观。，这里为了方便，没有做严格的区分）或者其它异步IO方式。<br>非阻塞同步方式，通过设置socket选项为NONBLOCK，可以很快的接收连接，但是处理采用同步IO方式，服务器处理性能也比较差。<br>上边三种方式不做深入介绍。下边主要从非阻塞异步IO方式介绍。<br>非阻塞异步IO方式中，由于异步IO方式在同一系统可能有多种实现，不同系统也有不同实现，下边介绍几种常见的IO方式和服务器框架。</p>
 <p>Ø  Select<br>Select采用轮训注册的fd方式。是一种比较老的IO多路服用实现方式，效率相对要差一些。Select方式在windows和linux上都支持。<br>基本框架如下：</p>
-<pre><code><span class="keyword">socket</span>( AF_INET,SOCK_STREAM,<span class="number">0</span> )  
-<span class="keyword">fcntl</span>(listen_fd, F_SETFL,flags|O_NONBLOCK);  
-<span class="keyword">bind</span>( listen_fd, (structsockaddr *)&amp;my_addr,sizeof(struct sockaddr_in))  
-<span class="keyword">listen</span>( listen_fd,<span class="number">1</span> )  
-FD_ZERO( &amp;fd_sets );  
-FD_SET(listen_fd,&amp;fd_sets);  
-<span class="keyword">for</span>(k=<span class="number">0</span>; k&lt;=i; k++){  
-         FD_SET(accept_fds[k],&amp;fd_sets);  
+<pre><code>socket<span class="params">( AF_INET,SOCK_STREAM,<span class="number">0</span> )</span>  
+fcntl<span class="params">(listen_fd, F_SETFL,flags|O_NONBLOCK)</span>;  
+bind<span class="params">( listen_fd, <span class="params">(structsockaddr *)</span>&amp;my_addr,sizeof<span class="params">(struct sockaddr_in)</span>)</span>  
+listen<span class="params">( listen_fd,<span class="number">1</span> )</span>  
+FD_ZERO<span class="params">( &amp;fd_sets )</span>;  
+FD_SET<span class="params">(listen_fd,&amp;fd_sets)</span>;  
+<span class="keyword">for</span><span class="params">(k=<span class="number">0</span>; k&lt;=i; k++)</span>{  
+         FD_SET<span class="params">(accept_fds[k],&amp;fd_sets)</span>;  
 }  
-events = <span class="keyword">select</span>( max_fd + <span class="number">1</span>,&amp;fd_sets, NULL, NULL, NULL );  
-<span class="keyword">if</span>(FD_ISSET(listen_fd,&amp;fd_sets) ){  
-accept_fd = <span class="keyword">accept</span>( listen_fd, (structsockaddr *)&amp;remote_addr,&amp;addr_len );  
+events = select<span class="params">( max_fd + <span class="number">1</span>,&amp;fd_sets, NULL, NULL, NULL )</span>;  
+<span class="keyword">if</span><span class="params">(FD_ISSET<span class="params">(listen_fd,&amp;fd_sets)</span> )</span>{  
+accept_fd = accept<span class="params">( listen_fd, <span class="params">(structsockaddr *)</span>&amp;remote_addr,&amp;addr_len )</span>;  
 }  
-<span class="keyword">for</span>( j=<span class="number">0</span>; j&lt;=i; j++ ){  
-         <span class="keyword">if</span>( FD_ISSET(accept_fds[j],&amp;fd_sets) ){  
-                   <span class="keyword">recv</span>( accept_fds[j] ,&amp;in_buf ,<span class="number">1024</span> ,<span class="number">0</span> );  
+<span class="keyword">for</span><span class="params">( j=<span class="number">0</span>; j&lt;=i; j++ )</span>{  
+         <span class="keyword">if</span><span class="params">( FD_ISSET<span class="params">(accept_fds[j],&amp;fd_sets)</span> )</span>{  
+                   recv<span class="params">( accept_fds[j] ,&amp;in_buf ,<span class="number">1024</span> ,<span class="number">0</span> )</span>;  
          }  
 }  
 </code></pre><p>Ø  Epoll<br>Epoll是linux2.6内核以后支持的一种高性能的IO多路服用技术。服务器框架如下：<br>[cpp] view plaincopy</p>
-<pre><code><span class="title">socket</span>( <span class="type">AF_INET</span>,<span class="type">SOCK_STREAM</span>,<span class="number">0</span> )  
-<span class="title">fcntl</span>(listen_fd, <span class="type">F_SETFL</span>,flags|<span class="type">O_NONBLOCK</span>);  
-<span class="title">bind</span>( listen_fd, (structsockaddr *)&amp;my_addr,sizeof(struct sockaddr_in))  
-<span class="title">listen</span>( listen_fd,<span class="number">1</span> )  
-<span class="title">epoll_ctl</span>(epfd,<span class="type">EPOLL_CTL_ADD</span>,listen_fd,&amp;ev);  
-<span class="title">ev_s</span> = epoll_wait(epfd,events,<span class="number">20</span>,<span class="number">500</span> );  
-<span class="title">for</span>(i=<span class="number">0</span>; i&lt;ev_s;i++){  
-                   <span class="keyword">if</span>(events[i].<span class="typedef"><span class="keyword">data</span>.fd==listen_fd)<span class="container">{  
-                            <span class="title">accept_fd</span> = <span class="title">accept</span>( <span class="title">listen_fd</span>,(<span class="title">structsockaddr</span> *)&amp;<span class="title">remote_addr</span>,&amp;<span class="title">addr_len</span> );  
-                            <span class="title">fcntl</span>(<span class="title">accept_fd</span>, <span class="type">F_SETFL</span>,<span class="title">flags</span>|<span class="type">O_NONBLOCK</span>);  
-                            <span class="title">epoll_ctl</span>(<span class="title">epfd</span>,<span class="type">EPOLL_CTL_ADD</span>,<span class="title">accept_fd</span>,&amp;<span class="title">ev</span>);  
-                   }</span>  </span>
-                   <span class="keyword">else</span> <span class="keyword">if</span>(events[i].events&amp;<span class="type">EPOLLIN</span>){  
-                            recv( events[i].<span class="typedef"><span class="keyword">data</span>.fd ,&amp;in_buf,1024 ,0 );  </span>
+<pre><code>socket<span class="params">( AF_INET,SOCK_STREAM,<span class="number">0</span> )</span>  
+fcntl<span class="params">(listen_fd, F_SETFL,flags|O_NONBLOCK)</span>;  
+bind<span class="params">( listen_fd, <span class="params">(structsockaddr *)</span>&amp;my_addr,sizeof<span class="params">(struct sockaddr_in)</span>)</span>  
+listen<span class="params">( listen_fd,<span class="number">1</span> )</span>  
+epoll_ctl<span class="params">(epfd,EPOLL_CTL_ADD,listen_fd,&amp;ev)</span>;  
+ev_s = epoll_wait<span class="params">(epfd,events,<span class="number">20</span>,<span class="number">500</span> )</span>;  
+<span class="keyword">for</span><span class="params">(i=<span class="number">0</span>; i&lt;ev_s;i++)</span>{  
+                   <span class="keyword">if</span><span class="params">(events[i].data.fd==listen_fd)</span>{  
+                            accept_fd = accept<span class="params">( listen_fd,<span class="params">(structsockaddr *)</span>&amp;remote_addr,&amp;addr_len )</span>;  
+                            fcntl<span class="params">(accept_fd, F_SETFL,flags|O_NONBLOCK)</span>;  
+                            epoll_ctl<span class="params">(epfd,EPOLL_CTL_ADD,accept_fd,&amp;ev)</span>;  
+                   }  
+                   <span class="keyword">else</span> <span class="keyword">if</span><span class="params">(events[i].events&amp;EPOLLIN)</span>{  
+                            recv<span class="params">( events[i].data.fd ,&amp;in_buf,<span class="number">1024</span> ,<span class="number">0</span> )</span>;  
                    }  
 }  
 </code></pre><p>Ø  AIO<br>在windows上微软实现了异步IO，通过AIO可以方便的实现高并发的服务器。框架如下：<br>[cpp] view plaincopy</p>
@@ -956,10 +839,10 @@ WSASend(PerHandleData-&gt; Socket,  &amp; (PerIoData -&gt;DataBuf),  1 ,  &amp; 
     <span class="comment">//handle_request(ev );  </span>
     <span class="comment">//registerto epoll EPOLLOUT  </span>
 
-    <span class="keyword">struct</span> epoll_eventev_temp;  
-    ev_temp.data.ptr = ev;  
-    ev_temp.events = EPOLLOUT|EPOLLET;  
-    epoll_ctl( ev-&gt;epoll_fd, EPOLL_CTL_MOD, ev-&gt;socket_fd, &amp;ev_temp );  
+    <span class="keyword">struct</span> <span class="keyword">epoll_eventev_t</span>emp;  
+    <span class="keyword">ev_t</span>emp.data.ptr = ev;  
+    <span class="keyword">ev_t</span>emp.events = EPOLLOUT|EPOLLET;  
+    epoll_ctl( ev-&gt;epoll_fd, EPOLL_CTL_MOD, ev-&gt;socket_fd, &amp;<span class="keyword">ev_t</span>emp );  
     <span class="keyword">return</span> SUCCESS;  
 }  
 
@@ -1041,7 +924,7 @@ WSASend(PerHandleData-&gt; Socket,  &amp; (PerIoData -&gt;DataBuf),  1 ,  &amp; 
     fstat(ev-&gt;file_fd, &amp;file_info);  
     <span class="keyword">int</span> write_num;  
     <span class="keyword">while</span>(<span class="number">1</span>){  
-        write_num = sendfile( ev-&gt;socket_fd, ev-&gt;file_fd, (off_t *)&amp;ev-&gt;file_pos, <span class="number">10240</span> );  
+        write_num = sendfile( ev-&gt;socket_fd, ev-&gt;file_fd, (<span class="keyword">off_t</span> *)&amp;ev-&gt;file_pos, <span class="number">10240</span> );  
         ev-&gt;file_pos += write_num;  
         <span class="keyword">if</span>( write_num == ERROR ){  
             <span class="keyword">if</span>( errno == EAGAIN ){  
@@ -1116,13 +999,13 @@ WSASend(PerHandleData-&gt; Socket,  &amp; (PerIoData -&gt;DataBuf),  1 ,  &amp; 
 <pre><code><span class="comment">/** 
  * 动态内容静态化的Filter。将变化非常缓慢的动态文件生成静态文件。 
  */</span>  
-<span class="keyword">package</span> com.zsl.cache.<span class="built_in">filter</span>;  
+package com.zsl.cache.filter;  
 
-<span class="keyword">import</span> java.io.File;  
-<span class="keyword">import</span> java.io.IOException;  
-<span class="keyword">import</span> java.io.UnsupportedEncodingException;  
-<span class="keyword">import</span> java.net.URLEncoder;  
-<span class="keyword">import</span> java.util.Map;  
+<span class="built_in">import</span> java.io.File;  
+<span class="built_in">import</span> java.io.IOException;  
+<span class="built_in">import</span> java.io.UnsupportedEncodingException;  
+<span class="built_in">import</span> java.net.URLEncoder;  
+<span class="built_in">import</span> java.util.Map;  
 
 importjavax.management.RuntimeErrorException;  
 importjavax.servlet.FilterChain;  
@@ -1143,95 +1026,95 @@ importcom.sun.xml.bind.v2.runtime.output.Encoded;
  * @author zsl 
  * 
  */</span>  
-<span class="keyword">public</span> class FileCacheFilterextends AbstractCacheFilter{  
-         <span class="keyword">private</span> <span class="keyword">String</span> root;  
+public class FileCacheFilterextends AbstractCacheFilter{  
+         private String root;  
 
-         <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">String</span> SUFFIX = <span class="string">".html"</span>;  
+         private final String SUFFIX = <span class="string">".html"</span>;  
 
-         <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> setFileDir(Resource dir){  
-                   <span class="keyword">try</span> {  
-                            File f = dir.getFile();  
-                            f.mkdirs();  
-                            <span class="keyword">if</span>(!f.isDirectory()){  
-                                     <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"Invalid directory: "</span>+f.getPath());  
+         public final void setFileDir<span class="params">(Resource dir)</span>{  
+                   try {  
+                            File f = dir.getFile<span class="params">()</span>;  
+                            f.mkdirs<span class="params">()</span>;  
+                            <span class="keyword">if</span><span class="params">(!f.isDirectory<span class="params">()</span>)</span>{  
+                                     throw newIllegalArgumentException<span class="params">(<span class="string">"Invalid directory: "</span>+f.getPath<span class="params">()</span>)</span>;  
                             }  
-                            <span class="keyword">if</span>(!f.canWrite())  
-                                     <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"Cannot write to directory: "</span>+f.getPath());  
-                            root = f.getPath();  
+                            <span class="keyword">if</span><span class="params">(!f.canWrite<span class="params">()</span>)</span>  
+                                     throw newIllegalArgumentException<span class="params">(<span class="string">"Cannot write to directory: "</span>+f.getPath<span class="params">()</span>)</span>;  
+                            root = f.getPath<span class="params">()</span>;  
 
-                            <span class="keyword">if</span>(!root.endsWith(<span class="string">"/"</span>)&amp;&amp;!root.endsWith(<span class="string">"//"</span>))  
+                            <span class="keyword">if</span><span class="params">(!root.endsWith<span class="params">(<span class="string">"/"</span>)</span>&amp;&amp;!root.endsWith<span class="params">(<span class="string">"//"</span>)</span>)</span>  
                                      root = root+<span class="string">"/"</span>;  
-                   } <span class="keyword">catch</span> (IOException e) {  
-                            <span class="comment">// TODO Auto-generated catch block  </span>
-                            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(e);  
+                   } catch <span class="params">(IOException e)</span> {  
+                            <span class="comment">// <span class="doctag">TODO</span> Auto-generated catch block  </span>
+                            throw new IllegalArgumentException<span class="params">(e)</span>;  
                    }  
          }  
 
-         <span class="keyword">public</span> <span class="keyword">void</span> afterPropertiesSet() <span class="keyword">throws</span> Exception {  
-                   <span class="keyword">super</span>.afterPropertiesSet();  
-                   <span class="keyword">if</span>(!<span class="keyword">new</span> File(root).isDirectory()){  
-                            <span class="keyword">throw</span> newIllegalArgumentException(<span class="string">"No directory: "</span>+root);  
+         public void afterPropertiesSet<span class="params">()</span> throws Exception {  
+                   super.afterPropertiesSet<span class="params">()</span>;  
+                   <span class="keyword">if</span><span class="params">(!new File<span class="params">(root)</span>.isDirectory<span class="params">()</span>)</span>{  
+                            throw newIllegalArgumentException<span class="params">(<span class="string">"No directory: "</span>+root)</span>;  
                    }  
          }  
 
-         <span class="keyword">public</span> <span class="keyword">void</span> doFilter(ServletRequest request,ServletResponseresponse,FilterChain chain) <span class="keyword">throws</span> IOException,ServletException {  
-                   HttpServletRequest httpRequest =(HttpServletRequest)request;  
-                   <span class="keyword">String</span> <span class="variable">key</span> = getKey(httpRequest);  
-                   <span class="keyword">if</span>(<span class="variable">key</span> == <span class="keyword">null</span>){  
-                            chain.doFilter(request,response);  
+         public void doFilter<span class="params">(ServletRequest request,ServletResponseresponse,FilterChain chain)</span> throws IOException,ServletException {  
+                   HttpServletRequest httpRequest =<span class="params">(HttpServletRequest)</span>request;  
+                   String key = getKey<span class="params">(httpRequest)</span>;  
+                   <span class="keyword">if</span><span class="params">(key == null)</span>{  
+                            chain.doFilter<span class="params">(request,response)</span>;  
                    }<span class="keyword">else</span>{  
-                            File file = key2File(<span class="variable">key</span>);  
-                            <span class="keyword">if</span>(file.isFile()){  
-                                     HttpServletResponse httpResponse= (HttpServletResponse)response;  
-                                     httpResponse.setContentType(getContentType());  
-                                     httpResponse.setHeader(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>);  
-                                     httpResponse.setContentLength((<span class="built_in">int</span>)file.length());  
-                                     FileUtil.readFil(file,httpResponse.getOutputStream());  
+                            File file = key2File<span class="params">(key)</span>;  
+                            <span class="keyword">if</span><span class="params">(file.isFile<span class="params">()</span>)</span>{  
+                                     HttpServletResponse httpResponse= <span class="params">(HttpServletResponse)</span>response;  
+                                     httpResponse.setContentType<span class="params">(getContentType<span class="params">()</span>)</span>;  
+                                     httpResponse.setHeader<span class="params">(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>)</span>;  
+                                     httpResponse.setContentLength<span class="params">(<span class="params">(int)</span>file.length<span class="params">()</span>)</span>;  
+                                     FileUtil.readFil<span class="params">(file,httpResponse.getOutputStream<span class="params">()</span>)</span>;  
                             }<span class="keyword">else</span>{  
                                      <span class="comment">//缓存未找到文件  </span>
-                                     HttpServletResponse httpResponse= (HttpServletResponse)response;  
-                                     CachedResponseWrapper wrapper =<span class="keyword">new</span> CachedResponseWrapper(httpResponse);  
-                                     chain.doFilter(request,response);  
-                                     <span class="keyword">if</span>(wrapper.getStatus() ==HttpServletResponse.SC_OK){  
-                                               <span class="built_in">byte</span>[] data =GZipUtil.gzip(wrapper.getResponseData());  
-                                               FileUtil.writeFile(file,data);  
-                                               httpResponse.setContentType(getContentType());  
-                                               httpResponse.setHeader(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>);  
-                                               httpResponse.setContentLength(data.length);  
-                                               httpResponse.getOutputStream().write(data);  
+                                     HttpServletResponse httpResponse= <span class="params">(HttpServletResponse)</span>response;  
+                                     CachedResponseWrapper wrapper =new CachedResponseWrapper<span class="params">(httpResponse)</span>;  
+                                     chain.doFilter<span class="params">(request,response)</span>;  
+                                     <span class="keyword">if</span><span class="params">(wrapper.getStatus<span class="params">()</span> ==HttpServletResponse.SC_OK)</span>{  
+                                               byte[] data =GZipUtil.gzip<span class="params">(wrapper.getResponseData<span class="params">()</span>)</span>;  
+                                               FileUtil.writeFile<span class="params">(file,data)</span>;  
+                                               httpResponse.setContentType<span class="params">(getContentType<span class="params">()</span>)</span>;  
+                                               httpResponse.setHeader<span class="params">(<span class="string">"Content-Encoding"</span>,<span class="string">"gzip"</span>)</span>;  
+                                               httpResponse.setContentLength<span class="params">(data.length)</span>;  
+                                               httpResponse.getOutputStream<span class="params">()</span>.write<span class="params">(data)</span>;  
                                      }  
                             }  
                    }  
 
          }  
 
-         <span class="keyword">private</span> File key2File(<span class="keyword">String</span> <span class="variable">key</span>){  
-                   <span class="built_in">int</span>  hash =<span class="variable">key</span>.hashCode();  
-                   <span class="built_in">int</span> dir1 = (hash &amp;<span class="number">0xff00</span>)&gt;&gt;<span class="number">8</span>;  
-                   <span class="built_in">int</span> dir2 = hash &amp; <span class="number">0xff</span>;  
-                   <span class="keyword">String</span>  dir= root+dir1+<span class="string">"/"</span>+dir2;  
-                   File fdir = <span class="keyword">new</span> File(dir);  
-                   <span class="keyword">if</span>(!fdir.isAbsolute()){  
-                            <span class="keyword">if</span>(!fdir.mkdirs()){  
-                                     <span class="keyword">return</span> <span class="keyword">null</span>;  
+         private File key2File<span class="params">(String key)</span>{  
+                   int  hash =key.hashCode<span class="params">()</span>;  
+                   int dir1 = <span class="params">(hash &amp;<span class="number">0</span>xff00)</span>&gt;&gt;<span class="number">8</span>;  
+                   int dir2 = hash &amp; <span class="number">0</span>xff;  
+                   String  dir= root+dir1+<span class="string">"/"</span>+dir2;  
+                   File fdir = new File<span class="params">(dir)</span>;  
+                   <span class="keyword">if</span><span class="params">(!fdir.isAbsolute<span class="params">()</span>)</span>{  
+                            <span class="keyword">if</span><span class="params">(!fdir.mkdirs<span class="params">()</span>)</span>{  
+                                     return null;  
                             }  
                    }  
-                   <span class="keyword">return</span> newFile(dir+<span class="string">"/"</span>+encode(<span class="variable">key</span>)+SUFFIX);  
+                   return newFile<span class="params">(dir+<span class="string">"/"</span>+encode<span class="params">(key)</span>+SUFFIX)</span>;  
          }  
 
-         <span class="keyword">private</span> <span class="keyword">String</span> encode(<span class="keyword">String</span> <span class="variable">key</span>){  
-                   <span class="keyword">try</span> {  
-                            <span class="keyword">return</span> URLEncoder.encode(<span class="variable">key</span>,<span class="string">"UTF-8"</span>);  
-                   } <span class="keyword">catch</span> (UnsupportedEncodingException e) {  
-                            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);  
+         private String encode<span class="params">(String key)</span>{  
+                   try {  
+                            return URLEncoder.encode<span class="params">(key,<span class="string">"UTF-8"</span>)</span>;  
+                   } catch <span class="params">(UnsupportedEncodingException e)</span> {  
+                            throw new RuntimeException<span class="params">(e)</span>;  
                    }  
 
          }  
 
-         <span class="keyword">public</span> <span class="keyword">void</span> remove(<span class="keyword">String</span> url,Map&lt;<span class="keyword">String</span>,<span class="keyword">String</span>&gt;parameters){  
-                   <span class="keyword">String</span> <span class="variable">key</span> =getKey(HttpServletRequestFactory.create(url,parameters));  
-                   <span class="keyword">if</span>(<span class="variable">key</span> != <span class="keyword">null</span>){  
-                            FileUtil.remveFile(key2File(<span class="variable">key</span>));  
+         public void remove<span class="params">(String url,Map&lt;String,String&gt;parameters)</span>{  
+                   String key =getKey<span class="params">(HttpServletRequestFactory.create<span class="params">(url,parameters)</span>)</span>;  
+                   <span class="keyword">if</span><span class="params">(key != null)</span>{  
+                            FileUtil.remveFile<span class="params">(key2File<span class="params">(key)</span>)</span>;  
                    }  
          }  
 }  
@@ -1313,124 +1196,438 @@ importorg.apache.commons.logging.LogFactory;
 </ol>
 <p>云计算</p>
 <p>转自：<a href="http://blog.csdn.net/shatty/article/details/6629896" target="_blank" rel="external">http://blog.csdn.net/shatty/article/details/6629896</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
 
-      
-    </div>
-    
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/concurrent/">concurrent</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://krisjin.github.io/2015/04/08/high-concurrent-system-design/" data-title="高并发系统设计 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2015/04/09/permission/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption"><</strong>
-      <div class="article-nav-title">
-        
-          权限流程图
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2015/04/08/concurrent-nio/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">高吞吐高并发Java NIO服务的架构</div>
-      <strong class="article-nav-caption">></strong>
-    </a>
-  
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/09/permission/" title="权限流程图">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  权限流程图</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/08/concurrent-nio/"  title="高吞吐高并发Java NIO服务的架构">
+ <strong>NEXT:</strong><br/> 
+ <span>高吞吐高并发Java NIO服务的架构
+</span>
+</a>
+</div>
+
 </nav>
 
-  
-</article>
+	
+<section class="comment">
+	
+	<div class="ds-thread" data-title="高并发系统设计" data-thread-key="high-concurrent-system-design" data-author-key="krisjin" data-url="http://krisjin.github.io/post/high-concurrent-system-design"></div>
+	
+</section>
 
 
-<div class="share">
-	<!-- JiaThis Button BEGIN -->
-	<div class="jiathis_style">
-		<span class="jiathis_txt">分享到：</span>
-		<a class="jiathis_button_tsina"></a>
-		<a class="jiathis_button_cqq"></a>
-		<a class="jiathis_button_douban"></a>
-		<a class="jiathis_button_weixin"></a>
-		<a class="jiathis_button_tumblr"></a>
-		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、引子"><span class="toc-number">1.</span> <span class="toc-text">一、引子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、服务器内部设计"><span class="toc-number">2.</span> <span class="toc-text">二、服务器内部设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Java高并发服务器"><span class="toc-number">2.1.</span> <span class="toc-text">1. Java高并发服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_C高并发服务器设计"><span class="toc-number">2.2.</span> <span class="toc-text">2. C高并发服务器设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1)_基本概念"><span class="toc-number">2.2.1.</span> <span class="toc-text">1) 基本概念</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-_分布式系统设计"><span class="toc-number">3.</span> <span class="toc-text">三. 分布式系统设计</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+<div id="authorInfo">
+	
+		<div class="author-logo"></div>		
+	
+	<div class="social-list" class="clearfix">
+		
+		
+		
+		
+		
 	</div>
-	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
-	<!-- JiaThis Button END -->
+</div>
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Architecture/" title="Architecture">Architecture<sup>7</sup></a></li>
+		
+			<li><a href="/categories/Guice/" title="Guice">Guice<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MicroServices/" title="MicroServices">MicroServices<sup>2</sup></a></li>
+		
+			<li><a href="/categories/NIO/" title="NIO">NIO<sup>3</sup></a></li>
+		
+			<li><a href="/categories/NLP/" title="NLP">NLP<sup>1</sup></a></li>
+		
+			<li><a href="/categories/NoSQL/" title="NoSQL">NoSQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Recommendation/" title="Recommendation">Recommendation<sup>1</sup></a></li>
+		
+			<li><a href="/categories/concurrent/" title="concurrent">concurrent<sup>3</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design pattern">design pattern<sup>3</sup></a></li>
+		
+			<li><a href="/categories/git/" title="git">git<sup>2</sup></a></li>
+		
+			<li><a href="/categories/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/categories/idea/" title="idea">idea<sup>1</sup></a></li>
+		
+			<li><a href="/categories/life/" title="life">life<sup>1</sup></a></li>
+		
+			<li><a href="/categories/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+		
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>2</sup></a></li>
+		
+			<li><a href="/categories/netty/" title="netty">netty<sup>13</sup></a></li>
+		
+			<li><a href="/categories/nexus/" title="nexus">nexus<sup>1</sup></a></li>
+		
+			<li><a href="/categories/product/" title="product">product<sup>1</sup></a></li>
+		
+			<li><a href="/categories/protobuf/" title="protobuf">protobuf<sup>1</sup></a></li>
+		
+			<li><a href="/categories/read-book/" title="read book">read book<sup>1</sup></a></li>
+		
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/categories/spring/" title="spring">spring<sup>7</sup></a></li>
+		
+			<li><a href="/categories/tcp/" title="tcp">tcp<sup>1</sup></a></li>
+		
+			<li><a href="/categories/thread/" title="thread">thread<sup>1</sup></a></li>
+		
+			<li><a href="/categories/zookeeper/" title="zookeeper">zookeeper<sup>1</sup></a></li>
+		
+			<li><a href="/categories/创业/" title="创业">创业<sup>1</sup></a></li>
+		
+		</ul>
 </div>
 
 
-
-<div class="duoshuo">
-	<!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="high-concurrent-system-design" data-title="高并发系统设计" data-url="http://krisjin.github.io/2015/04/08/high-concurrent-system-design/"></div>
-	<!-- 多说评论框 end -->
-	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-	<script type="text/javascript">
-	var duoshuoQuery = {short_name:"krisjin"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-	<!-- 多说公共JS代码 end -->
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NLP/" title="NLP">NLP<sup>1</sup></a></li>
+		
+			<li><a href="/tags/TF-IDF/" title="TF-IDF">TF-IDF<sup>1</sup></a></li>
+		
+			<li><a href="/tags/buffer/" title="buffer">buffer<sup>1</sup></a></li>
+		
+			<li><a href="/tags/cap/" title="cap">cap<sup>1</sup></a></li>
+		
+			<li><a href="/tags/centos/" title="centos">centos<sup>1</sup></a></li>
+		
+			<li><a href="/tags/channelpipeline/" title="channelpipeline">channelpipeline<sup>1</sup></a></li>
+		
+			<li><a href="/tags/di/" title="di">di<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gather/" title="gather">gather<sup>1</sup></a></li>
+		
+			<li><a href="/tags/git/" title="git">git<sup>2</sup></a></li>
+		
+			<li><a href="/tags/git-server/" title="git server">git server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/guice/" title="guice">guice<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>1</sup></a></li>
+		
+			<li><a href="/tags/idea/" title="idea">idea<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ioc/" title="ioc">ioc<sup>1</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/netty/" title="netty">netty<sup>10</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+		</ul>
 </div>
 
 
-
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+      <li><a href="http://gengbiao.me" target="_blank" title="coney">coney's Blog</a></li>
+    </ul>
 </div>
-      <footer id="footer">
-  <div class="outer">
-    <div id="footer-info">
-    	<div class="footer-left">
-    		&copy; 2015 krisjin
-    	</div>
-      	<div class="footer-right">
-      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
-      	</div>
+
+
+  <div class="rsspart">
+	<a href="atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/NIO/" style="font-size: 10px;">NIO</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a> <a href="/tags/buffer/" style="font-size: 10px;">buffer</a> <a href="/tags/cap/" style="font-size: 10px;">cap</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a> <a href="/tags/di/" style="font-size: 10px;">di</a> <a href="/tags/gather/" style="font-size: 10px;">gather</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/git-server/" style="font-size: 10px;">git server</a> <a href="/tags/guice/" style="font-size: 10px;">guice</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/ioc/" style="font-size: 10px;">ioc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 20px;">netty</a> <a href="/tags/nio/" style="font-size: 10px;">nio</a> <a href="/tags/nosql/" style="font-size: 10px;">nosql</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/scatter/" style="font-size: 10px;">scatter</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/websocket/" style="font-size: 10px;">websocket</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a> <a href="/tags/关键字/" style="font-size: 10px;">关键字</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/并发/" style="font-size: 10px;">并发</a> <a href="/tags/流程图/" style="font-size: 10px;">流程图</a> <a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a> <a href="/tags/马云/" style="font-size: 10px;">马云</a>
     </div>
   </div>
-</footer>
+
+
+</aside>
+</div>
     </div>
+    <footer><div id="footer" >
     
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
-  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
-
-
-<script src="/js/mobile.js" type="text/javascript"></script>
-<script src="/js/main.js" type="text/javascript"></script>
-
-
-
-
-
-<! -- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-        processEscapes: true,
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            <p class="copyright"> © 2015 
+		
+		<a href="http://krisjin.github.io" target="_blank" title="krisjin">krisjin</a>
+		
+            && Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> && Theme by <a href="http://gengbiao.me" target="_blank" title="coney">coney</a>
+            </div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
     }
-});
-
-MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-        all[i].SourceElement().parentNode.className += ' has-jax';                 
-    }       
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
 });
 </script>
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+<script>
+    
+        var _bdImg = '4';
+    
+    window._bd_share_config={
+        "common":{
+            "bdSnsKey":{
+
+            },
+            "bdText":"",
+            "bdMini":"2",
+            "bdMiniList":[
+                "qzone",
+                "tsina",
+                "weixin",
+                "renren",
+                "tqq",
+                "tieba",
+                "douban",
+                "sqq",
+                "diandian",
+                "huaban",
+                "youdao",
+                "mail",
+                "ty",
+                "fbook",
+                "twi",
+                "linkedin",
+                "copy",
+                "print"
+            ],
+            "bdPic":"",
+            "bdStyle":"0",
+            "bdSize":"16"
+        },
+        "slide":{
+            "type":"slide",
+            "bdImg":_bdImg,
+            "bdPos":"right",
+            "bdTop":"350"
+        },
+        "image":{
+            "viewList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ],
+            "viewText":"分享：",
+            "viewSize":"16"
+        },
+        "selectShare":{
+            "bdContainerClass":null,
+            "bdSelectMiniList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ]
+        }
+    };
+    with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
 </script>
 
 
 
-  </div>
-</body>
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
 </html>
+

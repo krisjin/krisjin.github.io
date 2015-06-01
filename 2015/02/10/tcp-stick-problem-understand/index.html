@@ -1,234 +1,109 @@
-<!DOCTYPE html>
-<html>
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="baidu_union_verify" content="d1952c66cf48912e21c18c7c581f382a">
+  <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
+<meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-  <title>理解TCP粘包问题之网络编程总结 | krisjin博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="协议简述
+    <title>理解TCP粘包问题之网络编程总结 | krisjin博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="krisjin">
+    
+    <meta name="description" content="协议简述
 TCP/IP协议 ：链路层，网络层，传输层，应用层。 　　
 以太网（Ethernet）的数据帧在链路层 　　
 IP包在网络层 　　
 TCP或UDP包在传输层 　　
 TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝">
-<meta property="og:type" content="article">
-<meta property="og:title" content="理解TCP粘包问题之网络编程总结">
-<meta property="og:url" content="http://krisjin.github.io/2015/02/10/tcp-stick-problem-understand/index.html">
-<meta property="og:site_name" content="krisjin博客">
-<meta property="og:description" content="协议简述
-TCP/IP协议 ：链路层，网络层，传输层，应用层。 　　
-以太网（Ethernet）的数据帧在链路层 　　
-IP包在网络层 　　
-TCP或UDP包在传输层 　　
-TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="理解TCP粘包问题之网络编程总结">
-<meta name="twitter:description" content="协议简述
-TCP/IP协议 ：链路层，网络层，传输层，应用层。 　　
-以太网（Ethernet）的数据帧在链路层 　　
-IP包在网络层 　　
-TCP或UDP包在传输层 　　
-TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包｛TCP或UDP｛Data｝｝｝">
-  
-    <link rel="alternative" href="/atom.xml" title="krisjin博客" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  <link rel="stylesheet" href="/css/style.css" type="text/css">
-  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    
+    
+    
+    
+    <link rel="alternate" href="atom.xml" title="krisjin博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            var _bdId ='391982416296a0d54221f59fe35250d4';
+             hm.src = "//hm.baidu.com/hm.js?" + _bdId;
+             var s = document.getElementsByTagName("script")[0]; 
+             s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+     
 </head>
-<body>
-  <div id="container">
-    <div class="left-col">
-    <div class="overlay"></div>
-<div class="intrude-less">
-	<header id="header" class="inner">
-		<a href="/" class="profilepic">
-			<img lazy-src="" class="js-avatar">
-		</a>
 
-		<hgroup>
-		  <h1 class="header-author"><a href="/">krisjin</a></h1>
-		</hgroup>
-
+  <body>
+    <header>
+      <div>
 		
-		<p class="header-subtitle">一步一脚印</p>
-		
-
-		
-			<div class="switch-btn">
-				<div class="icon">
-					<div class="icon-ctn">
-						<div class="icon-wrap icon-house" data-idx="0">
-							<div class="birdhouse"></div>
-							<div class="birdhouse_holes"></div>
-						</div>
-						<div class="icon-wrap icon-ribbon hide" data-idx="1">
-							<div class="ribbon"></div>
-						</div>
-						
-						
-						<div class="icon-wrap icon-me hide" data-idx="3">
-							<div class="user"></div>
-							<div class="shoulder"></div>
-						</div>
-						
-					</div>
-					
-				</div>
-				<div class="tips-box hide">
-					<div class="tips-arrow"></div>
-					<ul class="tips-inner">
-						<li>菜单</li>
-						<li>标签</li>
-						
-						
-						<li>关于我</li>
-						
-					</ul>
-				</div>
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="krisjin博客">krisjin博客</a></h1>
+				<a class="blog-motto">一步一脚印</a>
 			</div>
-		
-
-		<div class="switch-area">
-			<div class="switch-wrap">
-				<section class="switch-part switch-part1">
-					<nav class="header-menu">
-						<ul>
-						
-							<li><a href="/">主页</a></li>
-				        
-							<li><a href="/archives">归档</a></li>
-				        
-							<li><a href="/readbook">读书</a></li>
-				        
-							<li><a href="/categories">分类</a></li>
-				        
-							<li><a href="/about">关于</a></li>
-				        
-						</ul>
-					</nav>
-					<nav class="header-nav">
-						<div class="social">
-							
-								<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
-					        
-								<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
-					        
-								<a class="rss" target="_blank" href="/#" title="rss">rss</a>
-					        
-						</div>
-					</nav>
-				</section>
-				
-				
-				<section class="switch-part switch-part2">
-					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/NIO/" style="font-size: 10px;">NIO</a><a href="/tags/NLP/" style="font-size: 10px;">NLP</a><a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a><a href="/tags/buffer/" style="font-size: 10px;">buffer</a><a href="/tags/cap/" style="font-size: 10px;">cap</a><a href="/tags/centos/" style="font-size: 10px;">centos</a><a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a><a href="/tags/di/" style="font-size: 10px;">di</a><a href="/tags/gather/" style="font-size: 10px;">gather</a><a href="/tags/git/" style="font-size: 10px;">git</a><a href="/tags/git-server/" style="font-size: 10px;">git server</a><a href="/tags/guice/" style="font-size: 10px;">guice</a><a href="/tags/http/" style="font-size: 10px;">http</a><a href="/tags/idea/" style="font-size: 10px;">idea</a><a href="/tags/ioc/" style="font-size: 10px;">ioc</a><a href="/tags/java/" style="font-size: 10px;">java</a><a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a><a href="/tags/mysql/" style="font-size: 10px;">mysql</a><a href="/tags/netty/" style="font-size: 20px;">netty</a><a href="/tags/nio/" style="font-size: 10px;">nio</a><a href="/tags/nosql/" style="font-size: 10px;">nosql</a><a href="/tags/redis/" style="font-size: 10px;">redis</a><a href="/tags/scatter/" style="font-size: 10px;">scatter</a><a href="/tags/thread/" style="font-size: 10px;">thread</a><a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a><a href="/tags/websocket/" style="font-size: 10px;">websocket</a><a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a><a href="/tags/关键字/" style="font-size: 10px;">关键字</a><a href="/tags/分布式/" style="font-size: 10px;">分布式</a><a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a><a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a><a href="/tags/并发/" style="font-size: 10px;">并发</a><a href="/tags/流程图/" style="font-size: 10px;">流程图</a><a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a><a href="/tags/马云/" style="font-size: 10px;">马云</a>
-					</div>
-				</section>
-				
-				
-				
-
-				
-				
-				<section class="switch-part switch-part3">
-				
-					<div id="js-aboutme">技术博客</div>
-				</section>
-				
-			</div>
-		</div>
-	</header>				
-</div>
-    </div>
-    <div class="mid-col">
-      <nav id="mobile-nav">
-  	<div class="overlay">
-  		<div class="slider-trigger"></div>
-  		<h1 class="header-author js-mobile-header hide">krisjin</h1>
-  	</div>
-	<div class="intrude-less">
-		<header id="header" class="inner">
-			<div class="profilepic">
-				<img lazy-src="" class="js-avatar">
-			</div>
-			<hgroup>
-			  <h1 class="header-author">krisjin</h1>
-			</hgroup>
-			
-			<p class="header-subtitle">一步一脚印</p>
-			
-			<nav class="header-menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
 				<ul>
-				
-					<li><a href="/">主页</a></li>
-		        
-					<li><a href="/archives">归档</a></li>
-		        
-					<li><a href="/readbook">读书</a></li>
-		        
-					<li><a href="/categories">分类</a></li>
-		        
-					<li><a href="/about">关于</a></li>
-		        
-		        <div class="clearfix"></div>
-				</ul>
-			</nav>
-			<nav class="header-nav">
-				<div class="social">
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
 					
-						<a class="github" target="_blank" href="https://github.com/krisjin" title="github">github</a>
-			        
-						<a class="weibo" target="_blank" href="http://weibo.com/cook99" title="weibo">weibo</a>
-			        
-						<a class="rss" target="_blank" href="/#" title="rss">rss</a>
-			        
-				</div>
-			</nav>
-		</header>				
-	</div>
-</nav>
-      <div class="body-wrap"><article id="post-tcp-stick-problem-understand" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/02/10/tcp-stick-problem-understand/" class="article-date">
-  	<time datetime="2015-02-10T03:36:43.000Z" itemprop="datePublished">2月 10 2015</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      理解TCP粘包问题之网络编程总结
-    </h1>
-  
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/readbook">读书</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+					
+                                            <form class="search" action=http://zhannei.baidu.com/cse/search target="_blank">
+                                            <label>Search</label>
+                                        <input name="s" type="hidden" value= null ><input type="text" name="q" size="30" placeholder="搜索"><br>
+					
+					</li>
+				</ul>
+                            </nav>			
+</div>
 
-      </header>
-      
-      <div class="article-info article-info-post">
-        
-        
-	<div class="article-category tagcloud">
-	<a class="article-category-link" href="/categories/tcp/">tcp</a>
-	</div>
-
-
-        <div class="clearfix"></div>
-      </div>
-      
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="协议简述">协议简述</h3><ol>
+      <a href="/2015/02/10/tcp-stick-problem-understand/" title="理解TCP粘包问题之网络编程总结" itemprop="url">理解TCP粘包问题之网络编程总结</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-02-10T03:36:43.000Z" itemprop="datePublished">Feb 10 2015</time>
+    更新日期:<time datetime="2015-04-21T10:51:13.000Z" itemprop="dateModified">Apr 21 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#协议简述"><span class="toc-number">1.</span> <span class="toc-text">协议简述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MTU(最大传输单元)"><span class="toc-number">2.</span> <span class="toc-text">MTU(最大传输单元)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tcp传输中的nagle算法"><span class="toc-number">3.</span> <span class="toc-text">Tcp传输中的nagle算法</span></a></li></ol>
+		</div>
+		
+		<h3 id="协议简述">协议简述</h3><ol>
 <li><strong>TCP/IP协议</strong> ：链路层，网络层，传输层，应用层。 　　</li>
 <li>以太网（Ethernet）的数据帧在链路层 　　</li>
 <li>IP包在网络层 　　</li>
@@ -255,7 +130,7 @@ TCP或UDP中的数据（Data)在应用层,它们的关系是 数据帧｛IP包�
 4Mb/s令牌环（IEEE802.5）         　　　　 4464
 FDDI                              　　　  4352
 以太网                              　　  1500
-IEEE802.3/802.2                     　　  1492
+IEEE<span class="number">802.3/80</span>2.2                     　　  1492
 X.25                               　　   576
 点对点（低时延）                      　  296
 </code></pre><p> 路径MTU：如果两台主机之间的通信要通过多个网络，那么每个网络的链路层就可能有不同的MTU。重要的不是两台主机所在网络的MTU的值，重要的是两台通信主机路径中的最小MTU。它被称作路径MTU</p>
@@ -292,21 +167,21 @@ X.25                               　　   576
 </li>
 </ol>
 <p>关闭nagle算法,以免影响性能，因为控制时控制端要发送很多数据量很小的数据包,需要马上发送。</p>
-<pre><code> <span class="keyword">const</span> <span class="keyword">char</span> chOpt = <span class="number">1</span>;
+<pre><code> const char chOpt = <span class="number">1</span>;
 
-<span class="keyword">int</span> nErr = setsockopt(pContext-&gt;m_Socket, IPPROTO_TCP, TCP_NODELAY, &amp;chOpt, <span class="keyword">sizeof</span>(<span class="keyword">char</span>));
+int nErr = setsockopt<span class="params">(pContext-&gt;m_Socket, IPPROTO_TCP, TCP_NODELAY, &amp;chOpt, sizeof<span class="params">(char)</span>)</span>;
 
-<span class="keyword">if</span> (nErr == -<span class="number">1</span>)
+<span class="keyword">if</span> <span class="params">(nErr == -<span class="number">1</span>)</span>
 
 {
 
-    TRACE(_T(<span class="string">"setsockopt() error\n"</span>),WSAGetLastError());
+    TRACE<span class="params">(_T<span class="params">(<span class="string">"setsockopt() error\n"</span>)</span>,WSAGetLastError<span class="params">()</span>)</span>;
 
-    <span class="keyword">return</span>;
+    return;
 
 }
 
-setsockopt(sockfd, SOL_TCP, TCP_CORK, &amp;on, <span class="keyword">sizeof</span>(on)); <span class="comment">//set TCP_CORK</span>
+setsockopt<span class="params">(sockfd, SOL_TCP, TCP_CORK, &amp;on, sizeof<span class="params">(on)</span>)</span>; <span class="comment">//set TCP_CORK</span>
 </code></pre><p>TCP传输小数据包效率问题</p>
 <p>摘要：当使用TCP传输小型数据包时，程序的设计是相当重要的。如果在设计方案中不对TCP数据包的<br>延迟应答，Nagle算法，Winsock缓冲作用引起重视，将会严重影响程序的性能。这篇文章讨论了这些<br>问题，列举了两个案例，给出了一些传输小数据包的优化设计方案。</p>
 <p>背景：当Microsoft TCP栈接收到一个数据包时，会启动一个200毫秒的计时器。当ACK确认数据包<br>发出之后，计时器会复位，接收到下一个数据包时，会再次启动200毫秒的计时器。为了提升应用程序<br>在内部网和Internet上的传输性能，Microsoft TCP栈使用了下面的策略来决定在接收到数据包后<br>什么时候发送ACK确认数据包：<br>1、如果在200毫秒的计时器超时之前，接收到下一个数据包，则立即发送ACK确认数据包。<br>2、如果当前恰好有数据包需要发给ACK确认信息的接收端，则把ACK确认信息附带在数据包上立即发送。<br>3、当计时器超时，ACK确认信息立即发送。<br>为了避免小数据包拥塞网络，Microsoft TCP栈默认启用了Nagle算法，这个算法能够将应用程序多次<br>调用Send发送的数据拼接起来，当收到前一个数据包的ACK确认信息时，一起发送出去。下面是Nagle<br>算法的例外情况：<br>1、如果Microsoft TCP栈拼接起来的数据包超过了MTU值，这个数据会立即发送，而不等待前一个数据<br>包的ACK确认信息。在以太网中，TCP的MTU(Maximum Transmission Unit)值是1460字节。<br>2、如果设置了TCP_NODELAY选项，就会禁用Nagle算法，应用程序调用Send发送的数据包会立即被<br>投递到网络，而没有延迟。<br>为了在应用层优化性能，Winsock把应用程序调用Send发送的数据从应用程序的缓冲区复制到Winsock<br>内核缓冲区。Microsoft TCP栈利用类似Nagle算法的方法，决定什么时候才实际地把数据投递到网络。<br>内核缓冲区的默认大小是8K，使用SO_SNDBUF选项，可以改变Winsock内核缓冲区的大小。如果有必要的话，<br>Winsock能缓冲大于SO_SNDBUF缓冲区大小的数据。在绝大多数情况下，应用程序完成Send调用仅仅表明数据<br>被复制到了Winsock内核缓冲区，并不能说明数据就实际地被投递到了网络上。唯一一种例外的情况是：<br>通过设置SO_SNDBUT为0禁用了Winsock内核缓冲区。</p>
@@ -328,124 +203,438 @@ setsockopt(sockfd, SOL_TCP, TCP_CORK, &amp;on, <span class="keyword">sizeof</spa
 <li>如果数据传输不用保证可靠性，使用UDP。</li>
 </ol>
 <p>原文链接：<a href="http://www.cnblogs.com/maowang1991/archive/2013/04/15/3022955.html" target="_blank" rel="external">http://www.cnblogs.com/maowang1991/archive/2013/04/15/3022955.html</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
 
-      
-    </div>
-    
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/tcp/">tcp</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://krisjin.github.io/2015/02/10/tcp-stick-problem-understand/" data-title="理解TCP粘包问题之网络编程总结 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2015/02/10/netty-stick-principle/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption"><</strong>
-      <div class="article-nav-title">
-        
-          LineBasedFrameDecoder和StringDecoder的原理分析
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2015/02/09/tcp-stick-package-unpacking/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">tcp粘包拆包实例</div>
-      <strong class="article-nav-caption">></strong>
-    </a>
-  
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/02/10/netty-stick-principle/" title="LineBasedFrameDecoder和StringDecoder的原理分析">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  LineBasedFrameDecoder和StringDecoder的原理分析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/02/09/tcp-stick-package-unpacking/"  title="tcp粘包拆包实例">
+ <strong>NEXT:</strong><br/> 
+ <span>tcp粘包拆包实例
+</span>
+</a>
+</div>
+
 </nav>
 
-  
-</article>
+	
+<section class="comment">
+	
+	<div class="ds-thread" data-title="理解TCP粘包问题之网络编程总结" data-thread-key="tcp-stick-problem-understand" data-author-key="krisjin" data-url="http://krisjin.github.io/post/tcp-stick-problem-understand"></div>
+	
+</section>
 
 
-<div class="share">
-	<!-- JiaThis Button BEGIN -->
-	<div class="jiathis_style">
-		<span class="jiathis_txt">分享到：</span>
-		<a class="jiathis_button_tsina"></a>
-		<a class="jiathis_button_cqq"></a>
-		<a class="jiathis_button_douban"></a>
-		<a class="jiathis_button_weixin"></a>
-		<a class="jiathis_button_tumblr"></a>
-		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#协议简述"><span class="toc-number">1.</span> <span class="toc-text">协议简述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MTU(最大传输单元)"><span class="toc-number">2.</span> <span class="toc-text">MTU(最大传输单元)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tcp传输中的nagle算法"><span class="toc-number">3.</span> <span class="toc-text">Tcp传输中的nagle算法</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+<div id="authorInfo">
+	
+		<div class="author-logo"></div>		
+	
+	<div class="social-list" class="clearfix">
+		
+		
+		
+		
+		
 	</div>
-	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
-	<!-- JiaThis Button END -->
+</div>
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Architecture/" title="Architecture">Architecture<sup>7</sup></a></li>
+		
+			<li><a href="/categories/Guice/" title="Guice">Guice<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MicroServices/" title="MicroServices">MicroServices<sup>2</sup></a></li>
+		
+			<li><a href="/categories/NIO/" title="NIO">NIO<sup>3</sup></a></li>
+		
+			<li><a href="/categories/NLP/" title="NLP">NLP<sup>1</sup></a></li>
+		
+			<li><a href="/categories/NoSQL/" title="NoSQL">NoSQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Recommendation/" title="Recommendation">Recommendation<sup>1</sup></a></li>
+		
+			<li><a href="/categories/concurrent/" title="concurrent">concurrent<sup>3</sup></a></li>
+		
+			<li><a href="/categories/design-pattern/" title="design pattern">design pattern<sup>3</sup></a></li>
+		
+			<li><a href="/categories/git/" title="git">git<sup>2</sup></a></li>
+		
+			<li><a href="/categories/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+		
+			<li><a href="/categories/idea/" title="idea">idea<sup>1</sup></a></li>
+		
+			<li><a href="/categories/life/" title="life">life<sup>1</sup></a></li>
+		
+			<li><a href="/categories/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+		
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>2</sup></a></li>
+		
+			<li><a href="/categories/netty/" title="netty">netty<sup>13</sup></a></li>
+		
+			<li><a href="/categories/nexus/" title="nexus">nexus<sup>1</sup></a></li>
+		
+			<li><a href="/categories/product/" title="product">product<sup>1</sup></a></li>
+		
+			<li><a href="/categories/protobuf/" title="protobuf">protobuf<sup>1</sup></a></li>
+		
+			<li><a href="/categories/read-book/" title="read book">read book<sup>1</sup></a></li>
+		
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		
+			<li><a href="/categories/spring/" title="spring">spring<sup>7</sup></a></li>
+		
+			<li><a href="/categories/tcp/" title="tcp">tcp<sup>1</sup></a></li>
+		
+			<li><a href="/categories/thread/" title="thread">thread<sup>1</sup></a></li>
+		
+			<li><a href="/categories/zookeeper/" title="zookeeper">zookeeper<sup>1</sup></a></li>
+		
+			<li><a href="/categories/创业/" title="创业">创业<sup>1</sup></a></li>
+		
+		</ul>
 </div>
 
 
-
-<div class="duoshuo">
-	<!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="tcp-stick-problem-understand" data-title="理解TCP粘包问题之网络编程总结" data-url="http://krisjin.github.io/2015/02/10/tcp-stick-problem-understand/"></div>
-	<!-- 多说评论框 end -->
-	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-	<script type="text/javascript">
-	var duoshuoQuery = {short_name:"krisjin"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-	<!-- 多说公共JS代码 end -->
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>1</sup></a></li>
+		
+			<li><a href="/tags/NLP/" title="NLP">NLP<sup>1</sup></a></li>
+		
+			<li><a href="/tags/TF-IDF/" title="TF-IDF">TF-IDF<sup>1</sup></a></li>
+		
+			<li><a href="/tags/buffer/" title="buffer">buffer<sup>1</sup></a></li>
+		
+			<li><a href="/tags/cap/" title="cap">cap<sup>1</sup></a></li>
+		
+			<li><a href="/tags/centos/" title="centos">centos<sup>1</sup></a></li>
+		
+			<li><a href="/tags/channelpipeline/" title="channelpipeline">channelpipeline<sup>1</sup></a></li>
+		
+			<li><a href="/tags/di/" title="di">di<sup>1</sup></a></li>
+		
+			<li><a href="/tags/gather/" title="gather">gather<sup>1</sup></a></li>
+		
+			<li><a href="/tags/git/" title="git">git<sup>2</sup></a></li>
+		
+			<li><a href="/tags/git-server/" title="git server">git server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/guice/" title="guice">guice<sup>1</sup></a></li>
+		
+			<li><a href="/tags/http/" title="http">http<sup>1</sup></a></li>
+		
+			<li><a href="/tags/idea/" title="idea">idea<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ioc/" title="ioc">ioc<sup>1</sup></a></li>
+		
+			<li><a href="/tags/java/" title="java">java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+		
+			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+		
+			<li><a href="/tags/netty/" title="netty">netty<sup>10</sup></a></li>
+		
+			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
+		
+		</ul>
 </div>
 
 
-
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+      <li><a href="http://gengbiao.me" target="_blank" title="coney">coney's Blog</a></li>
+    </ul>
 </div>
-      <footer id="footer">
-  <div class="outer">
-    <div id="footer-info">
-    	<div class="footer-left">
-    		&copy; 2015 krisjin
-    	</div>
-      	<div class="footer-right">
-      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
-      	</div>
+
+
+  <div class="rsspart">
+	<a href="atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/NIO/" style="font-size: 10px;">NIO</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a> <a href="/tags/buffer/" style="font-size: 10px;">buffer</a> <a href="/tags/cap/" style="font-size: 10px;">cap</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a> <a href="/tags/di/" style="font-size: 10px;">di</a> <a href="/tags/gather/" style="font-size: 10px;">gather</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/git-server/" style="font-size: 10px;">git server</a> <a href="/tags/guice/" style="font-size: 10px;">guice</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/ioc/" style="font-size: 10px;">ioc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 20px;">netty</a> <a href="/tags/nio/" style="font-size: 10px;">nio</a> <a href="/tags/nosql/" style="font-size: 10px;">nosql</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/scatter/" style="font-size: 10px;">scatter</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/websocket/" style="font-size: 10px;">websocket</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a> <a href="/tags/关键字/" style="font-size: 10px;">关键字</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/并发/" style="font-size: 10px;">并发</a> <a href="/tags/流程图/" style="font-size: 10px;">流程图</a> <a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a> <a href="/tags/马云/" style="font-size: 10px;">马云</a>
     </div>
   </div>
-</footer>
+
+
+</aside>
+</div>
     </div>
+    <footer><div id="footer" >
     
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
-  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
-
-
-<script src="/js/mobile.js" type="text/javascript"></script>
-<script src="/js/main.js" type="text/javascript"></script>
-
-
-
-
-
-<! -- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-        processEscapes: true,
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            <p class="copyright"> © 2015 
+		
+		<a href="http://krisjin.github.io" target="_blank" title="krisjin">krisjin</a>
+		
+            && Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> && Theme by <a href="http://gengbiao.me" target="_blank" title="coney">coney</a>
+            </div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
     }
-});
-
-MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-        all[i].SourceElement().parentNode.className += ' has-jax';                 
-    }       
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
 });
 </script>
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+<script>
+    
+        var _bdImg = '4';
+    
+    window._bd_share_config={
+        "common":{
+            "bdSnsKey":{
+
+            },
+            "bdText":"",
+            "bdMini":"2",
+            "bdMiniList":[
+                "qzone",
+                "tsina",
+                "weixin",
+                "renren",
+                "tqq",
+                "tieba",
+                "douban",
+                "sqq",
+                "diandian",
+                "huaban",
+                "youdao",
+                "mail",
+                "ty",
+                "fbook",
+                "twi",
+                "linkedin",
+                "copy",
+                "print"
+            ],
+            "bdPic":"",
+            "bdStyle":"0",
+            "bdSize":"16"
+        },
+        "slide":{
+            "type":"slide",
+            "bdImg":_bdImg,
+            "bdPos":"right",
+            "bdTop":"350"
+        },
+        "image":{
+            "viewList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ],
+            "viewText":"分享：",
+            "viewSize":"16"
+        },
+        "selectShare":{
+            "bdContainerClass":null,
+            "bdSelectMiniList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ]
+        }
+    };
+    with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
 </script>
 
 
 
-  </div>
-</body>
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
 </html>
+
