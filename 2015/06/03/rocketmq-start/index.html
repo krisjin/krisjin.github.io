@@ -7,12 +7,15 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Hello World | krisjin博客</title>
+    <title>RocketMQ入门 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in ">
+    <meta name="description" content="1.RocketMQ 是什么?
+是一个队列模型的消息中间件，具有高性能、高可靠、高实时、分布式特点。
+Producer、Consumer、队列都可以分布式。
+Producer 向一些队列轮流发送消息，队列集合称为Topic，Consumer 如果做广播消费，则一个consumer实例消费这个Topi">
     
     
     
@@ -78,15 +81,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/05/26/hello-world/" title="Hello World" itemprop="url">Hello World</a>
+      <a href="/2015/06/03/rocketmq-start/" title="RocketMQ入门" itemprop="url">RocketMQ入门</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-05-26T15:28:33.000Z" itemprop="datePublished">May 26 2015</time>
-    更新日期:<time datetime="2015-05-26T15:28:33.000Z" itemprop="dateModified">May 26 2015</time>
+    <time datetime="2015-06-03T00:48:23.000Z" itemprop="datePublished">Jun 3 2015</time>
+    更新日期:<time datetime="2015-06-03T00:56:49.000Z" itemprop="dateModified">Jun 3 2015</time>
     
   </p>
 </header>
@@ -95,28 +98,113 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick_Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create_a_new_post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run_server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate_static_files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy_to_remote_sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-RocketMQ_是什么?"><span class="toc-number">1.</span> <span class="toc-text">1.RocketMQ 是什么?</span></a></li></ol>
 		</div>
 		
-		<p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-  
+		<h2 id="1-RocketMQ_是什么?">1.RocketMQ 是什么?</h2><ol>
+<li>是一个队列模型的消息中间件，具有高性能、高可靠、高实时、分布式特点。</li>
+<li>Producer、Consumer、队列都可以分布式。</li>
+<li>Producer 向一些队列轮流发送消息，队列集合称为Topic，Consumer 如果做广播消费，则一个consumer<br>实例消费这个Topic 对应的所有队列，如果做集群消费，则多个Consumer 实例平均消费这个topic 对应的队列集合。</li>
+<li>能够保证严格的消息顺序</li>
+<li>提供丰富的消息拉取模式</li>
+<li>高效的订阅者水平扩展能力</li>
+<li>实时的消息订阅机制</li>
+<li>亿级消息堆积能力</li>
+<li>较少的依赖</li>
+</ol>
+<pre><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Producer</span> {
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) throws MQClientException,
+        InterruptedException </span>{
+    <span class="comment">/**
+     * 一个应用创建一个Producer，由应用来维护此对象，可以设置为全局对象或者单例&lt;br&gt;
+     * 注意：ProducerGroupName需要由应用来保证唯一&lt;br&gt;
+     * ProducerGroup这个概念发送普通的消息时，作用不大，但是发送分布式事务消息时，比较关键，
+     * 因为服务器会回查这个Group下的任意一个Producer
+     */</span>
+    final DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(<span class="string">"ProducerGroupName"</span>);
+    producer.setNamesrvAddr(<span class="string">"192.168.133.1:9876"</span>);
+    producer.setInstanceName(<span class="string">"Producer"</span>);
+
+    <span class="comment">/**
+     * Producer对象在使用之前必须要调用start初始化，初始化一次即可&lt;br&gt;
+     * 注意：切记不可以在每次发送消息时，都调用start方法
+     */</span>
+    producer.start();
+
+    <span class="comment">/**
+     * 下面这段代码表明一个Producer对象可以发送多个topic，多个tag的消息。
+     * 注意：send方法是同步调用，只要不抛异常就标识成功。但是发送成功也可会有多种状态，&lt;br&gt;
+     * 例如消息写入Master成功，但是Slave不成功，这种情况消息属于成功，但是对于个别应用如果对消息可靠性要求极高，&lt;br&gt;
+     * 需要对这种情况做处理。另外，消息可能会存在发送失败的情况，失败重试由应用来处理。
+     */</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {
+        <span class="keyword">try</span> {
+            {
+                Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest1"</span>,<span class="comment">// topic</span>
+                        <span class="string">"TagA"</span>,<span class="comment">// tag</span>
+                        <span class="string">"OrderID001"</span>,<span class="comment">// key</span>
+                        (<span class="string">"Hello MetaQA"</span>).getBytes());<span class="comment">// body</span>
+                SendResult sendResult = producer.send(msg);
+                System.<span class="keyword">out</span>.println(sendResult);
+            }
+
+            {
+                Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest2"</span>,<span class="comment">// topic</span>
+                        <span class="string">"TagB"</span>,<span class="comment">// tag</span>
+                        <span class="string">"OrderID0034"</span>,<span class="comment">// key</span>
+                        (<span class="string">"Hello MetaQB"</span>).getBytes());<span class="comment">// body</span>
+                SendResult sendResult = producer.send(msg);
+                System.<span class="keyword">out</span>.println(sendResult);
+            }
+
+            {
+                Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest3"</span>,<span class="comment">// topic</span>
+                        <span class="string">"TagC"</span>,<span class="comment">// tag</span>
+                        <span class="string">"OrderID061"</span>,<span class="comment">// key</span>
+                        (<span class="string">"Hello MetaQC"</span>).getBytes());<span class="comment">// body</span>
+                SendResult sendResult = producer.send(msg);
+                System.<span class="keyword">out</span>.println(sendResult);
+            }
+        } <span class="keyword">catch</span> (Exception e) {
+            e.printStackTrace();
+        }
+        TimeUnit.MILLISECONDS.sleep(<span class="number">1000</span>);
+    }
+
+    <span class="comment">/**
+     * 应用退出时，要调用shutdown来清理资源，关闭网络连接，从RocketMQ服务器上注销自己
+     * 注意：我们建议应用在JBOSS、Tomcat等容器的退出钩子里调用shutdown方法
+     */</span>
+    <span class="comment">//    producer.shutdown();</span>
+            Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() {
+                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>(<span class="params"></span>) </span>{
+                    producer.shutdown();
+                }
+            }));
+            System.exit(<span class="number">0</span>);
+        }
+    }
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mq/">mq</a><a href="/tags/rocketmq/">rocketmq</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/rocketmq/">rocketmq</a>
+</div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/05/26/hello-world/" data-title="Hello World | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/03/rocketmq-start/" data-title="RocketMQ入门 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -125,19 +213,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/01/gitpullshell/" title="Git仓库更新shell">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Git仓库更新shell</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/04/29/mayun-2015-year-talk/"  title="马云员工大会演讲:今年冻结新增员工 重整队形">
+<a href="/2015/06/01/gitpullshell/"  title="Git仓库更新shell">
  <strong>NEXT:</strong><br/> 
- <span>马云员工大会演讲:今年冻结新增员工 重整队形
+ <span>Git仓库更新shell
 </span>
 </a>
 </div>
@@ -147,7 +227,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="Hello World" data-thread-key="hello-world" data-author-key="krisjin" data-url="http://krisjin.github.io/post/hello-world"></div>
+	<div class="ds-thread" data-title="RocketMQ入门" data-thread-key="rocketmq-start" data-author-key="krisjin" data-url="http://krisjin.github.io/post/rocketmq-start"></div>
 	
 </section>
 
@@ -157,7 +237,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick_Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create_a_new_post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run_server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate_static_files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy_to_remote_sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-RocketMQ_是什么?"><span class="toc-number">1.</span> <span class="toc-text">1.RocketMQ 是什么?</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -227,6 +307,8 @@
 		
 			<li><a href="/categories/read-book/" title="read book">read book<sup>1</sup></a></li>
 		
+			<li><a href="/categories/rocketmq/" title="rocketmq">rocketmq<sup>1</sup></a></li>
+		
 			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
 		
 			<li><a href="/categories/spring/" title="spring">spring<sup>7</sup></a></li>
@@ -280,13 +362,13 @@
 		
 			<li><a href="/tags/java/" title="java">java<sup>1</sup></a></li>
 		
+			<li><a href="/tags/mq/" title="mq">mq<sup>1</sup></a></li>
+		
 			<li><a href="/tags/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
 		
 			<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
 		
 			<li><a href="/tags/netty/" title="netty">netty<sup>10</sup></a></li>
-		
-			<li><a href="/tags/nio/" title="nio">nio<sup>1</sup></a></li>
 		
 		</ul>
 </div>
@@ -309,7 +391,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">标签云</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/NIO/" style="font-size: 10px;">NIO</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a> <a href="/tags/buffer/" style="font-size: 10px;">buffer</a> <a href="/tags/cap/" style="font-size: 10px;">cap</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a> <a href="/tags/di/" style="font-size: 10px;">di</a> <a href="/tags/gather/" style="font-size: 10px;">gather</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/git-server/" style="font-size: 10px;">git server</a> <a href="/tags/guice/" style="font-size: 10px;">guice</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/ioc/" style="font-size: 10px;">ioc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 20px;">netty</a> <a href="/tags/nio/" style="font-size: 10px;">nio</a> <a href="/tags/nosql/" style="font-size: 10px;">nosql</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/scatter/" style="font-size: 10px;">scatter</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/websocket/" style="font-size: 10px;">websocket</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a> <a href="/tags/关键字/" style="font-size: 10px;">关键字</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/并发/" style="font-size: 10px;">并发</a> <a href="/tags/流程图/" style="font-size: 10px;">流程图</a> <a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a> <a href="/tags/马云/" style="font-size: 10px;">马云</a>
+       <a href="/tags/NIO/" style="font-size: 10px;">NIO</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/TF-IDF/" style="font-size: 10px;">TF-IDF</a> <a href="/tags/buffer/" style="font-size: 10px;">buffer</a> <a href="/tags/cap/" style="font-size: 10px;">cap</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/channelpipeline/" style="font-size: 10px;">channelpipeline</a> <a href="/tags/di/" style="font-size: 10px;">di</a> <a href="/tags/gather/" style="font-size: 10px;">gather</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/git-server/" style="font-size: 10px;">git server</a> <a href="/tags/guice/" style="font-size: 10px;">guice</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/ioc/" style="font-size: 10px;">ioc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/mq/" style="font-size: 10px;">mq</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 20px;">netty</a> <a href="/tags/nio/" style="font-size: 10px;">nio</a> <a href="/tags/nosql/" style="font-size: 10px;">nosql</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/rocketmq/" style="font-size: 10px;">rocketmq</a> <a href="/tags/scatter/" style="font-size: 10px;">scatter</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/websocket/" style="font-size: 10px;">websocket</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a> <a href="/tags/关键字/" style="font-size: 10px;">关键字</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/创业，经验/" style="font-size: 10px;">创业，经验</a> <a href="/tags/动态代理/" style="font-size: 10px;">动态代理</a> <a href="/tags/并发/" style="font-size: 10px;">并发</a> <a href="/tags/流程图/" style="font-size: 10px;">流程图</a> <a href="/tags/阿里巴巴/" style="font-size: 10px;">阿里巴巴</a> <a href="/tags/马云/" style="font-size: 10px;">马云</a>
     </div>
   </div>
 
@@ -450,6 +532,27 @@ $(document).ready(function(){
 
 
 
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
 
 
 
