@@ -7,12 +7,12 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Spring Xml配置文件之beans | krisjin博客</title>
+    <title>RocketMQ管理控制台 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。">
+    <meta name="description" content="rocketmq-console github下载地址 https://github.com/rocketmq/rocketmq-console.git在idea打开，直接运行如下图：">
     
     
     
@@ -78,15 +78,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/02/20/spring-xml-beans/" title="Spring Xml配置文件之beans" itemprop="url">Spring Xml配置文件之beans</a>
+      <a href="/2015/06/03/rocketmq-console/" title="RocketMQ管理控制台" itemprop="url">RocketMQ管理控制台</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-02-20T10:43:48.000Z" itemprop="datePublished">Feb 20 2015</time>
-    更新日期:<time datetime="2015-04-21T10:51:13.000Z" itemprop="dateModified">Apr 21 2015</time>
+    <time datetime="2015-06-03T07:42:48.000Z" itemprop="datePublished">Jun 3 2015</time>
+    更新日期:<time datetime="2015-06-03T08:03:25.000Z" itemprop="dateModified">Jun 3 2015</time>
     
   </p>
 </header>
@@ -95,32 +95,31 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#beans元素属性"><span class="toc-number">1.</span> <span class="toc-text">beans元素属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#import元素"><span class="toc-number">2.</span> <span class="toc-text">import元素</span></a></li></ol>
+		
 		</div>
 		
-		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在上文中我们介绍了几种注入的方式，xml格式的容器信息管理方式是Spring提供的最为强大、支持最为全面的方式。所用使用XML文件进行配置信息加载的Spring IoC容器，包括BeanFactory和ApplicationContext的所有XML相应实现，都使用统一的XML格式。  <a id="more"></a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所有注册到容器的业务对象，在Sring中称之为Bean,所以，每个对象在XMl中的映射也自然而然的对应一个<em>bean</em>的元素。既然容器中可以管理很多的业务对象，那么把这么多的bean元素组织起来，就叫做beans。下面看下beans元素。</p>
-<h3 id="beans元素属性">beans元素属性</h3><ol>
-<li><strong>default-lazy-init</strong>：其值可以指定为true和false,默认值是false。用来标识是否对所有的bean进行延迟初始化。</li>
-<li><strong>default-autowire</strong>：可以取值为no、byName、byType、constructor、default，默认为no。</li>
-<li><strong>default-init-method</strong>：如果所管理的bean按照某种规则，都有同样名称的初始化方法的话，可以在这里统一指定这个初始化方法名，而不用在没个bean上都重复单独指定。</li>
-<li><strong>default-destroy-method</strong>： 与default-init-method相对应，如果所管理的bean有按照某种规则使用了相同名称的对象销毁方法，可以通过这个属性统一指定。</li>
-</ol>
-<h3 id="import元素">import元素</h3><p>通常情况下，可以根据模块功能或者层次关系，将配置信息分门别类地放到多个配置文件中。在加载主配置文件时，并将主配置文件所依赖的配置文件同时加载，可以在这个主配置文件中通过import元素对其所依赖的配置文件进行引用。</p>
+		<p>rocketmq-console github下载地址 <a href="https://github.com/rocketmq/rocketmq-console.git" target="_blank" rel="external">https://github.com/rocketmq/rocketmq-console.git</a><br>在idea打开，直接运行如下图：</p>
+<p><img src="/img/rocc1.png" alt=""><br><img src="/img/rocc2.png" alt=""><br><img src="/img/rocc3.png" alt=""></p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mq/">mq</a><a href="/tags/rocketmq/">rocketmq</a>
+  </div>
+
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/spring/">spring</a>
+  <a class="article-category-link" href="/categories/rocketmq/">rocketmq</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/02/20/spring-xml-beans/" data-title="Spring Xml配置文件之beans | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/03/rocketmq-console/" data-title="RocketMQ管理控制台 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -129,19 +128,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/02/21/spring-injection-pattern/" title="Spring注入之道">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Spring注入之道</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/02/20/spring-ioc-container-sample/"  title="Spring容器之BeanFactory">
+<a href="/2015/06/03/system-architecture-learn-materials/"  title="系统架构领域的一些学习材料">
  <strong>NEXT:</strong><br/> 
- <span>Spring容器之BeanFactory
+ <span>系统架构领域的一些学习材料
 </span>
 </a>
 </div>
@@ -151,7 +142,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="Spring Xml配置文件之beans" data-thread-key="spring-xml-beans" data-author-key="krisjin" data-url="http://krisjin.github.io/post/spring-xml-beans"></div>
+	<div class="ds-thread" data-title="RocketMQ管理控制台" data-thread-key="rocketmq-console" data-author-key="krisjin" data-url="http://krisjin.github.io/post/rocketmq-console"></div>
 	
 </section>
 
@@ -161,7 +152,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#beans元素属性"><span class="toc-number">1.</span> <span class="toc-text">beans元素属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#import元素"><span class="toc-number">2.</span> <span class="toc-text">import元素</span></a></li></ol>
+  
   </div>
 
 <div id="asidepart">
