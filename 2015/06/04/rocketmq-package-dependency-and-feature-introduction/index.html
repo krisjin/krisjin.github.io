@@ -7,10 +7,14 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>krisjin博客</title>
+    <title>RocketMQ包依赖关系与功能介绍 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
+    
+    <meta name="description" content="rocketmq包含9个子模块：
+rocketmq-common：通用的常量枚举、基类方法或者数据结构，按描述的目标来分包通俗易懂。包名有：admin，consumer，filter，hook，message等。
+rocketmq-remoting：用Netty4写的客户端和服务端，fastjson">
     
     
     
@@ -71,226 +75,97 @@
 
     </header>
     <div id="container">
-      <div id="main">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/04/rocketmq-package-dependency-and-feature-introduction/" title="RocketMQ包依赖关系与功能介绍" itemprop="url">RocketMQ包依赖关系与功能介绍</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-06-04T14:59:22.000Z" itemprop="datePublished">Jun 4 2015</time>
+    更新日期:<time datetime="2015-06-04T15:35:03.000Z" itemprop="dateModified">Jun 4 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>rocketmq包含9个子模块：</p>
+<p><strong>rocketmq-common</strong>：通用的常量枚举、基类方法或者数据结构，按描述的目标来分包通俗易懂。包名有：admin，consumer，filter，hook，message等。</p>
+<p><strong>rocketmq-remoting</strong>：用Netty4写的客户端和服务端，fastjson做的序列化，自定义二进制协议。</p>
+<p><strong>rocketmq-srvutil</strong>：只有一个ServerUtil类，类注解是，只提供Server程序依赖，目的为了拆解客户端依赖，尽可能减少客户端的依赖。</p>
+<p><strong>rocketmq-store</strong>：存储服务，消息存储，索引存储，commitLog存储。</p>
+<p><strong>rocketmq-client</strong>:客户端，包含producer端和consumer端，发送消息和接收消息的过程。</p>
+<p><strong>rocketmq-filtersrv:</strong>消息过滤器server，现在rocketmq的wiki上有示例代码及说明，<a href="https://github.com/alibaba/RocketMQ/wiki/filter_server_guide" target="_blank" rel="external">https://github.com/alibaba/RocketMQ/wiki/filter_server_guide</a></p>
+<p><strong>rocketmq-broker</strong>：对consumer和producer来说是服务端，接收producer发来的消息并存储，同时consumer来这里拉取消息。</p>
+<p><strong>rocketmq-tools</strong>：命令行工具。</p>
+<p><strong>rocketmq-namesrv</strong>：NameServer，类似SOA服务的注册中心，这里保存着消息的TopicName，队列等运行时的meta信息。一般系统分dataNode和nameNode，这里是nameNode。</p>
+<p>如下依赖图：<br><img src="/img/rocketmq-pkg-den.png" alt=""></p>
+<p>参考： <a href="http://lifestack.cn/archives/324.html" title="http://lifestack.cn/archives/324.html" target="_blank" rel="external">考拉哥的博客</a> </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mq/">mq</a><a href="/tags/rocketmq/">rocketmq</a>
+  </div>
 
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/23/zookeeper-cluster-install/" title="zookeeper集群安装" itemprop="url">
-  
-      <time datetime="2015-03-23T08:18:59.000Z" itemprop="datePublished">Mar 23 2015</time>
-    <h1 itemprop="name">zookeeper集群安装</h1>
-    
-     
-       <p itemprop="description" >ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务，它包含一个简单的原语集，分布式应用程序可以基于它实现同步服务，配置维护和命名服务等。Zookeeper是hadoop的一个子项目，其发展历程无需赘述。在分布式应用中，由于工程师不能很好地使用锁机制，以及基于消息的</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/19/nio-selector/" title="NIO多路复用器理解" itemprop="url">
-  
-      <time datetime="2015-03-19T14:31:19.000Z" itemprop="datePublished">Mar 19 2015</time>
-    <h1 itemprop="name">NIO多路复用器理解</h1>
-    
-     
-       <p itemprop="description" >Selector（选择器）是Java NIO中能够检测一到多个NIO通道，并能够知晓通道是否为诸如读写事件做好准备的组件。这样，一个单独的线程可以管理多个channel，从而管理多个网络连接。</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/19/redis-install/" title="Ubuntu安装redis" itemprop="url">
-  
-      <time datetime="2015-03-19T01:20:44.000Z" itemprop="datePublished">Mar 19 2015</time>
-    <h1 itemprop="name">Ubuntu安装redis</h1>
-    
-     
-       <p itemprop="description" >Redis 是一个高性能的key-value数据库，属于NoSQL的一种。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。它跟memcached类似，不过数据可以持久化，而且支持的数据类型更丰富。有字符串，链表，集合和有序集合。支持在服务器端计算集合的并，</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/17/ubuntu14-install-mysql/" title="ubuntu14安装mysql" itemprop="url">
-  
-      <time datetime="2015-03-17T06:49:55.000Z" itemprop="datePublished">Mar 17 2015</time>
-    <h1 itemprop="name">ubuntu14安装mysql</h1>
-    
-     
-       <p itemprop="description" >使用ubuntu14搭建Java项目的运行环境确实方便不少，下面就在Ubuntu14下搭建Mysql。输入 sudo apt-get install mysql-server 命令即可</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/16/Netty-ChannelPipeline/" title="Netty ChannelPipeline 详解" itemprop="url">
-  
-      <time datetime="2015-03-16T13:29:29.000Z" itemprop="datePublished">Mar 16 2015</time>
-    <h1 itemprop="name">Netty ChannelPipeline 详解</h1>
-    
-     
-       <p itemprop="description" >ChannelPipeline是ChannelHandler的容器，它负责ChannelHandler的管理和事件拦截与调度。</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/13/netty-thread-model/" title="netty thread model" itemprop="url">
-  
-      <time datetime="2015-03-13T15:52:26.000Z" itemprop="datePublished">Mar 13 2015</time>
-    <h1 itemprop="name">netty thread model</h1>
-    
-     
-           <p itemprop="description" ></p>
-        
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/13/netty-websocket/" title="Netty WebSocket协议实例" itemprop="url">
-  
-      <time datetime="2015-03-13T15:26:36.000Z" itemprop="datePublished">Mar 13 2015</time>
-    <h1 itemprop="name">Netty WebSocket协议实例</h1>
-    
-     
-       <p itemprop="description" >长期以来存在着各种技术让服务器得知有新数据可用是，立即将数据发送到客户端。这些技术种类繁多，例如“推送”活comet。最常用的的一种黑客手段是对服务器发起链接创建假象，被称为长轮询。利用长轮询，客户端可以打开指向服务器的HTTP连接，而服务器会一直保持连接打开，直到发送响应。</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/12/netty-question/" title="学习Netty的11个疑问" itemprop="url">
-  
-      <time datetime="2015-03-12T06:24:24.000Z" itemprop="datePublished">Mar 12 2015</time>
-    <h1 itemprop="name">学习Netty的11个疑问</h1>
-    
-     
-       <p itemprop="description" >Netty是一个基于JAVA NIO类库的异步通信框架，它的架构特点是：异步非阻塞、基于事件驱动、高性能、高可靠性和高可定制性。</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/11/process-on/" title="在线画图工具Processon" itemprop="url">
-  
-      <time datetime="2015-03-11T01:07:45.000Z" itemprop="datePublished">Mar 11 2015</time>
-    <h1 itemprop="name">在线画图工具Processon</h1>
-    
-     
-       <p itemprop="description" >最近在网上想寻找一个在线画流程图的工具，O(∩_∩)O~终于找到了一个https://www.processon.com ，支持各种流程图，优秀的资源也很多，着实不错哦。先上一张搜的一张关于netty 运行时流程图：</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/10/concurrent-history/" title="并发简史" itemprop="url">
-  
-      <time datetime="2015-03-10T11:59:27.000Z" itemprop="datePublished">Mar 10 2015</time>
-    <h1 itemprop="name">并发简史</h1>
-    
-     
-       <p itemprop="description" >&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;在早期的计算机中不包含操作系统，它们从头到尾只执行一个程序，并且这个程序能访问计算机中的任何资源。在这种裸机环境中，不仅很难编写和运行程序，而且每次只能运行一个程序，这对于昂贵并且稀缺的计算机资源来说也是一种</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/10/nio-scatter-gather/" title="NIO Scatter/Gather实例" itemprop="url">
-  
-      <time datetime="2015-03-10T04:00:56.000Z" itemprop="datePublished">Mar 10 2015</time>
-    <h1 itemprop="name">NIO Scatter/Gather实例</h1>
-    
-     
-       <p itemprop="description" >Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel（译者注：Channel在中文经常翻译为通道）中读取或者写入到Channel的操作。分散（scatter）从Channel中读取是指在读操作时将读取的数据写入多个buffer</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/09/it-idf-keyword/" title="TF-IDF关键字提取" itemprop="url">
-  
-      <time datetime="2015-03-09T01:32:47.000Z" itemprop="datePublished">Mar 9 2015</time>
-    <h1 itemprop="name">TF-IDF关键字提取</h1>
-    
-     
-       <p itemprop="description" >TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/06/set-up-git-server/" title="CentOS上搭建Git Server" itemprop="url">
-  
-      <time datetime="2015-03-06T05:50:06.000Z" itemprop="datePublished">Mar 6 2015</time>
-    <h1 itemprop="name">CentOS上搭建Git Server</h1>
-    
-     
-       <p itemprop="description" >经过了一年，公司的项目终于采用了Git作为代码的版本管理，利用了一上午的时间终于弄完了，在这里做个记录供以后使用。</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/02/nio-buffer-explore/" title="NIO Buffer理解" itemprop="url">
-  
-      <time datetime="2015-03-02T07:40:43.000Z" itemprop="datePublished">Mar 2 2015</time>
-    <h1 itemprop="name">NIO Buffer理解</h1>
-    
-     
-       <p itemprop="description" >&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Java Nio中的Buffer用于与Channel通道进行交互，数据从通道中读入缓冲区，或从缓冲器写入到通道中。缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO中的Buff</p>
-      
-    
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/02/23/strategy-pattern/" title="策略模式" itemprop="url">
-  
-      <time datetime="2015-02-23T12:19:19.000Z" itemprop="datePublished">Feb 23 2015</time>
-    <h1 itemprop="name">策略模式</h1>
-    
-     
-       <p itemprop="description" >策略模式属于对象的行为模式，其用意是针对一组算法，将每一个算法封装到具有共同接口的独立类中，从而使得它们可以相互转换。策略模式可以使得算法可以在不影响客户端的情况下发生变化。</p>
-      
-    
-  </a>
-</section>
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/rocketmq/">rocketmq</a>
+</div>
 
 
-  <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
-  </nav>
+
+<div class="article-share" id="share">
+
+  <div data-url="http://krisjin.github.io/2015/06/04/rocketmq-package-dependency-and-feature-introduction/" data-title="RocketMQ包依赖关系与功能介绍 | krisjin博客" data-tsina="null" class="share clearfix">
+  </div>
 
 </div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/06/03/rocketmq-console/"  title="RocketMQ管理控制台">
+ <strong>NEXT:</strong><br/> 
+ <span>RocketMQ管理控制台
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	
+	<div class="ds-thread" data-title="RocketMQ包依赖关系与功能介绍" data-thread-key="rocketmq-package-dependency-and-feature-introduction" data-author-key="krisjin" data-url="http://krisjin.github.io/post/rocketmq-package-dependency-and-feature-introduction"></div>
+	
+</section>
+
+
+</div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
 <div id="asidepart">
 <div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
@@ -441,8 +316,8 @@
 
 </aside>
 </div>
-  </div>
-  <footer><div id="footer" >
+    </div>
+    <footer><div id="footer" >
     
             <p class="copyright"> © 2015 
 		
@@ -478,6 +353,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -497,10 +374,103 @@ $(document).ready(function(){
 });
 </script>
 
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
 
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
 
 
 
@@ -586,5 +556,5 @@ ga('send', 'pageview');
 
 
   </body>
- </html>
+</html>
 
