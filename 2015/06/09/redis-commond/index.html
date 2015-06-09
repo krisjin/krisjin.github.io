@@ -7,12 +7,16 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>浅谈数据库分表分库策略 | krisjin博客</title>
+    <title>Redis 命令 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="随着大数据时代的来临，数据的存储和访问成了系统设计的瓶颈。对于一个大型的互联网项目，每天百万，千万的访问量都是正常的现象。那么这么频繁的通讯，无疑会给服务器的访问速度和稳定性带来了巨大的鸭梨。那么我们的聪明的计算机专家们是不是束手无策了了。答案肯定是NO。我们的计算机工程师们立马就想出了对策。分表，">
+    <meta name="description" content="连接操作相关的命令QUIT：关闭连接（connection）；AUTH：简单密码认证。关于密码验证：  
+
+如果 redis 监听回环IP之外的地址 任何人都可以读取其信息，所以安全问题需要考虑；
+redis 服务器的速度众所周知，因此官方文件中提醒设置比较复杂的密码，防止机器破解；
+首先需要在re">
     
     
     
@@ -78,15 +82,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/09/sharding-db/" title="浅谈数据库分表分库策略" itemprop="url">浅谈数据库分表分库策略</a>
+      <a href="/2015/06/09/redis-commond/" title="Redis 命令" itemprop="url">Redis 命令</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-06-09T00:46:11.000Z" itemprop="datePublished">Jun 9 2015</time>
-    更新日期:<time datetime="2015-06-09T00:59:04.000Z" itemprop="dateModified">Jun 9 2015</time>
+    <time datetime="2015-06-09T09:30:44.000Z" itemprop="datePublished">Jun 9 2015</time>
+    更新日期:<time datetime="2015-06-09T09:39:15.000Z" itemprop="dateModified">Jun 9 2015</time>
     
   </p>
 </header>
@@ -95,55 +99,139 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#连接操作相关的命令"><span class="toc-number">1.</span> <span class="toc-text">连接操作相关的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适合全体类型的命令"><span class="toc-number">2.</span> <span class="toc-text">适合全体类型的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对_STRING_操作的命令"><span class="toc-number">3.</span> <span class="toc-text">对 STRING 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对无索引序列_LIST_操作的命令"><span class="toc-number">4.</span> <span class="toc-text">对无索引序列 LIST 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有索引无序集合_SET_操作的命令"><span class="toc-number">5.</span> <span class="toc-text">对有索引无序集合 SET 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有序集合_ZSET（sorted_set）操作的命令"><span class="toc-number">6.</span> <span class="toc-text">对有序集合 ZSET（sorted set）操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有序列表_HASH_操作的命令"><span class="toc-number">7.</span> <span class="toc-text">对有序列表 HASH 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#持久化"><span class="toc-number">8.</span> <span class="toc-text">持久化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程服务控制"><span class="toc-number">9.</span> <span class="toc-text">远程服务控制</span></a></li></ol>
 		</div>
 		
-		<p>随着大数据时代的来临，数据的存储和访问成了系统设计的瓶颈。对于一个大型的互联网项目，每天百万，千万的访问量都是正常的现象。那么这么频繁的通讯，无疑会给服务器的访问速度和稳定性带来了巨大的鸭梨。那么我们的聪明的计算机专家们是不是束手无策了了。答案肯定是NO。我们的计算机工程师们立马就想出了对策。分表，分库。一种新的概念立马在软件行业里面产生巨大的反响。有了这种方式在面对海量数据的时候我们的系统仍然能够支撑的起来。既然谈到了分表分库那么下面我们就先来理解一下什么是分表，分库的概念。</p>
-<p><strong>分表分库的概念：</strong></p>
-<blockquote>
-<p>分表，分库通俗的解释就是原来一个人完成的事情我们现在让两个人一起来完成。专业的解释就是数据的切分“Sharding”（可以理解为分片的意思）,要说切菜，切肉我知道，但是切数据是什么意思了又该怎么去切了。好了 下面我们就简单的解释下什么是数据的切分（Date Sharding）</p>
-<p>所谓的数据切分就是通过一系列的切分规则将数据分布到不同的DB或者Table中。再通过相应的DB路由或者Table路由的规则找到这些数据所在的DB或Table。进行数据的“增删改查”等一序列的操作。</p>
-</blockquote>
-<p>那么在了解了数据切分的概念后我们来说说数据的切分有那些方式，主要有两种，一种是物理上的，一种是逻辑上的。那么什么物理上的切分，什么又叫做逻辑上的切分了。</p>
-<p><strong>物理切分</strong>：物理上的切分就是通过既定的切分规则将数据分布到不同的DB上去，通过路由访问规则去访问这些特定的数据库。这样我们每次的访问就不止访问一台服务器了，而是多台。</p>
-<p>例如：我们的系统需要把会员表(user)进行无物理上的切分，那么我们就可以把id为1-1000放进DB1里面，把id为1001-2000放进DB2里面，把id为2001-3000放在DB3中。当然还需要在DB1中建立一张路由表（regulation），用来描述切分规则</p>
-<p><img src="/img/sharding01.png" alt=""></p>
-<p><strong>逻辑切分：</strong>逻辑切分就好理解了，它就是通过既定切分规则，将数据分布到同一个数据库的不同的表里面。然后通过路由表的规则找到这些数据在那张表。然后对数据进行一些了的操作。</p>
-<p>例如：同样我们要对会有表（user）进行分表的处理。这次我们采用逻辑上切分，那么这个时候我们还是跟上次的切分规则一样id为1-1000的在user1，id为1001-2000的在user2。然后建立张路由表（regulation）来记录这些信息。</p>
-<p><img src="/img/sharding02.png" alt=""></p>
-<p>那么在了解了分表分库的概念后，接下来我们就来了解下分表的方案，因为分表的方式有很多中，没有那种更好，只有那种更适合我当前的场景。但是原理都一样，即添加信息路由机制，但是有二个原则一个是分表方案执行速度要快，另一个是一个博客的信息必须要保存在一张分表中，以有利于信息查找。这里提供三种分表方案：</p>
-<p>(1) 方案一、将表ID设置成一个自动自增主键，那么我们就可以把每个表的初始ID记录在配置文件里，这样我们的程序就很容易根据ID找到对应的数据表了。这种方法没有数据大规模迁移的麻烦，可是每个表的访问压力会有比较大的差别。</p>
-<p>(2) 方案二、使用信息路由机制，给每一个要进行分表的表建一个路由表，表结构如下</p>
-<p><img src="/img/sharding03.jpg" alt=""></p>
-<p>方案2的访问机制如下</p>
-<p><img src="/img/sharding04.png" alt=""></p>
-<p>我们首先要根据会员的id在路由表里面找到会员信息所处的表名，然后对信息进行查询。采用这种机制需要开发一个自动分表程序，然后让自动分表程序每隔一段时间就执行一次，如果最后一个分表超过了设定的信息最大值，就进行分表，这个分表机制适合每一个会员的信息量都相差不大情况。</p>
-<p>1) 方案三、建立带有统计功能的信息路由机制，这种机制和第二种方案类似，但是在方案二的基础上再增加了一张信息统计表，统计某一个会员在分表中的信息总量，表结构如下：<br><img src="/img/sharding05.png" alt=""></p>
-<p>在分表的时候会将当前表中信息量最大的一个或几个会员的信息提取出来，放到新的分表中，以减慢当前表信息的增长速度，这种机制适合于有的会员的信息量很大，更新也很频繁的情况。</p>
-<p>方案三信息访问机制如下</p>
-<p><img src="/img/sharding06.png" alt=""></p>
-<p>当然，分表分库这些方法虽然能承载巨大的数据也不是没有缺点的，比我我们在做联合查询的时候，有可能就无法实现，因为有些关联数据会不在同一个库里面，所以我们要尽量把有关联的数据放在同一种个DB里面。还要尽量避免跨库的事物。</p>
-<p>转载自：<a href="http://blog.csdn.net/xiaowonious/article/details/20214487" title="http://blog.csdn.net/xiaowonious/article/details/20214487" target="_blank" rel="external">CSDN博客</a></p>
+		<h2 id="连接操作相关的命令">连接操作相关的命令</h2><p>QUIT：关闭连接（connection）；<br>AUTH：简单密码认证。<br>关于密码验证：  </p>
+<ol>
+<li>如果 redis 监听回环IP之外的地址 任何人都可以读取其信息，所以安全问题需要考虑；</li>
+<li>redis 服务器的速度众所周知，因此官方文件中提醒设置比较复杂的密码，防止机器破解；</li>
+<li>首先需要在redis的配置文件 redis.conf 中 requirepass 注释掉的内容，设置 requirepass testpassword ；</li>
+<li>重新启动 redis (service redis-server restart) 即需密码验证；</li>
+<li>验证 auth testpassword, testpassword 是配置文件中设置的 requirepass 值。</li>
+</ol>
+<h2 id="适合全体类型的命令">适合全体类型的命令</h2><ul>
+<li>EXISTS(key) 确认一个 key 是否存在；  </li>
+<li>DEL(key) 删除一个 key；  </li>
+<li>TYPE(key) 返回值的类型；  </li>
+<li>KEYS(pattern) 返回满足给定 pattern 的所有 key；  </li>
+<li>RANDOMKEY：随机返回 key 空间的一个key；  </li>
+<li>RENAME(oldname, newname) 将 key 由 oldname 重命名为 newname，若 newname 存在则删除 newname 表示的 key；  </li>
+<li>DBSIZE：返回当前数据库中 key 的数目；  </li>
+<li>EXPIRE(key,ttl) 设定一个 key 的生存时间 ttl（s）；  </li>
+<li>TTL(key) 获得一个 key 的活动时间；  </li>
+<li>SELECT(index) 按索引查询；  </li>
+<li>MOVE(key, dbindex) 将当前数据库中的 key 转移到有 dbindex 索引的数据库；  </li>
+<li>FLUSHDB：删除当前选择数据库中的所有 key；  </li>
+<li>FLUSHALL：删除所有数据库中的所有 key。  </li>
+</ul>
+<h2 id="对_STRING_操作的命令">对 STRING 操作的命令</h2><ul>
+<li>SET(key, value) 给数据库中名称为 key 的 string 赋予值 value；</li>
+<li>GET(key) 返回数据库中名称为 key 的 string 的 value；</li>
+<li>GETSET(key, value) 给名称为 key 的 string 赋予上一次的value；</li>
+<li>MGET(key1, key2,…, key{$n}) 返回库中多个 string（它们的名称为key1，key2…）的value；</li>
+<li>SETNX(key, value) 如果不存在名称为 key 的 string，则向库中添加 string，名称为 key，值为 value；</li>
+<li>SETEX(key, time, value) 向库中添加 string（名称为key，值为value）同时，设定过期时间time；</li>
+<li>MSET(key1, value1, key2, value2,…key{$n}, value{$n}) 同时给多个 string 赋值，名称为 key{$i} 的 string 赋值 value{$i}；</li>
+<li>MSETNX(key1, value1, key2, value2,…key{$n}, value{$n}) 如果所有名称为 key{$i} 的 string 都不存在，则向库中添加 string，名称 key{$i} 赋值为 value{$i}；</li>
+<li>INCR(key) 名称为 key 的 string 增1操作；</li>
+<li>INCRBY(key, integer) 名称为 key 的 string 增加 integer；</li>
+<li>DECR(key) 名称为 key 的 string 减1操作；</li>
+<li>DECRBY(key, integer) 名称为 key 的 string 减少 integer；</li>
+<li>APPEND(key, value) 名称为 key的 string 的值附加 value；</li>
+<li>SUBSTR(key, start, end) 返回名称为 key 的 string 的 value 的子串。</li>
+</ul>
+<h2 id="对无索引序列_LIST_操作的命令">对无索引序列 LIST 操作的命令</h2><ul>
+<li>RPUSH(key, value) 在名称为 key 的 list 尾添加一个值为 value 的元素；</li>
+<li>LPUSH(key, value) 在名称为 key 的 list 头添加一个值为 value 的 元素；</li>
+<li>LLEN(key) 返回名称为 key 的 list 的长度；</li>
+<li>LRANGE(key, start, end) 返回名称为 key 的 list 中 start 至 end 之间的元素（下标从0开始，下同）；</li>
+<li>LTRIM(key, start, end) 截取名称为 key 的 list，保留 start 至 end 之间的元素；</li>
+<li>LINDEX(key, index) 返回名称为 key 的 list 中 index 位置的元素；</li>
+<li>LSET(key, index, value) 给名称为 key 的 list 中 index 位置的元素赋值为 value；</li>
+<li>LREM(key, count, value) 删除 count 个名称为 key 的 list 中值为value的元素。count 为0，删除所有值为 value 的元素，count&gt;0从 头至尾删除 count 个值为 value 的元素，count&lt;0从尾到头删除|count|个值为value的元素；</li>
+<li>LPOP(key) 返回并删除名称为key的list中的首元素；</li>
+<li>RPOP(key) 返回并删除名称为key的list中的尾元素；</li>
+<li>BLPOP(key1, key2,… key{$n}, timeout) LPOP 命令的 block 版本。即当 timeout 为0时，若遇到名称为 key{$i} 的 list 不存在或该 list 为空，则命令结束。如果 timeout&gt;0，则遇到上述情况时，等待 timeout 秒，如果问题没有解决，则对 key{$i}+1 开始的 list 执行 pop 操作；</li>
+<li>BRPOP(key1, key2,… key{$n}, timeout) RPOP 的 block 版本。参考上一命令；</li>
+<li>RPOPLPUSH(srckey, dstkey) 返回并删除名称为 srckey 的 list 的尾元素，并将该元素添加到名称为 dstkey 的 list 的头部。</li>
+</ul>
+<h2 id="对有索引无序集合_SET_操作的命令">对有索引无序集合 SET 操作的命令</h2><ul>
+<li>SADD(key, member) 向名称为 key 的 set 中添加元素 member；</li>
+<li>SREM(key, member) 删除名称为 key 的 set 中的元素 member；</li>
+<li>SPOP(key) 随机返回并删除名称为 key 的 set 中一个元素；</li>
+<li>SMOVE(srckey, dstkey, member) 将 member 元素从名称为 srckey 的集合移到名称为 dstkey 的集合；</li>
+<li>SCARD(key) 返回名称为 key 的 set 的基数；</li>
+<li>SISMEMBER(key, member) 测试 member 是否是名称为 key 的 set 的元素；</li>
+<li>SINTER(key1, key2,…key{$n}) 求交集；</li>
+<li>SINTERSTORE(dstkey, key1, key2,…key{$n}) 求交集并将交集保存到 dstkey 的集合；</li>
+<li>SUNION(key1, key2,…key{$n}) 求并集；</li>
+<li>SUNIONSTORE(dstkey, key1, key2,…key{$n}) 求并集并将并集保存到 dstkey 的集合；</li>
+<li>SDIFF(key1, key2,…key{$n}) 求差集；</li>
+<li>SDIFFSTORE(dstkey, key1, key2,…key{$n}) 求差集并将差集保存到 dstkey 的集合；</li>
+<li>SMEMBERS(key) 返回名称为 key 的 set 的所有元素；</li>
+<li>SRANDMEMBER(key) 随机返回名称为 key 的 set 的一个元素。</li>
+</ul>
+<h2 id="对有序集合_ZSET（sorted_set）操作的命令">对有序集合 ZSET（sorted set）操作的命令</h2><ul>
+<li>ZADD(key, score, member) 向名称为 key 的 zset 中添加元素 member，score 用于排序。如果该元素已经存在，则根据score更新该元素的顺序；</li>
+<li>ZREM(key, member) 删除名称为 key 的 zset 中的元素 member；</li>
+<li>ZINCRBY(key, increment, member) 如果在名称为 key 的 zset 中已经存在元素 member，则该元素的 score 增加 increment；否则向集合中添加该元素，其 score 的值为 increment；</li>
+<li>ZRANK(key, member) 返回名称为 key 的 zset（元素已按 score 从小到大排序）中 member 元素的 rank（即 index，从0开始），若没有 member 元素，返回 “null”；</li>
+<li>ZREVRANK(key, member) 返回名称为 key 的 zset（元素已按 score 从大到小排序）中 member元素的 rank（即 index，从0开始），若没有 member 元素，返回 “null”；</li>
+<li>ZRANGE(key, start, end) 返回名称为 key 的 zset（元素已按 score 从小到大排序）中的 index 从 start 到 end 的所有元素；</li>
+<li>ZREVRANGE(key, start, end) 返回名称为 key 的 zset（元素已按 score 从大到小排序）中的 index 从 start 到 end 的所有元素；</li>
+<li>ZRANGEBYSCORE(key, min, max) 返回名称为 key 的 zset 中 score &gt;= min 且 score &lt;= max 的所有元素；</li>
+<li>ZCARD(key) 返回名称为 key 的 zset 的基数；</li>
+<li>ZSCORE(key, element) 返回名称为 key 的 zset 中元素 element 的 score；</li>
+<li>ZREMRANGEBYRANK(key, min, max) 删除名称为 key 的 zset 中 rank &gt;= min 且 rank &lt;= max 的所有元素；</li>
+<li>ZREMRANGEBYSCORE(key, min, max) 删除名称为 key 的 zset 中 score &gt;= min 且 score &lt;= max 的所有元素；</li>
+<li>ZUNIONSTORE / ZINTERSTORE(dstkeyN, key1,…,keyN, WEIGHTS w1,…wN, AGGREGATE SUM|MIN|MAX) 对N个 zset 求并集和交集，并将最后的集合保存在 dstkeyN 中。对于集合中每一个元素的 score，在进行 AGGREGATE 运算前，都要乘以对于的 WEIGHT 参数。如果没有提供 WEIGHT，默认为1。默认的 AGGREGATE 是 SUM，即结果集合中元素 的 score 是所有集合对应元素进行 SUM 运算的值，而 MIN 和 MAX 是指，结果集合中元素的 score 是所有集合对应元素中最小值和最大值。</li>
+</ul>
+<h2 id="对有序列表_HASH_操作的命令">对有序列表 HASH 操作的命令</h2><ul>
+<li>HSET(key, field, value) 向名称为 key 的 hash 中添加元素 field=value；</li>
+<li>HGET(key, field) 返回名称为 key 的 hash 中 field 对应的 value；</li>
+<li>HMGET(key, field1, …,field{$n}) 返回名称为 key 的 hash 中 field{$i} 对应的 value；</li>
+<li>HMSET(key, field1, value1,…,field{$n}, value{$n}) 向名称为 key 的 hash 中添加元素 field{$i}=value{$i}；</li>
+<li>HINCRBY(key, field, integer) 将名称为 key 的 hash 中 field 的 value 增加 integer；</li>
+<li>HEXISTS(key, field) 名称为 key 的 hash 中是否存在键为 field 的域；</li>
+<li>HDEL(key, field) 删除名称为 key 的 hash 中键为 field 的域；</li>
+<li>HLEN(key) 返回名称为 key 的 hash 中元素个数；</li>
+<li>HKEYS(key) 返回名称为 key 的 hash 中所有键；</li>
+<li>HVALS(key) 返回名称为 key 的 hash 中所有键对应的 value；</li>
+<li>HGETALL(key) 返回名称为 key 的 hash 中所有的键（field）及其对应的 value。</li>
+</ul>
+<h2 id="持久化">持久化</h2><ul>
+<li>SAVE：将数据同步保存到磁盘；</li>
+<li>BGSAVE：将数据异步保存到磁盘；</li>
+<li>LASTSAVE：返回上次成功将数据保存到磁盘的 UNIX 时戳；</li>
+<li>SHUNDOWN：将数据同步保存到磁盘，然后关闭服务。</li>
+</ul>
+<h2 id="远程服务控制">远程服务控制</h2><ul>
+<li>INFO：提供服务器的信息和统计；</li>
+<li>MONITOR：实时转储收到的请求；</li>
+<li>SLAVEOF：改变复制策略设置；</li>
+<li>CONFIG：在运行时配置 Redis 服务器。</li>
+</ul>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/分库/">分库</a><a href="/tags/分表/">分表</a><a href="/tags/数据库/">数据库</a>
+  <span></span> <a href="/tags/redis/">redis</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/大数据/">大数据</a>
+  <a class="article-category-link" href="/categories/NoSQl/">NoSQl</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/06/09/sharding-db/" data-title="浅谈数据库分表分库策略 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/09/redis-commond/" data-title="Redis 命令 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -152,19 +240,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/09/redis-commond/" title="Redis 命令">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Redis 命令</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/05/most-user-use-product/"  title="如何做好一款大众化产品总结">
+<a href="/2015/06/09/sharding-db/"  title="浅谈数据库分表分库策略">
  <strong>NEXT:</strong><br/> 
- <span>如何做好一款大众化产品总结
+ <span>浅谈数据库分表分库策略
 </span>
 </a>
 </div>
@@ -174,7 +254,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="浅谈数据库分表分库策略" data-thread-key="sharding-db" data-author-key="krisjin" data-url="http://krisjin.github.io/post/sharding-db"></div>
+	<div class="ds-thread" data-title="Redis 命令" data-thread-key="redis-commond" data-author-key="krisjin" data-url="http://krisjin.github.io/post/redis-commond"></div>
 	
 </section>
 
@@ -184,7 +264,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#连接操作相关的命令"><span class="toc-number">1.</span> <span class="toc-text">连接操作相关的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适合全体类型的命令"><span class="toc-number">2.</span> <span class="toc-text">适合全体类型的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对_STRING_操作的命令"><span class="toc-number">3.</span> <span class="toc-text">对 STRING 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对无索引序列_LIST_操作的命令"><span class="toc-number">4.</span> <span class="toc-text">对无索引序列 LIST 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有索引无序集合_SET_操作的命令"><span class="toc-number">5.</span> <span class="toc-text">对有索引无序集合 SET 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有序集合_ZSET（sorted_set）操作的命令"><span class="toc-number">6.</span> <span class="toc-text">对有序集合 ZSET（sorted set）操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对有序列表_HASH_操作的命令"><span class="toc-number">7.</span> <span class="toc-text">对有序列表 HASH 操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#持久化"><span class="toc-number">8.</span> <span class="toc-text">持久化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程服务控制"><span class="toc-number">9.</span> <span class="toc-text">远程服务控制</span></a></li></ol>
   </div>
 
 <div id="asidepart">
