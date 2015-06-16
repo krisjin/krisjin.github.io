@@ -7,12 +7,23 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>新年感冒了 | krisjin博客</title>
+    <title>Jetty使用介绍 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;还有两天就过年了，不知怎么的就突然的感冒了。没有任何的征兆，这是习惯性的，还是就是这样的呢。感冒了，也引发了一点争执，结果是我出去住旅馆了。如果感冒不好，就得一个人过年了。">
+    <meta name="description" content="Jetty的使用方式有很多种，可以在应用程序中嵌入，可以从不同的构建系统中去启动，构建在不同的JVM之上，或是作为一个独立的服务。适合部署Web应用程序独立的分布。
+Jetty下载下载地址
+Jetty目录介绍
+
+
+Location
+Description
+
+
+
+
+license-eplv10-asl">
     
     
     
@@ -78,15 +89,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/02/16/cold-in-new-year/" title="新年感冒了" itemprop="url">新年感冒了</a>
+      <a href="/2015/06/16/using-jetty-introduction/" title="Jetty使用介绍" itemprop="url">Jetty使用介绍</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-02-16T00:24:14.000Z" itemprop="datePublished">Feb 16 2015</time>
-    更新日期:<time datetime="2015-06-12T07:42:57.000Z" itemprop="dateModified">Jun 12 2015</time>
+    <time datetime="2015-06-16T14:14:30.000Z" itemprop="datePublished">Jun 16 2015</time>
+    更新日期:<time datetime="2015-06-16T15:39:07.000Z" itemprop="dateModified">Jun 16 2015</time>
     
   </p>
 </header>
@@ -95,30 +106,101 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty下载"><span class="toc-number">1.</span> <span class="toc-text">Jetty下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty目录介绍"><span class="toc-number">2.</span> <span class="toc-text">Jetty目录介绍</span></a></li></ol>
 		</div>
 		
-		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;还有两天就过年了，不知怎么的就突然的感冒了。没有任何的征兆，这是习惯性的，还是就是这样的呢。感冒了，也引发了一点争执，结果是我出去住旅馆了。如果感冒不好，就得一个人过年了。</p>
+		<p>Jetty的使用方式有很多种，可以在应用程序中嵌入，可以从不同的构建系统中去启动，构建在不同的JVM之上，或是作为一个独立的服务。适合部署Web应用程序独立的分布。</p>
+<h2 id="Jetty下载">Jetty下载</h2><p><a href="http://download.eclipse.org/jetty/" title="http://download.eclipse.org/jetty/" target="_blank" rel="external">下载地址</a></p>
+<h2 id="Jetty目录介绍">Jetty目录介绍</h2><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>license-eplv10-aslv20.html</td>
+<td>License文件</td>
+</tr>
+<tr>
+<td>README.txt</td>
+<td>开始入门信息</td>
+</tr>
+<tr>
+<td>VERSION.txt</td>
+<td>版本信息</td>
+</tr>
+<tr>
+<td>bin/</td>
+<td>linux环境运行shell</td>
+</tr>
+<tr>
+<td>demo-base/</td>
+<td>demo</td>
+</tr>
+<tr>
+<td>etc/</td>
+<td>jetty xml配置文件</td>
+</tr>
+<tr>
+<td>lib/</td>
+<td>jetty运行需要的所有文件</td>
+</tr>
+<tr>
+<td>logs/</td>
+<td>日志目录</td>
+</tr>
+<tr>
+<td>modules/</td>
+<td>模块定义目录</td>
+</tr>
+<tr>
+<td>notice.html</td>
+<td>许可证信息和异常</td>
+</tr>
+<tr>
+<td>resources/</td>
+<td>Directory containing additional resources for classpath, activated via configuration</td>
+</tr>
+<tr>
+<td>start.d/</td>
+<td>Directory of *.ini files containing arguments that are added to the effective command line (see start.ini)</td>
+</tr>
+<tr>
+<td>start.ini</td>
+<td>File containing the arguments that are added to the effective command line (modules, properties and XML configuration files)</td>
+</tr>
+<tr>
+<td>start.jar</td>
+<td>调用jetty执行jar</td>
+</tr>
+<tr>
+<td>webapps/</td>
+<td>Directory containing webapps that run under the default configuration of Jetty</td>
+</tr>
+</tbody>
+</table>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/生活/">生活</a>
+  <span></span> <a href="/tags/jetty/">jetty</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/生活/">生活</a>
+  <a class="article-category-link" href="/categories/jetty/">jetty</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/02/16/cold-in-new-year/" data-title="新年感冒了 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/16/using-jetty-introduction/" data-title="Jetty使用介绍 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -127,19 +209,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/02/16/netty-api-reference/" title="Netty包功能描述">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Netty包功能描述</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/02/16/channel-detail/"  title="netty channel详解">
+<a href="/2015/06/16/introduce-jetty/"  title="Jetty介绍">
  <strong>NEXT:</strong><br/> 
- <span>netty channel详解
+ <span>Jetty介绍
 </span>
 </a>
 </div>
@@ -149,7 +223,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="新年感冒了" data-thread-key="cold-in-new-year" data-author-key="krisjin" data-url="http://krisjin.github.io/post/cold-in-new-year"></div>
+	<div class="ds-thread" data-title="Jetty使用介绍" data-thread-key="using-jetty-introduction" data-author-key="krisjin" data-url="http://krisjin.github.io/post/using-jetty-introduction"></div>
 	
 </section>
 
@@ -159,7 +233,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty下载"><span class="toc-number">1.</span> <span class="toc-text">Jetty下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty目录介绍"><span class="toc-number">2.</span> <span class="toc-text">Jetty目录介绍</span></a></li></ol>
   </div>
 
 <div id="asidepart">
