@@ -7,12 +7,15 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>RocketMQ管理控制台 | krisjin博客</title>
+    <title>Jetty介绍 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="rocketmq-console github下载地址 https://github.com/rocketmq/rocketmq-console.git在idea打开，直接运行如下图：">
+    <meta name="description" content="Jetty是什么Jetty是一个开源项目，提供了HTTP server,HTTP client和Servletr容器。
+
+使用方面：去官网下载jetty,在使用时可以做修改操作，如修改端口，调整日记级别和像其他Servlet容器特征如JNDI,JMX,会话管理。
+扩展使用：提供深度覆盖的特定功能，比">
     
     
     
@@ -78,15 +81,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/03/rocketmq-console/" title="RocketMQ管理控制台" itemprop="url">RocketMQ管理控制台</a>
+      <a href="/2015/06/16/introduce-jetty/" title="Jetty介绍" itemprop="url">Jetty介绍</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-06-03T07:42:48.000Z" itemprop="datePublished">Jun 3 2015</time>
-    更新日期:<time datetime="2015-06-03T08:03:25.000Z" itemprop="dateModified">Jun 3 2015</time>
+    <time datetime="2015-06-16T08:47:45.000Z" itemprop="datePublished">Jun 16 2015</time>
+    更新日期:<time datetime="2015-06-16T13:11:12.000Z" itemprop="dateModified">Jun 16 2015</time>
     
   </p>
 </header>
@@ -95,31 +98,356 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty是什么"><span class="toc-number">1.</span> <span class="toc-text">Jetty是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty版本选择"><span class="toc-number">2.</span> <span class="toc-text">Jetty版本选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_and_Java_EE_Web_Profile"><span class="toc-number">3.</span> <span class="toc-text">Jetty and Java EE Web Profile</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaEE7_Web_Profile"><span class="toc-number">3.1.</span> <span class="toc-text">JavaEE7 Web Profile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Jetty_EE_6_Web_Profile"><span class="toc-number">3.2.</span> <span class="toc-text">Jetty EE 6 Web Profile</span></a></li></ol></li></ol>
 		</div>
 		
-		<p>rocketmq-console github下载地址 <a href="https://github.com/rocketmq/rocketmq-console.git" target="_blank" rel="external">https://github.com/rocketmq/rocketmq-console.git</a><br>在idea打开，直接运行如下图：</p>
-<p><img src="/img/rocc1.png" alt=""><br><img src="/img/rocc2.png" alt=""><br><img src="/img/rocc3.png" alt=""></p>
+		<h2 id="Jetty是什么">Jetty是什么</h2><p>Jetty是一个开源项目，提供了HTTP server,HTTP client和Servletr容器。</p>
+<ol>
+<li>使用方面：去官网下载jetty,在使用时可以做修改操作，如修改端口，调整日记级别和像其他Servlet容器特征如JNDI,JMX,会话管理。</li>
+<li>扩展使用：提供深度覆盖的特定功能，比如我们的高可扩展性的异步客户端，Servlet代理配置，Jetty Maven插件，使用Jetty作为一个嵌入Web服务器。</li>
+</ol>
+<h2 id="Jetty版本选择">Jetty版本选择</h2><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Year</th>
+<th>Home</th>
+<th>JVM</th>
+<th>Protocols</th>
+<th>Servlet</th>
+<th>JSP</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9.3</td>
+<td>2014</td>
+<td>Eclipse</td>
+<td>1.7</td>
+<td>HTTP/1.1, HTTP/2 RFC2616,javax.websocket, SPDY v3</td>
+<td>3.1</td>
+<td>2.3</td>
+<td>Experimental</td>
+</tr>
+<tr>
+<td>9.2</td>
+<td>2014</td>
+<td>Eclipse</td>
+<td>1.7</td>
+<td>HTTP/1.1 RFC2616,javax.websocket, SPDY v3</td>
+<td>3.1</td>
+<td>2.3</td>
+<td>Stable</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2009-</td>
+<td>Eclipse/Codehaus</td>
+<td>1.6</td>
+<td>HTTP/1.1 RFC2616, WebSocket RFC 6455, SPDY v3</td>
+<td>3.0</td>
+<td>2.2</td>
+<td>Mature</td>
+</tr>
+<tr>
+<td>7</td>
+<td>2008-</td>
+<td>Eclipse/Codehaus</td>
+<td>1.5</td>
+<td>HTTP/1.1 RFC2616, WebSocket RFC 6455, SPDY v3</td>
+<td>2.5</td>
+<td>2.1</td>
+<td>Mature</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2006-2010</td>
+<td>Codehaus</td>
+<td>1.4-1.5</td>
+<td>HTTP/1.1 RFC2616</td>
+<td>2.5</td>
+<td>2.0</td>
+<td>Venerable</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2003-2009</td>
+<td>Sourceforge</td>
+<td>1.2-1.5</td>
+<td>HTTP/1.1 RFC2616</td>
+<td>2.4</td>
+<td>2.0</td>
+<td>Deprecated</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2001-2006</td>
+<td>Sourceforge</td>
+<td>1.2, J2ME</td>
+<td>HTTP/1.1 RFC2616</td>
+<td>2.3</td>
+<td>1.2</td>
+<td>Ancient</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1999-2002</td>
+<td>Sourceforge</td>
+<td>1.2</td>
+<td>HTTP/1.1 RFC2068</td>
+<td>2.2</td>
+<td>1.1</td>
+<td>Fossilized</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1998-2000</td>
+<td>Mortbay</td>
+<td>1.1</td>
+<td>HTTP/1.0 RFC1945</td>
+<td>2.1</td>
+<td>1.0</td>
+<td>Legendary</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1995-1998</td>
+<td>Mortbay</td>
+<td>1.0</td>
+<td>HTTP/1.0 RFC1945</td>
+<td>-</td>
+<td>-</td>
+<td>Mythical</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Jetty_and_Java_EE_Web_Profile">Jetty and Java EE Web Profile</h2><p>Jetty实现Java EE规范方面，主要是Servlet规范。最近的Java EE 平台发布对Web Profile做了介绍，也认识到了许多的开发人员只使用Java EE平台技术中的一部分。</p>
+<p>Jetty本身没有使用所有的Web Profile技术，Jetty的架构是这样的，你可以通过第三方插件的方式实现产生一个容器定制化具体的需求。  </p>
+<h3 id="JavaEE7_Web_Profile">JavaEE7 Web Profile</h3><table>
+<thead>
+<tr>
+<th>JSR</th>
+<th>Name</th>
+<th>Included with jetty-9.1.x</th>
+<th>Pluggable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JSR 340</td>
+<td>Servlet Specification API 3.1</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>JSR 344</td>
+<td>Java Server Faces 2.2 (JSF)</td>
+<td>No</td>
+<td>Yes, Mojarra or MyFaces</td>
+</tr>
+<tr>
+<td>JSR 245 / JSR 341</td>
+<td>Java Server Pages 2.3/Java Expression Language 3.0 (JSP/EL)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>JSR 52</td>
+<td>Java Standard Tag Library 1.2 (JSTL)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>JSR 45</td>
+<td>Debugging Support for Other Languages 1.0</td>
+<td>Yes (via JSP)</td>
+<td>Yes (via JSP)</td>
+</tr>
+<tr>
+<td>JSR 346</td>
+<td>Contexts and Dependency Injection for the JavaEE Platform 1.1 (Web Beans)</td>
+<td>No</td>
+<td>Yes, Weld</td>
+</tr>
+<tr>
+<td>JSR 330</td>
+<td>Dependency Injection for Java 1.0</td>
+<td>No</td>
+<td>Yes as part of a CDI implementation, Weld</td>
+</tr>
+<tr>
+<td>JSR 316</td>
+<td>Managed Beans 1.0</td>
+<td>No</td>
+<td>Yes, as part of another technology</td>
+</tr>
+<tr>
+<td>JSR 345</td>
+<td>Enterprise JavaBeans 3.2</td>
+<td>Lite</td>
+<td>No</td>
+</tr>
+<tr>
+<td>JSR 338</td>
+<td>Java Persistance 2.1 (JPA)</td>
+<td>No</td>
+<td>Yes, eg Hibernate</td>
+</tr>
+<tr>
+<td>JSR 250</td>
+<td>Common Annotations for the Java Platform 1.2</td>
+<td>Yes</td>
+<td>Partially (for non-core Servlet Spec annotations)</td>
+</tr>
+<tr>
+<td>JSR 907</td>
+<td>Java Transaction API 1.2 (JTA)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>JSR 349</td>
+<td>Bean Validation 1.1</td>
+<td>No</td>
+<td>Yes as part of another technology eg JSF, or a stand-alone implementation such as Hiberate Validator</td>
+</tr>
+<tr>
+<td>JSR 339</td>
+<td>Java API for RESTful Web Services 2.0 (JAX-RS)</td>
+<td>No</td>
+<td></td>
+</tr>
+<tr>
+<td>JSR 356</td>
+<td>Java API for Websocket 1.0</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>JSR 353</td>
+<td>Java API for JSON Processing 1.0 (JSON-P)    No</td>
+<td></td>
+<td>Yes, eg JSON-P reference implementation</td>
+</tr>
+<tr>
+<td>JSR 318</td>
+<td>Interceptors 1.2</td>
+<td>No</td>
+<td>Yes as part of a CDI implementation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Jetty_EE_6_Web_Profile">Jetty EE 6 Web Profile</h3><table>
+<thead>
+<tr>
+<th>JSR</th>
+<th>Name</th>
+<th>Included with jetty-9.0.x</th>
+<th>Pluggable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JSR 315</td>
+<td>Servlet Specification API 3.0</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>JSR 314</td>
+<td>JavaServer Faces 2.0 (JSF)</td>
+<td>No</td>
+<td>Yes, for example, Mojarra or MyFaces</td>
+</tr>
+<tr>
+<td>JSR 245</td>
+<td>JavaServer Pages 2.2/Java Expression Language 2.2 (JSP/EL)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>JSR 52</td>
+<td>Java Standard Tag Library 1.2 (JSTL)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>JSR 45</td>
+<td>Debugging Support for Other Languages 1.0</td>
+<td>Yes (via JSP)</td>
+<td>Yes (via JSP)</td>
+</tr>
+<tr>
+<td>JSR 299</td>
+<td>Contexts and Dependency Injection for the Java EE Platform 1.0 (Web Beans)</td>
+<td>No</td>
+<td>Yes, Weld or OpenWebBeans</td>
+</tr>
+<tr>
+<td>JSR 330</td>
+<td>Dependency Injection for Java 1.0</td>
+<td>No</td>
+<td>Yes as part of a CDI implementation, Weld</td>
+</tr>
+<tr>
+<td>JSR 316</td>
+<td>Managed Beans 1.0</td>
+<td>No</td>
+<td>Yes, as part of another technology.</td>
+</tr>
+<tr>
+<td>JSR 318</td>
+<td>Enterprise JavaBeans 3.1</td>
+<td>No</td>
+<td>Yes, OpenEJB</td>
+</tr>
+<tr>
+<td>JSR 317</td>
+<td>Java Persistance 2.0 (JPA)</td>
+<td>No</td>
+<td>Yes, Hibernate</td>
+</tr>
+<tr>
+<td>JSR 250</td>
+<td>Common Annotations for the Java Platform</td>
+<td>Yes</td>
+<td>Partially (for non-core Servlet Spec annotations)</td>
+</tr>
+<tr>
+<td>JSR 907</td>
+<td>Java Transaction API (JTA)</td>
+<td>Yes</td>
+<td>Implementations are pluggable, such as Atomikos, JOTM, Jencks (Geronimo Transaction Manager)</td>
+</tr>
+<tr>
+<td>JSR 303</td>
+<td>Bean Validation 1.0</td>
+<td>No</td>
+<td>Yes as part of another technology (JSF), or a stand-alone implementation such as Hiberate Validator</td>
+</tr>
+</tbody>
+</table>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/mq/">mq</a><a href="/tags/rocketmq/">rocketmq</a>
+  <span></span> <a href="/tags/jetty/">jetty</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/rocketmq/">rocketmq</a>
+  <a class="article-category-link" href="/categories/jetty/">jetty</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/06/03/rocketmq-console/" data-title="RocketMQ管理控制台 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/16/introduce-jetty/" data-title="Jetty介绍 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -128,19 +456,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/04/rocketmq-package-dependency-and-feature-introduction/" title="RocketMQ包依赖关系与功能介绍">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  RocketMQ包依赖关系与功能介绍</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/03/system-architecture-learn-materials/"  title="系统架构领域的一些学习材料">
+<a href="/2015/06/12/jijixintai/"  title="积极的心态">
  <strong>NEXT:</strong><br/> 
- <span>系统架构领域的一些学习材料
+ <span>积极的心态
 </span>
 </a>
 </div>
@@ -150,7 +470,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="RocketMQ管理控制台" data-thread-key="rocketmq-console" data-author-key="krisjin" data-url="http://krisjin.github.io/post/rocketmq-console"></div>
+	<div class="ds-thread" data-title="Jetty介绍" data-thread-key="introduce-jetty" data-author-key="krisjin" data-url="http://krisjin.github.io/post/introduce-jetty"></div>
 	
 </section>
 
@@ -160,7 +480,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty是什么"><span class="toc-number">1.</span> <span class="toc-text">Jetty是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty版本选择"><span class="toc-number">2.</span> <span class="toc-text">Jetty版本选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_and_Java_EE_Web_Profile"><span class="toc-number">3.</span> <span class="toc-text">Jetty and Java EE Web Profile</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaEE7_Web_Profile"><span class="toc-number">3.1.</span> <span class="toc-text">JavaEE7 Web Profile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Jetty_EE_6_Web_Profile"><span class="toc-number">3.2.</span> <span class="toc-text">Jetty EE 6 Web Profile</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">
