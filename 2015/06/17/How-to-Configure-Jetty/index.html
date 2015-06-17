@@ -7,23 +7,15 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Jetty使用介绍 | krisjin博客</title>
+    <title>怎么配置Jetty | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="Jetty的使用方式有很多种，可以在应用程序中嵌入，可以从不同的构建系统中去启动，构建在不同的JVM之上，或是作为一个独立的服务。适合部署Web应用程序独立的分布。
-Jetty下载下载地址
-Jetty目录介绍
+    <meta name="description" content="Jetty POJO 配置Jetty的核心组件简单的就像一个POJO一样，Jetty的配置过程大部分是实例化的过程，在POJO之上的装配和设置域操作，你可以通过下面的方式实现：
 
-
-Location
-Description
-
-
-
-
-license-eplv10-asl">
+直接写代码实例化和装配Jetty对象，如：Embedding Jetty
+使用Jetty xml配置，这是一个IOC框架">
     
     
     
@@ -89,15 +81,15 @@ license-eplv10-asl">
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/16/using-jetty-introduction/" title="Jetty使用介绍" itemprop="url">Jetty使用介绍</a>
+      <a href="/2015/06/17/How-to-Configure-Jetty/" title="怎么配置Jetty" itemprop="url">怎么配置Jetty</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-06-16T14:14:30.000Z" itemprop="datePublished">Jun 16 2015</time>
-    更新日期:<time datetime="2015-06-16T15:39:07.000Z" itemprop="dateModified">Jun 16 2015</time>
+    <time datetime="2015-06-17T05:47:20.000Z" itemprop="datePublished">Jun 17 2015</time>
+    更新日期:<time datetime="2015-06-17T09:45:22.000Z" itemprop="dateModified">Jun 17 2015</time>
     
   </p>
 </header>
@@ -106,82 +98,37 @@ license-eplv10-asl">
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty下载"><span class="toc-number">1.</span> <span class="toc-text">Jetty下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty目录介绍"><span class="toc-number">2.</span> <span class="toc-text">Jetty目录介绍</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_POJO_配置"><span class="toc-number">1.</span> <span class="toc-text">Jetty POJO 配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_Start配置文件"><span class="toc-number">2.</span> <span class="toc-text">Jetty Start配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它配置文件"><span class="toc-number">3.</span> <span class="toc-text">其它配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_IoC_XML_配置格式"><span class="toc-number">4.</span> <span class="toc-text">Jetty IoC XML 配置格式</span></a></li></ol>
 		</div>
 		
-		<p>Jetty的使用方式有很多种，可以在应用程序中嵌入，可以从不同的构建系统中去启动，构建在不同的JVM之上，或是作为一个独立的服务。适合部署Web应用程序独立的分布。</p>
-<h2 id="Jetty下载">Jetty下载</h2><p><a href="http://download.eclipse.org/jetty/" title="http://download.eclipse.org/jetty/" target="_blank" rel="external">下载地址</a></p>
-<h2 id="Jetty目录介绍">Jetty目录介绍</h2><table>
-<thead>
-<tr>
-<th>Location</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>license-eplv10-aslv20.html</td>
-<td>License文件</td>
-</tr>
-<tr>
-<td>README.txt</td>
-<td>开始入门信息</td>
-</tr>
-<tr>
-<td>VERSION.txt</td>
-<td>版本信息</td>
-</tr>
-<tr>
-<td>bin/</td>
-<td>linux环境运行shell</td>
-</tr>
-<tr>
-<td>demo-base/</td>
-<td>demo</td>
-</tr>
-<tr>
-<td>etc/</td>
-<td>jetty xml配置文件</td>
-</tr>
-<tr>
-<td>lib/</td>
-<td>jetty运行需要的所有文件</td>
-</tr>
-<tr>
-<td>logs/</td>
-<td>日志目录</td>
-</tr>
-<tr>
-<td>modules/</td>
-<td>模块定义目录</td>
-</tr>
-<tr>
-<td>notice.html</td>
-<td>许可证信息和异常</td>
-</tr>
-<tr>
-<td>resources/</td>
-<td>Directory containing additional resources for classpath, activated via configuration</td>
-</tr>
-<tr>
-<td>start.d/</td>
-<td>Directory of *.ini files containing arguments that are added to the effective command line (see start.ini)</td>
-</tr>
-<tr>
-<td>start.ini</td>
-<td>File containing the arguments that are added to the effective command line (modules, properties and XML configuration files)</td>
-</tr>
-<tr>
-<td>start.jar</td>
-<td>调用jetty执行jar</td>
-</tr>
-<tr>
-<td>webapps/</td>
-<td>Directory containing webapps that run under the default configuration of Jetty</td>
-</tr>
-</tbody>
-</table>
-  
+		<h2 id="Jetty_POJO_配置">Jetty POJO 配置</h2><p>Jetty的核心组件简单的就像一个POJO一样，Jetty的配置过程大部分是实例化的过程，在POJO之上的装配和设置域操作，你可以通过下面的方式实现：</p>
+<ol>
+<li>直接写代码实例化和装配Jetty对象，如：<a href="http://www.eclipse.org/jetty/documentation/9.2.8.v20150217/embedding-jetty.html" title="http://www.eclipse.org/jetty/documentation/9.2.8.v20150217/embedding-jetty.html" target="_blank" rel="external">Embedding Jetty</a></li>
+<li>使用Jetty xml配置，这是一个IOC框架，实例化和装配Jetty对象作为XML对象，etc/jetty.xm 是主要的Jetty配置文件。但是也有其它配置jetty特定配置文件在发布版本里。</li>
+<li>用第三方的IOC框架，如Spring，实例化和装配Jetty对象作为一个Spring Bean。</li>
+</ol>
+<p>因为主要的Jetty配置文件都是IOC来去完成的，可以去参考<a href="http://download.eclipse.org/jetty/stable-9/apidocs/" title="http://download.eclipse.org/jetty/stable-9/apidocs/" target="_blank" rel="external">Jetty API文档</a>。</p>
+<h2 id="Jetty_Start配置文件">Jetty Start配置文件</h2><p>Jetty使用下面的配置文件去实例化、注入和启动服务器通过执行start.jar</p>
+<p><strong>ini文件</strong>：</p>
+<p>Jetty使用命令行的启动方式，<strong>start.ini</strong> 和start.d/*.ini下的文件可以创建一有效的命令行参数，参数可能是：</p>
+<ul>
+<li>Xml文件使用jetty IOC的文件格式</li>
+<li>模块激活使用 —module=name配置</li>
+<li>属性配置方式 name=value,参数化使用jetty IOC xml</li>
+<li>一个标准的Java属性文件包含额外的 start文件属性</li>
+<li>其它start.jar选项（参见：java -jar start.jar —help ）</li>
+<li>JVM 选项</li>
+</ul>
+<p><strong>mod文件</strong>：<br>modules/*.mod文件包含模块定义，激活方式 —module=name 名称是每个模块文件的定义</p>
+<ul>
+<li>模块依赖按照顺序激活</li>
+<li>所需的库模块添加到类路径中</li>
+<li>该模块所需要的XML文件添加到有效的命令行</li>
+<li>文件所需的激活模块</li>
+<li>模板ini文件 —add-to-start =name 激活时使用的名字</li>
+</ul>
+<p><strong>XML文件</strong>：<br>Jetty或spring IoC格式的XML文件或在命令行上列出,ini文件或添加到模块定义有效的命令行。XML文件实例化和注入实际的Java对象,包括服务器、连接器和上下文。因为码头奥委会XML文件经常使用属性,许多常见配置任务可以没有编辑这些XML文件来完成。如果需要XML配置更改,应该从jetty复制XML文件 jetty.home/etc 到 jetty.base/etc 在修改之前</p>
+<h2 id="其它配置文件">其它配置文件</h2><h2 id="Jetty_IoC_XML_配置格式">Jetty IoC XML 配置格式</h2>  
 	</div>
 		<footer class="article-footer clearfix">
 
@@ -200,7 +147,7 @@ license-eplv10-asl">
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/06/16/using-jetty-introduction/" data-title="Jetty使用介绍 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/06/17/How-to-Configure-Jetty/" data-title="怎么配置Jetty | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -209,19 +156,11 @@ license-eplv10-asl">
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/17/adapter-pattern/" title="适配器模式">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  适配器模式</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/16/introduce-jetty/"  title="Jetty介绍">
+<a href="/2015/06/17/adapter-pattern/"  title="适配器模式">
  <strong>NEXT:</strong><br/> 
- <span>Jetty介绍
+ <span>适配器模式
 </span>
 </a>
 </div>
@@ -231,7 +170,7 @@ license-eplv10-asl">
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="Jetty使用介绍" data-thread-key="using-jetty-introduction" data-author-key="krisjin" data-url="http://krisjin.github.io/post/using-jetty-introduction"></div>
+	<div class="ds-thread" data-title="怎么配置Jetty" data-thread-key="How-to-Configure-Jetty" data-author-key="krisjin" data-url="http://krisjin.github.io/post/How-to-Configure-Jetty"></div>
 	
 </section>
 
@@ -241,7 +180,7 @@ license-eplv10-asl">
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty下载"><span class="toc-number">1.</span> <span class="toc-text">Jetty下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty目录介绍"><span class="toc-number">2.</span> <span class="toc-text">Jetty目录介绍</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_POJO_配置"><span class="toc-number">1.</span> <span class="toc-text">Jetty POJO 配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_Start配置文件"><span class="toc-number">2.</span> <span class="toc-text">Jetty Start配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它配置文件"><span class="toc-number">3.</span> <span class="toc-text">其它配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jetty_IoC_XML_配置格式"><span class="toc-number">4.</span> <span class="toc-text">Jetty IoC XML 配置格式</span></a></li></ol>
   </div>
 
 <div id="asidepart">
