@@ -89,7 +89,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-06-17T05:47:20.000Z" itemprop="datePublished">Jun 17 2015</time>
-    更新日期:<time datetime="2015-06-17T09:45:22.000Z" itemprop="dateModified">Jun 17 2015</time>
+    更新日期:<time datetime="2015-06-17T14:33:35.000Z" itemprop="dateModified">Jun 17 2015</time>
     
   </p>
 </header>
@@ -128,7 +128,139 @@
 <li>模板ini文件 —add-to-start =name 激活时使用的名字</li>
 </ul>
 <p><strong>XML文件</strong>：<br>Jetty或spring IoC格式的XML文件或在命令行上列出,ini文件或添加到模块定义有效的命令行。XML文件实例化和注入实际的Java对象,包括服务器、连接器和上下文。因为码头奥委会XML文件经常使用属性,许多常见配置任务可以没有编辑这些XML文件来完成。如果需要XML配置更改,应该从jetty复制XML文件 jetty.home/etc 到 jetty.base/etc 在修改之前</p>
-<h2 id="其它配置文件">其它配置文件</h2><h2 id="Jetty_IoC_XML_配置格式">Jetty IoC XML 配置格式</h2>  
+<h2 id="其它配置文件">其它配置文件</h2><h2 id="Jetty_IoC_XML_配置格式">Jetty IoC XML 配置格式</h2><pre><code><span class="keyword">public</span> <span class="keyword">class</span> ExampleServer {
+
+<span class="keyword">public</span> static void main(<span class="built_in">String</span>[] args) throws Exception {
+    <span class="built_in">Server</span> <span class="built_in">server</span> = <span class="keyword">new</span> <span class="built_in">Server</span>();
+    ServerConnector connector = <span class="keyword">new</span> ServerConnector(<span class="built_in">server</span>);
+    connector.setPort(<span class="number">8080</span>);
+    <span class="built_in">server</span>.setConnectors(<span class="keyword">new</span> Connector[]{connector});
+    ServletContextHandler context = <span class="keyword">new</span> ServletContextHandler();
+    context.setContextPath(<span class="string">"/"</span>);
+    context.addServlet(HelloServlet.<span class="keyword">class</span>, <span class="string">"/hello"</span>);
+    context.addServlet(AsyncEchoServlet.<span class="keyword">class</span>, <span class="string">"/echo/*"</span>);
+    HandlerCollection handlers = <span class="keyword">new</span> HandlerCollection();
+    handlers.setHandlers(<span class="keyword">new</span> Handler[]{context, <span class="keyword">new</span> DefaultHandler()});
+    <span class="built_in">server</span>.setHandler(handlers);
+    <span class="built_in">server</span>.start();
+    <span class="built_in">server</span>.<span class="built_in">join</span>();
+}
+}
+</code></pre><p>HelloServlet</p>
+<pre><code><span class="comment">/**
+ * &lt;p/&gt;
+ * User : krisibm@163.com
+ * Date: 2015/6/17
+ * Time: 18:00
+ */</span>
+public <span class="class"><span class="keyword">class</span> <span class="title">HelloServlet</span> <span class="keyword"><span class="keyword">extends</span></span> <span class="title">HttpServlet</span> {</span>
+<span class="keyword">final</span> <span class="type">String</span> greeting;
+
+public <span class="type">HelloServlet</span>() {
+    <span class="keyword">this</span>(<span class="string">"Hello"</span>);
+}
+
+public <span class="type">HelloServlet</span>(<span class="type">String</span> greeting) {
+    <span class="keyword">this</span>.greeting = greeting;
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">protected</span> void doGet(<span class="type">HttpServletRequest</span> request, <span class="type">HttpServletResponse</span> response) <span class="keyword">throws</span> <span class="type">ServletException</span>, <span class="type">IOException</span> {
+    response.setContentType(<span class="string">"text/html"</span>);
+    response.setStatus(<span class="type">HttpServletResponse</span>.<span class="type">SC_OK</span>);
+    response.getWriter().println(<span class="string">"&lt;h1&gt;"</span> + greeting + <span class="string">" from HelloServlet&lt;/h1&gt;"</span>);
+}
+}
+</code></pre><p>AsyncEchoServlet</p>
+<pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncEchoServlet</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{
+<span class="annotation">@Override</span>
+<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> ServletException, IOException </span>{
+    AsyncContext asyncContext = request.startAsync(request, response);
+    asyncContext.setTimeout(<span class="number">0</span>);
+    Echoer echoer = <span class="keyword">new</span> Echoer(asyncContext);
+    request.getInputStream().setReadListener(echoer);
+    response.getOutputStream().setWriteListener(echoer);
+}
+
+<span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Echoer</span> <span class="keyword">implements</span> <span class="title">ReadListener</span>, <span class="title">WriteListener</span> </span>{
+    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">4096</span>];
+    <span class="keyword">private</span> <span class="keyword">final</span> AsyncContext asyncContext;
+    <span class="keyword">private</span> <span class="keyword">final</span> ServletInputStream input;
+    <span class="keyword">private</span> <span class="keyword">final</span> ServletOutputStream output;
+    <span class="keyword">private</span> <span class="keyword">final</span> AtomicBoolean complete = <span class="keyword">new</span> AtomicBoolean(<span class="keyword">false</span>);
+
+    <span class="function"><span class="keyword">private</span> <span class="title">Echoer</span><span class="params">(AsyncContext asyncContext)</span> <span class="keyword">throws</span> IOException </span>{
+        <span class="keyword">this</span>.asyncContext = asyncContext;
+        <span class="keyword">this</span>.input = asyncContext.getRequest().getInputStream();
+        <span class="keyword">this</span>.output = asyncContext.getResponse().getOutputStream();
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataAvailable</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>{
+        onWritePossible();
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAllDataRead</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>{
+        onWritePossible();
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onWritePossible</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>{
+        <span class="comment">// This method is called:</span>
+        <span class="comment">//   1) after first registering a WriteListener (ready for first write)</span>
+        <span class="comment">//   2) after first registering a ReadListener iff write is ready</span>
+        <span class="comment">//   3) when a previous write completes after an output.isReady() returns false</span>
+        <span class="comment">//   4) from an input callback</span>
+
+        <span class="comment">// We should try to read, only if we are able to write!</span>
+        <span class="keyword">while</span> (output.isReady() &amp;&amp; input.isReady()) {
+            <span class="keyword">int</span> read = input.read(buffer);
+            <span class="keyword">if</span> (read &lt; <span class="number">0</span>) {
+                <span class="keyword">if</span> (complete.compareAndSet(<span class="keyword">false</span>, <span class="keyword">true</span>))
+                    asyncContext.complete();
+                <span class="keyword">break</span>;
+            } <span class="keyword">else</span> <span class="keyword">if</span> (read &gt; <span class="number">0</span>) {
+                output.write(buffer, <span class="number">0</span>, read);
+            }
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable failure)</span> </span>{
+        failure.printStackTrace();
+        asyncContext.complete();
+    }
+}
+}
+</code></pre><p>pom</p>
+<pre><code><span class="tag">&lt;<span class="title">dependency</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.eclipse.jetty<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>jetty-server<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">version</span>&gt;</span>9.0.4.v20130625<span class="tag">&lt;/<span class="title">version</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">exclusions</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">exclusion</span>&gt;</span>
+                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.eclipse.jetty.orbit<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span>
+                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span>
+            <span class="tag">&lt;/<span class="title">exclusion</span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">exclusions</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">dependency</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.eclipse.jetty<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>jetty-servlet<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">version</span>&gt;</span>9.0.4.v20130625<span class="tag">&lt;/<span class="title">version</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">dependency</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">dependency</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>javax<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>javaee-api<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">version</span>&gt;</span>7.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span>
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 
