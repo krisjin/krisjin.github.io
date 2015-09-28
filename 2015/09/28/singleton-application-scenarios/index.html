@@ -7,12 +7,20 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>RocketMQ管理控制台 | krisjin博客</title>
+    <title>单例设计模式应用场景 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="rocketmq-console github下载地址 https://github.com/rocketmq/rocketmq-console.git在idea打开，直接运行如下图：">
+    <meta name="description" content="确保一个类只有一个实例，而且自行实例化并向整个系统提供这个实例
+示例public class Singleton {
+
+private Singleton() {
+}
+
+
+public static Singleton getInstance() {
+    return SingletonHold">
     
     
     
@@ -78,15 +86,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/03/rocketmq-console/" title="RocketMQ管理控制台" itemprop="url">RocketMQ管理控制台</a>
+      <a href="/2015/09/28/singleton-application-scenarios/" title="单例设计模式应用场景" itemprop="url">单例设计模式应用场景</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-06-03T07:42:48.000Z" itemprop="datePublished">Jun 3 2015</time>
-    更新日期:<time datetime="2015-06-03T08:03:25.000Z" itemprop="dateModified">Jun 3 2015</time>
+    <time datetime="2015-09-28T04:54:39.000Z" itemprop="datePublished">Sep 28 2015</time>
+    更新日期:<time datetime="2015-09-28T07:15:00.000Z" itemprop="dateModified">Sep 28 2015</time>
     
   </p>
 </header>
@@ -95,31 +103,59 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#示例"><span class="toc-number">1.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用场景"><span class="toc-number">2.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优点"><span class="toc-number">3.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺点"><span class="toc-number">4.</span> <span class="toc-text">缺点</span></a></li></ol>
 		</div>
 		
-		<p>rocketmq-console github下载地址 <a href="https://github.com/rocketmq/rocketmq-console.git" target="_blank" rel="external">https://github.com/rocketmq/rocketmq-console.git</a><br>在idea打开，直接运行如下图：</p>
-<p><img src="/img/rocc1.png" alt=""><br><img src="/img/rocc2.png" alt=""><br><img src="/img/rocc3.png" alt=""></p>
+		<p>确保一个类只有一个实例，而且自行实例化并向整个系统提供这个实例</p>
+<h2 id="示例">示例</h2><pre><code><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>{
+
+<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>{
+}
+
+
+<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>{
+    <span class="keyword">return</span> SingletonHolder.singleton;
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span> </span>{
+    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Singleton singleton = <span class="keyword">new</span> Singleton();
+}
+}
+</code></pre><h2 id="应用场景">应用场景</h2><ul>
+<li>系统只需要一个实例对象，如系统要求提供一个唯一的序列号生成器或资源管理器，或者需要考虑资源消耗太大而只允许创建一个对象。</li>
+<li>客户调用类的单个实例只允许使用一个公共访问点，除了该公共访问点，不能通过其他途径访问该实例。</li>
+<li>由于配置文件一般都是共享资源，即web应用的配置对象的读取，一般采用单例模式来实现。如：spring的配置文件的读取等</li>
+<li>创建对象时耗时过多或者耗资源过多，但又经常用到的对象</li>
+<li>需要频繁实例化然后销毁的对象。</li>
+</ul>
+<h2 id="优点">优点</h2><ul>
+<li><p>由于单例模式在内存中只有一个实例，减少了内存开支，特别是一个对象需要频繁地创建、销毁时，而且创建或销毁时性能又无法优化，单例模式的优势就非常明显。</p>
+</li>
+<li><p>由于单例模式只生成一个实例，所以减少了系统的性能开销，当一个对象的产生需要比较多的资源时，如读取配置、产生其他依赖对象时，则可以通过在应用启动时直接产生一个单例对象，然后用永久驻留内存的方式来解决；</p>
+</li>
+<li><p>单例模式可以避免对资源的多重占用，例如一个写文件动作，由于只有一个实例存在内存中，避免对同一个资源文件的同时写操作。</p>
+</li>
+<li><p>单例模式可以在系统设置全局的访问点，优化和共享资源访问，例如可以设计一个单例类，负责所有数据表的映射处理。</p>
+</li>
+</ul>
+<h2 id="缺点">缺点</h2><ul>
+<li>单例模式一般没有接口，扩展很困难，若要扩展，除了修改代码基本上没有第二种途径可以实现。</li>
+</ul>
   
 	</div>
 		<footer class="article-footer clearfix">
 
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/mq/">mq</a><a href="/tags/rocketmq/">rocketmq</a>
-  </div>
-
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/rocketmq/">rocketmq</a>
+  <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/06/03/rocketmq-console/" data-title="RocketMQ管理控制台 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/09/28/singleton-application-scenarios/" data-title="单例设计模式应用场景 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -128,19 +164,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/04/rocketmq-package-dependency-and-feature-introduction/" title="RocketMQ包依赖关系与功能介绍">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  RocketMQ包依赖关系与功能介绍</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/03/system-architecture-learn-materials/"  title="系统架构领域的一些学习材料">
+<a href="/2015/09/06/java-gc-param-collect/"  title="Java GC 参数使用">
  <strong>NEXT:</strong><br/> 
- <span>系统架构领域的一些学习材料
+ <span>Java GC 参数使用
 </span>
 </a>
 </div>
@@ -150,7 +178,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="RocketMQ管理控制台" data-thread-key="rocketmq-console" data-author-key="krisjin" data-url="http://krisjin.github.io/post/rocketmq-console"></div>
+	<div class="ds-thread" data-title="单例设计模式应用场景" data-thread-key="singleton-application-scenarios" data-author-key="krisjin" data-url="http://krisjin.github.io/post/singleton-application-scenarios"></div>
 	
 </section>
 
@@ -160,7 +188,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#示例"><span class="toc-number">1.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用场景"><span class="toc-number">2.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优点"><span class="toc-number">3.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺点"><span class="toc-number">4.</span> <span class="toc-text">缺点</span></a></li></ol>
   </div>
 
 <div id="asidepart">
