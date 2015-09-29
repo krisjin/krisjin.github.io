@@ -7,12 +7,13 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>NIO Buffer理解 | krisjin博客</title>
+    <title>ascii 对照表 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Java Nio中的Buffer用于与Channel通道进行交互，数据从通道中读入缓冲区，或从缓冲器写入到通道中。缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO中的Buffer对象。">
+    <meta name="description" content="引用链接http://baike.baidu.com/link?url=gBpz7s-JGeaKrN5_E36h-4f8yc2CsDY00Ow7R-23NpXca9TARd6rkVy8QniwKmAZ
+http://tool.oschina.net/commons?type=4">
     
     
     
@@ -78,15 +79,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/02/nio-buffer-explore/" title="NIO Buffer理解" itemprop="url">NIO Buffer理解</a>
+      <a href="/2015/09/29/ascii-table/" title="ascii 对照表" itemprop="url">ascii 对照表</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-03-02T07:40:43.000Z" itemprop="datePublished">Mar 2 2015</time>
-    更新日期:<time datetime="2015-04-21T10:51:13.000Z" itemprop="dateModified">Apr 21 2015</time>
+    <time datetime="2015-09-29T03:30:14.000Z" itemprop="datePublished">Sep 29 2015</time>
+    更新日期:<time datetime="2015-09-29T07:38:44.000Z" itemprop="dateModified">Sep 29 2015</time>
     
   </p>
 </header>
@@ -95,53 +96,26 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引用链接"><span class="toc-number">1.</span> <span class="toc-text">引用链接</span></a></li></ol>
 		</div>
 		
-		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Java Nio中的Buffer用于与Channel通道进行交互，数据从通道中读入缓冲区，或从缓冲器写入到通道中。缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO中的Buffer对象。  <a id="more"></a></p>
-<p>先来看一段代码：</p>
-<pre><code>    public static void main<span class="params">(String[] args)</span> {
-    ByteBuffer buf = ByteBuffer.allocate<span class="params">(<span class="number">125</span>)</span>;
-    buf.put<span class="params">(<span class="string">"Hello Buffer !"</span>.getBytes<span class="params">()</span>)</span>;
-
-    System.out.println<span class="params">(<span class="string">"Write mode:"</span>)</span>;
-    System.out.println<span class="params">(<span class="string">"Position: "</span> + buf.position<span class="params">()</span> + <span class="string">"; Limit: "</span> + buf.limit<span class="params">()</span> + <span class="string">"; Capacity: "</span> + buf.capacity<span class="params">()</span>)</span>;
-
-    buf.flip<span class="params">()</span>;
-
-    System.out.println<span class="params">(<span class="string">"Read mode:"</span>)</span>;
-
-    System.out.println<span class="params">(<span class="string">"Position: "</span> + buf.position<span class="params">()</span> + <span class="string">"; Limit: "</span> + buf.limit<span class="params">()</span> + <span class="string">"; Capacity: "</span> + buf.capacity<span class="params">()</span>)</span>;
-
-}
-</code></pre><p>输出结果：</p>
-<pre><code><span class="tag">Write</span> <span class="rule"><span class="attribute">mode</span>:<span class="value">
-Position: <span class="number">14</span></span></span>; <span class="rule"><span class="attribute">Limit</span>:<span class="value"> <span class="number">125</span></span></span>; <span class="rule"><span class="attribute">Capacity</span>:<span class="value"> <span class="number">125</span>
-Read mode:
-Position: <span class="number">0</span></span></span>; <span class="rule"><span class="attribute">Limit</span>:<span class="value"> <span class="number">14</span></span></span>; <span class="rule"><span class="attribute">Capacity</span>:<span class="value"> <span class="number">125</span></span></span>
-</code></pre><p>上面的这段代码，是针对ByteBuffer的一些操作，allocate分配了指定大小的字节。然后向缓冲区中写入数据，查看Buffer中的状态，使用flip反转成读模式，查看Buffer中的状态。</p>
-<p>下图理解：</p>
-<p><img src="/img/buffer explore.png" alt=""></p>
+		<h2 id="引用链接">引用链接</h2><p><a href="http://baike.baidu.com/link?url=gBpz7s-JGeaKrN5_E36h-4f8yc2CsDY00Ow7R-23NpXca9TARd6rkVy8QniwKmAZ" title="http://baike.baidu.com/link?url=gBpz7s-JGeaKrN5_E36h-4f8yc2CsDY00Ow7R-23NpXca9TARd6rkVy8QniwKmAZ" target="_blank" rel="external">http://baike.baidu.com/link?url=gBpz7s-JGeaKrN5_E36h-4f8yc2CsDY00Ow7R-23NpXca9TARd6rkVy8QniwKmAZ</a></p>
+<p><a href="http://tool.oschina.net/commons?type=4" title="http://tool.oschina.net/commons?type=4" target="_blank" rel="external">http://tool.oschina.net/commons?type=4</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/NIO/">NIO</a><a href="/tags/buffer/">buffer</a>
-  </div>
-
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/NIO/">NIO</a>
+  <a class="article-category-link" href="/categories/工具/">工具</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/03/02/nio-buffer-explore/" data-title="NIO Buffer理解 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/09/29/ascii-table/" data-title="ascii 对照表 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -150,19 +124,11 @@ Position: <span class="number">0</span></span></span>; <span class="rule"><span 
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/03/06/set-up-git-server/" title="CentOS上搭建Git Server">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  CentOS上搭建Git Server</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/02/23/strategy-pattern/"  title="策略模式">
+<a href="/2015/09/28/singleton-application-scenarios/"  title="单例设计模式应用场景">
  <strong>NEXT:</strong><br/> 
- <span>策略模式
+ <span>单例设计模式应用场景
 </span>
 </a>
 </div>
@@ -172,7 +138,7 @@ Position: <span class="number">0</span></span></span>; <span class="rule"><span 
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="NIO Buffer理解" data-thread-key="nio-buffer-explore" data-author-key="krisjin" data-url="http://krisjin.github.io/post/nio-buffer-explore"></div>
+	<div class="ds-thread" data-title="ascii 对照表" data-thread-key="ascii-table" data-author-key="krisjin" data-url="http://krisjin.github.io/post/ascii-table"></div>
 	
 </section>
 
@@ -182,7 +148,7 @@ Position: <span class="number">0</span></span></span>; <span class="rule"><span 
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引用链接"><span class="toc-number">1.</span> <span class="toc-text">引用链接</span></a></li></ol>
   </div>
 
 <div id="asidepart">
