@@ -7,12 +7,10 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>TF-IDF关键字提取 | krisjin博客</title>
+    <title>Object equals hashcode方法解析 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
-    
-    <meta name="description" content="TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相关程度的度量或评级。除了TF-IDF以外，互联网上的搜索引擎还会使用基于连结分析的评级方法，以确定文件在搜寻结果中出现的顺序。">
     
     
     
@@ -78,15 +76,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/09/it-idf-keyword/" title="TF-IDF关键字提取" itemprop="url">TF-IDF关键字提取</a>
+      <a href="/2015/09/29/Object-equals-hashcode/" title="Object equals hashcode方法解析" itemprop="url">Object equals hashcode方法解析</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-03-09T01:32:47.000Z" itemprop="datePublished">Mar 9 2015</time>
-    更新日期:<time datetime="2015-04-21T10:51:13.000Z" itemprop="dateModified">Apr 21 2015</time>
+    <time datetime="2015-09-29T08:47:29.000Z" itemprop="datePublished">Sep 29 2015</time>
+    更新日期:<time datetime="2015-09-29T08:54:58.000Z" itemprop="dateModified">Sep 29 2015</time>
     
   </p>
 </header>
@@ -98,258 +96,21 @@
 		
 		</div>
 		
-		<p>TF-IDF（term frequency–inverse document frequency）是一种用于资讯检索与文本挖掘的常用加权技术。TF-IDF是一种统计方法，用以评估一字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相关程度的度量或评级。除了TF-IDF以外，互联网上的搜索引擎还会使用基于连结分析的评级方法，以确定文件在搜寻结果中出现的顺序。 <a id="more"></a></p>
-<p><strong>想要了解更多请查看</strong>：<br><a href="http://www.ruanyifeng.com/blog/2013/03/tf-idf.html" title="TF-IDF与余弦相似性的应用（一）：自动提取关键词" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2013/03/tf-idf.html</a></p>
-<p><a href="http://zh.wikipedia.org/wiki/TF-IDF" title="TF-IDF" target="_blank" rel="external">http://zh.wikipedia.org/wiki/TF-IDF</a></p>
-<p>实现代码清单：</p>
-<pre><code>package net.snails.common.algorithm.keyword;
-
-<span class="literal">import</span> java.util.ArrayList;
-<span class="literal">import</span> java.util.Collections;
-<span class="literal">import</span> java.util.Comparator;
-<span class="literal">import</span> java.util.LinkedList;
-<span class="literal">import</span> java.util.<span class="built_in">List</span>;
-<span class="literal">import</span> java.util.<span class="built_in">Map</span>;
-<span class="literal">import</span> java.util.<span class="built_in">Map</span>.Entry;
-<span class="literal">import</span> java.util.TreeMap;
-<span class="literal">import</span> java.util.concurrent.atomic.AtomicInteger;
-
-<span class="literal">import</span> net.snails.common.algorithm.summary.StopWord;
-<span class="literal">import</span> net.snails.common.algorithm.util.CorpusLoad;
-
-<span class="literal">import</span> org.ansj.domain.Term;
-<span class="literal">import</span> org.ansj.splitWord.analysis.ToAnalysis;
-
-<span class="literal">import</span> com.google.common.base.Strings;
-
-<span class="comment"><span class="markdown">/**
- * TF-IDF关键词提取
- * 
- * @author krisjin
- * 
- */</span></span>
-public <span class="class"><span class="keyword">class</span> <span class="title">TFIDF</span> </span>{
-
-<span class="comment"><span class="markdown">/**
- * 语料文档总数
- */</span></span>
-private <span class="built_in">int</span> DOC_NUM;
-
-<span class="comment"><span class="markdown">/**
- * 文档中划分的句子的词频统计
- */</span></span>
-private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt;[] FRAGMENT_TF;
-
-<span class="comment"><span class="markdown">/**
- * 词频
- */</span></span>
-private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; TF;
-
-<span class="comment"><span class="markdown">/**
- * 逆文档词频
- */</span></span>
-private <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Double&gt; IDF;
-
-<span class="comment"><span class="markdown">/**
- * 将文档 进行片段式的划分
- * 
- * @param doc
- * @return
- */</span></span>
-private <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; getFragmentList(<span class="built_in">String</span> doc) {
-    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; sentences = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">String</span>&gt;();
-
-    <span class="keyword">if</span> (doc == <span class="keyword">null</span>)
-        <span class="keyword">return</span> sentences;
-
-    <span class="built_in">String</span>[] senArr = doc.split(<span class="string">"[，,。:：“”？?！!；;]"</span>);
-
-    <span class="keyword">for</span> (<span class="built_in">String</span> sen : senArr) {
-        sen = sen.trim();
-        <span class="keyword">if</span> (Strings.isNullOrEmpty(sen))
-            <span class="keyword">continue</span>;
-        sentences.add(sen);
-    }
-
-    <span class="keyword">return</span> sentences;
-}
-
-private <span class="keyword">void</span> process(<span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; wordFragment) {
-    FRAGMENT_TF = <span class="keyword">new</span> <span class="built_in">Map</span>[wordFragment.size()];
-    TF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Integer&gt;();
-    IDF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Double&gt;();
-    <span class="built_in">int</span> index = <span class="number">0</span>;
-
-    <span class="keyword">for</span> (<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; frag : wordFragment) {
-        <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; tmpTF = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Integer&gt;();
-        <span class="keyword">for</span> (<span class="built_in">String</span> word : frag) {
-            Integer freq = tmpTF.<span class="literal">get</span>(word);
-            freq = (freq == <span class="keyword">null</span> ? <span class="number">0</span> : freq) + <span class="number">1</span>;
-            tmpTF.put(word, freq);
-        }
-        FRAGMENT_TF[index] = tmpTF;
-
-        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : tmpTF.entrySet()) {
-            <span class="built_in">String</span> word = entry.getKey();
-            Integer freq = TF.<span class="literal">get</span>(word);
-
-            freq = (freq == <span class="keyword">null</span> ? <span class="number">0</span> : freq) + <span class="number">1</span>;
-            TF.put(word, freq);
-
-        }
-        ++index;
-    }
-
-    <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : TF.entrySet()) {
-        <span class="built_in">String</span> word = entry.getKey();
-
-        IDF.put(word, Math.log(DOC_NUM / (getIncludeWordDocs(FRAGMENT_TF, word) + <span class="number">1</span>)));
-
-    }
-
-}
-
-private <span class="built_in">int</span> getIncludeWordDocs(<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt;[] fragmentDocs, <span class="built_in">String</span> word) {
-    AtomicInteger ai = <span class="keyword">new</span> AtomicInteger();
-    <span class="keyword">for</span> (<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Integer&gt; frag : fragmentDocs) {
-
-        <span class="keyword">if</span> (frag.containsKey(word)) {
-            ai.incrementAndGet();
-        }
-    }
-    <span class="keyword">return</span> ai.<span class="literal">get</span>();
-}
-
-private <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; getKeywordList() {
-
-    <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, Double&gt; result = <span class="keyword">new</span> TreeMap&lt;<span class="built_in">String</span>, Double&gt;();
-
-    <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Integer&gt; entry : TF.entrySet()) {
-
-        <span class="built_in">String</span> word = entry.getKey();
-        Integer freq = entry.getValue();
-
-        <span class="keyword">if</span> (IDF.containsKey(word)) {
-            <span class="built_in">double</span> val = ((<span class="built_in">double</span>) freq / (<span class="built_in">double</span>) TF.size()) * (IDF.<span class="literal">get</span>(word));
-            result.put(word, val);
-        } <span class="keyword">else</span> {
-            result.put(word, ((<span class="built_in">double</span>) freq / TF.size()));
-        }
-
-    }
-
-    <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt;(result.entrySet());
-
-    Collections.sort(list, <span class="keyword">new</span> MapValueComparator());
-    <span class="keyword">return</span> list;
-}
-
-private <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; getParticipleFragment(<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; sentences) {
-
-    <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; wordFragment = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt;();
-
-    <span class="keyword">for</span> (<span class="built_in">String</span> sens : sentences) {
-        <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; wordList = <span class="keyword">new</span> LinkedList&lt;<span class="built_in">String</span>&gt;();
-        <span class="built_in">List</span>&lt;Term&gt; termList = ToAnalysis.parse(sens);
-
-        <span class="keyword">for</span> (Term term : termList) {
-            <span class="keyword">if</span> (validateWord(term)) {
-                <span class="keyword">if</span> (!(term.item().name == <span class="keyword">null</span>)) {
-                    wordList.add(term.getName());
-                }
-            }
-        }
-
-        <span class="keyword">if</span> (wordList.size() &gt; <span class="number">0</span>)
-            wordFragment.add(wordList);
-    }
-
-    DOC_NUM = wordFragment.size();
-
-    <span class="keyword">return</span> wordFragment;
-}
-
-public <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; extractKeyword(<span class="built_in">String</span> doc, <span class="built_in">int</span> size) {
-
-    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; result = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">String</span>&gt;();
-
-    <span class="built_in">List</span>&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt; fragList = getParticipleFragment(getFragmentList(doc));
-
-    process(fragList);
-
-    <span class="built_in">List</span>&lt;<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt;&gt; keywords = getKeywordList();
-
-    <span class="keyword">if</span> (keywords.size() &lt;= size) {
-        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt; entry : keywords) {
-            result.add(entry.getKey());
-        }
-    } <span class="keyword">else</span> {
-        <span class="built_in">int</span> i = <span class="number">1</span>;
-        <span class="keyword">for</span> (<span class="built_in">Map</span>.Entry&lt;<span class="built_in">String</span>, Double&gt; entry : keywords) {
-            result.add(entry.getKey());
-            <span class="keyword">if</span> (i == size)
-                <span class="keyword">break</span>;
-            i++;
-        }
-    }
-
-    <span class="keyword">return</span> result;
-}
-
-public <span class="literal">static</span> boolean validateWord(Term term) {
-    <span class="keyword">if</span> (term.getNatureStr().startsWith(<span class="string">"n"</span>) || term.getNatureStr().startsWith(<span class="string">"v"</span>) || term.getNatureStr().startsWith(<span class="string">"d"</span>)
-            || term.getNatureStr().startsWith(<span class="string">"a"</span>)) {
-        <span class="keyword">if</span> (!StopWord.contains(term.getName())) {
-            <span class="keyword">return</span> <span class="keyword">true</span>;
-        }
-    }
-    <span class="keyword">return</span> <span class="keyword">false</span>;
-}
-
-}
-
-<span class="class"><span class="keyword">class</span> <span class="title">MapValueComparator</span> <span class="keyword">implements</span> <span class="title">Comparator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">String</span>, <span class="title">Double</span>&gt;&gt; </span>{
-
-public <span class="built_in">int</span> compare(Entry&lt;<span class="built_in">String</span>, Double&gt; o1, Entry&lt;<span class="built_in">String</span>, Double&gt; o2) {
-    <span class="keyword">return</span> o2.getValue().compareTo(o1.getValue());
-}
-
-public <span class="literal">static</span> <span class="keyword">void</span> main(<span class="built_in">String</span>[] args) {
-
-    TFIDF ti = <span class="keyword">new</span> TFIDF();
-
-    <span class="built_in">String</span> corpus = CorpusLoad.getText(<span class="string">"extract.txt"</span>);
-
-    <span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; kds = ti.extractKeyword(corpus, <span class="number">12</span>);
-
-    <span class="keyword">for</span> (<span class="built_in">String</span> k : kds) {
-        System.out.println(k);
-    }
-
-}
-}
-</code></pre><p>上述代码简单实现了TF-IDF算法，欢迎讨论！</p>
-<p>github 查看：<a href="https://github.com/zoopaper/common-algorithm.git" target="_blank" rel="external">https://github.com/zoopaper/common-algorithm.git</a></p>
-  
+		  
 	</div>
 		<footer class="article-footer clearfix">
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/NLP/">NLP</a><a href="/tags/TF-IDF/">TF-IDF</a><a href="/tags/关键字/">关键字</a>
-  </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/NLP/">NLP</a>
+  <a class="article-category-link" href="/categories/java/">java</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/03/09/it-idf-keyword/" data-title="TF-IDF关键字提取 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/09/29/Object-equals-hashcode/" data-title="Object equals hashcode方法解析 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -358,19 +119,11 @@ public <span class="literal">static</span> <span class="keyword">void</span> mai
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/03/10/nio-scatter-gather/" title="NIO Scatter/Gather实例">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  NIO Scatter/Gather实例</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/03/06/set-up-git-server/"  title="CentOS上搭建Git Server">
+<a href="/2015/09/29/ascii-table/"  title="ascii 对照表">
  <strong>NEXT:</strong><br/> 
- <span>CentOS上搭建Git Server
+ <span>ascii 对照表
 </span>
 </a>
 </div>
@@ -380,7 +133,7 @@ public <span class="literal">static</span> <span class="keyword">void</span> mai
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="TF-IDF关键字提取" data-thread-key="it-idf-keyword" data-author-key="krisjin" data-url="http://krisjin.github.io/post/it-idf-keyword"></div>
+	<div class="ds-thread" data-title="Object equals hashcode方法解析" data-thread-key="Object-equals-hashcode" data-author-key="krisjin" data-url="http://krisjin.github.io/post/Object-equals-hashcode"></div>
 	
 </section>
 
