@@ -7,17 +7,14 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>单一职责原则的系统设计 | krisjin博客</title>
+    <title>Mysql性能优化检查 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="摘自维基百科：
-
-在面向对象编程领域中，单一职责原则（Single responsibility principle）规定每个类都应该有一个单一的功能，并且该功能应该由这个类&amp;gt;完全封装起来。所有它的（这个类的）服务都应该严密的和该功能平行（功能平行，意味着没有依赖）。
-这个术语由罗伯特·C·马丁（Robert Cecil Martin）在他的《敏捷软件开发，原则，模式和实践》一书中的一篇名为〈面向对象设计原则〉的文章中给出。 [1] 马丁表述该原则是基于的《结构化分析和系统规格》[2]一书中的内聚原则（Cohesion）上。
-马丁把功能（职责）定义为：“改变的原因”，并且总结出一个类或者模块应该有且只有一个改变的原因。一个具体的例子就是，想象有一个用于编辑和打印报表的模块。这样的一个模块存在两个改变的原因。第一，报表的内容可以改变（编辑）。第二，报表的格式可以改变（打印）。这两方面会的改变因为完全不同的起因而发生：一个是本质的修改，一个是表面的修改。单一功能原则认为这两方面的问题事实上是两个分离的功能，因此他们应该分离在不同的类或者模块里。把有不同的改变原因的事物耦合在一起的设计是糟糕的。
-保持一个类专注于单一功能点上的一个重要的原因是，它会使得类更加的健壮。继续上面的例子，如果有一个对于报表编辑流程的修改，那么将存在极大的危险性，打印功能的代码会因此不工作，假使这两个功能存在于同一个类中的话。">
+    <meta name="description" content="1. 寻找运行缓慢的SQL语句在mysql系统或者终端运行以下命令：
+show full processlist
+2. 生成一个查询执行计划（Query Execution Plan,QEP）当Mysql要执行一个SQL查询的时候，它首先会对该SQL语句进行语法检查，然后构造一个QEP，QEP决定了">
     
     
     
@@ -83,15 +80,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/04/14/single-responsibility-principle/" title="单一职责原则的系统设计" itemprop="url">单一职责原则的系统设计</a>
+      <a href="/2015/10/08/mysql-check-slow-sql-running/" title="Mysql性能优化检查" itemprop="url">Mysql性能优化检查</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-04-14T07:16:30.000Z" itemprop="datePublished">Apr 14 2015</time>
-    更新日期:<time datetime="2015-06-16T13:24:59.000Z" itemprop="dateModified">Jun 16 2015</time>
+    <time datetime="2015-10-08T07:05:44.000Z" itemprop="datePublished">Oct 8 2015</time>
+    更新日期:<time datetime="2015-10-08T07:20:09.000Z" itemprop="dateModified">Oct 8 2015</time>
     
   </p>
 </header>
@@ -100,39 +97,33 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_寻找运行缓慢的SQL语句"><span class="toc-number">1.</span> <span class="toc-text">1. 寻找运行缓慢的SQL语句</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_生成一个查询执行计划（Query_Execution_Plan,QEP）"><span class="toc-number">2.</span> <span class="toc-text">2. 生成一个查询执行计划（Query Execution Plan,QEP）</span></a></li></ol>
 		</div>
 		
-		<p>摘自维基百科：</p>
-<blockquote>
-<p>在面向对象编程领域中，单一职责原则（Single responsibility principle）规定每个类都应该有一个单一的功能，并且该功能应该由这个类&gt;完全封装起来。所有它的（这个类的）服务都应该严密的和该功能平行（功能平行，意味着没有依赖）。</p>
-<p>这个术语由罗伯特·C·马丁（Robert Cecil Martin）在他的《敏捷软件开发，原则，模式和实践》一书中的一篇名为〈面向对象设计原则〉的文章中给出。 [1] 马丁表述该原则是基于的《结构化分析和系统规格》[2]一书中的内聚原则（Cohesion）上。</p>
-<p>马丁把功能（职责）定义为：“改变的原因”，并且总结出一个类或者模块应该有且只有一个改变的原因。一个具体的例子就是，想象有一个用于编辑和打印报表的模块。这样的一个模块存在两个改变的原因。第一，报表的内容可以改变（编辑）。第二，报表的格式可以改变（打印）。这两方面会的改变因为完全不同的起因而发生：一个是本质的修改，一个是表面的修改。单一功能原则认为这两方面的问题事实上是两个分离的功能，因此他们应该分离在不同的类或者模块里。把有不同的改变原因的事物耦合在一起的设计是糟糕的。</p>
-<p>保持一个类专注于单一功能点上的一个重要的原因是，它会使得类更加的健壮。继续上面的例子，如果有一个对于报表编辑流程的修改，那么将存在极大的危险性，打印功能的代码会因此不工作，假使这两个功能存在于同一个类中的话。</p>
-</blockquote>
-<a id="more"></a>
-<p>最近在看《设计模式之禅》，第一个就是单一职责设计，文中介绍此设计是一步一步开始深入的。单一职责适用于接口、类、方法，但是实际使用却不是这样的，真正的做到单一职责原则是很困难的，至少接口实现单一职责原则是问题的。文中建议是接口一定要做到单一职责，类的设计尽量做到只有一个原因引起变化。  </p>
-<p>如果想更好的使用这样原则，对业务要有透彻的理解，因为只有理解了业务，在编码实现的过程中才能更好的运用它。</p>
-  
+		<h1 id="1-_寻找运行缓慢的SQL语句">1. 寻找运行缓慢的SQL语句</h1><p>在mysql系统或者终端运行以下命令：</p>
+<pre><code><span class="operator"><span class="keyword">show</span> <span class="keyword">full</span> <span class="keyword">processlist</span></span>
+</code></pre><h1 id="2-_生成一个查询执行计划（Query_Execution_Plan,QEP）">2. 生成一个查询执行计划（Query Execution Plan,QEP）</h1><p>当Mysql要执行一个SQL查询的时候，它首先会对该SQL语句进行语法检查，然后构造一个QEP，QEP决定了Mysql从底层存储引擎获取信息方式。如果想要查看Mysql查询优化器为SQL语句构造的QEP，需要在select语句前加上前缀explain:</p>
+<pre><code><span class="operator"><span class="keyword">explain</span> <span class="keyword">select</span> * <span class="keyword">from</span> t_advert <span class="keyword">where</span> id =<span class="number">100000</span>\G</span>
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/设计模式/">设计模式</a>
+  <span></span> <a href="/tags/mysql/">mysql</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
+  <a class="article-category-link" href="/categories/mysql/">mysql</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/04/14/single-responsibility-principle/" data-title="单一职责原则的系统设计 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/10/08/mysql-check-slow-sql-running/" data-title="Mysql性能优化检查 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -141,19 +132,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/04/15/Recommen-System/" title="58推荐系统学习">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  58推荐系统学习</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/04/10/micor-services-practice/"  title="基于微服务架构，改造企业核心系统之实践">
+<a href="/2015/10/08/mysql-performance-optimization/"  title="MySQL性能优化的最佳20+条经验">
  <strong>NEXT:</strong><br/> 
- <span>基于微服务架构，改造企业核心系统之实践
+ <span>MySQL性能优化的最佳20+条经验
 </span>
 </a>
 </div>
@@ -163,7 +146,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="单一职责原则的系统设计" data-thread-key="single-responsibility-principle" data-author-key="krisjin" data-url="http://krisjin.github.io/post/single-responsibility-principle"></div>
+	<div class="ds-thread" data-title="Mysql性能优化检查" data-thread-key="mysql-check-slow-sql-running" data-author-key="krisjin" data-url="http://krisjin.github.io/post/mysql-check-slow-sql-running"></div>
 	
 </section>
 
@@ -173,7 +156,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-_寻找运行缓慢的SQL语句"><span class="toc-number">1.</span> <span class="toc-text">1. 寻找运行缓慢的SQL语句</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-_生成一个查询执行计划（Query_Execution_Plan,QEP）"><span class="toc-number">2.</span> <span class="toc-text">2. 生成一个查询执行计划（Query Execution Plan,QEP）</span></a></li></ol>
   </div>
 
 <div id="asidepart">
