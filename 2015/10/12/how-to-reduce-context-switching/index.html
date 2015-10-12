@@ -7,21 +7,15 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Java GC日志图解 | krisjin博客</title>
+    <title>如何减少上下文切换 | krisjin博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="krisjin">
     
-    <meta name="description" content="配置JVM 参数：
+    <meta name="description" content="如何减少上下文切换减少上下文切换的方法有无锁并发编程，CAS算法，使用最少线程和使用协程。
 
--XX:+PrintGCDetails   打印GC回收的细节
--XX:+PrintGCTimeStamps 打印GC停顿耗时
--Xloggc:gc.log  GC日志输出到文件
-
-YoungGC日志：
-FullGC日志：
-
-转载自：http://www.chinasb.org">
+无锁并发编程：多线程竞争时，会引起上下文切换，所以多线程处理数据时，可以用一些办法来避免锁，如数据的ID按照Hash算法取模分段，不同的线程处理不同段的数据。
+CAS算法：Java的Atomic包使用CAS">
     
     
     
@@ -87,15 +81,15 @@ FullGC日志：
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/09/06/java-gc-log-understand/" title="Java GC日志图解" itemprop="url">Java GC日志图解</a>
+      <a href="/2015/10/12/how-to-reduce-context-switching/" title="如何减少上下文切换" itemprop="url">如何减少上下文切换</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://krisjin.github.io" title="krisjin">krisjin</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-09-06T06:51:36.000Z" itemprop="datePublished">Sep 6 2015</time>
-    更新日期:<time datetime="2015-09-06T07:14:58.000Z" itemprop="dateModified">Sep 6 2015</time>
+    <time datetime="2015-10-12T13:35:23.000Z" itemprop="datePublished">Oct 12 2015</time>
+    更新日期:<time datetime="2015-10-12T13:56:17.000Z" itemprop="dateModified">Oct 12 2015</time>
     
   </p>
 </header>
@@ -104,39 +98,31 @@ FullGC日志：
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#如何减少上下文切换"><span class="toc-number">1.</span> <span class="toc-text">如何减少上下文切换</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#减少上下文切换实战"><span class="toc-number">2.</span> <span class="toc-text">减少上下文切换实战</span></a></li></ol>
 		</div>
 		
-		<p>配置JVM 参数：</p>
-<ol>
-<li><strong>-XX:+PrintGCDetails</strong>   打印GC回收的细节</li>
-<li><strong>-XX:+PrintGCTimeStamps</strong> 打印GC停顿耗时</li>
-<li><strong>-Xloggc:gc.log</strong>  GC日志输出到文件</li>
-</ol>
-<p><strong>YoungGC日志：</strong><br><img src="/img/yonggc.jpg" alt=""></p>
-<p><strong>FullGC日志：</strong></p>
-<p><img src="/img/fullgc.jpg" alt=""></p>
-<p>转载自：<a href="http://www.chinasb.org/archives/2012/09/4921.shtml" title="http://www.chinasb.org/archives/2012/09/4921.shtml" target="_blank" rel="external">http://www.chinasb.org/archives/2012/09/4921.shtml</a></p>
-  
+		<h1 id="如何减少上下文切换">如何减少上下文切换</h1><p>减少上下文切换的方法有无锁并发编程，CAS算法，使用最少线程和使用协程。</p>
+<ul>
+<li>无锁并发编程：多线程竞争时，会引起上下文切换，所以多线程处理数据时，可以用一些办法来避免锁，如数据的ID按照Hash算法取模分段，不同的线程处理不同段的数据。</li>
+<li>CAS算法：Java的Atomic包使用CAS算法来更新数据，而不需要加锁。</li>
+<li>使用最少线程：避免创建不需要的线程，比如任务少，但是创建了很多线程来处理，这样会造成大量线程都处于等待状态。</li>
+<li>协程：在单线程里实现多任务的调度，并在单线程里维持多个任务间的切换。</li>
+</ul>
+<h1 id="减少上下文切换实战">减少上下文切换实战</h1>  
 	</div>
 		<footer class="article-footer clearfix">
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/GC/">GC</a><a href="/tags/Jvm/">Jvm</a>
-  </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Jvm/">Jvm</a>
+  <a class="article-category-link" href="/categories/并发/">并发</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://krisjin.github.io/2015/09/06/java-gc-log-understand/" data-title="Java GC日志图解 | krisjin博客" data-tsina="null" class="share clearfix">
+  <div data-url="http://krisjin.github.io/2015/10/12/how-to-reduce-context-switching/" data-title="如何减少上下文切换 | krisjin博客" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -145,19 +131,11 @@ FullGC日志：
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/09/06/java-gc-param-collect/" title="Java GC 参数使用">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Java GC 参数使用</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/09/02/java-jcmd-tool/"  title="jcmd工具使用">
+<a href="/2015/10/12/redis-and-memcached/"  title="对比 Redis 与 Memcached">
  <strong>NEXT:</strong><br/> 
- <span>jcmd工具使用
+ <span>对比 Redis 与 Memcached
 </span>
 </a>
 </div>
@@ -167,7 +145,7 @@ FullGC日志：
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="Java GC日志图解" data-thread-key="java-gc-log-understand" data-author-key="krisjin" data-url="http://krisjin.github.io/post/java-gc-log-understand"></div>
+	<div class="ds-thread" data-title="如何减少上下文切换" data-thread-key="how-to-reduce-context-switching" data-author-key="krisjin" data-url="http://krisjin.github.io/post/how-to-reduce-context-switching"></div>
 	
 </section>
 
@@ -177,7 +155,7 @@ FullGC日志：
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#如何减少上下文切换"><span class="toc-number">1.</span> <span class="toc-text">如何减少上下文切换</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#减少上下文切换实战"><span class="toc-number">2.</span> <span class="toc-text">减少上下文切换实战</span></a></li></ol>
   </div>
 
 <div id="asidepart">
